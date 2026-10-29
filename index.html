@@ -3,42 +3,501 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="One place to follow Filecoin governance: FIPs, Core Devs meetings and recordings, network upgrades and discussions.">
 <meta name="color-scheme" content="light dark">
+<meta name="generated-at" content="2026-10-29T13:23:15Z">
 <meta http-equiv="Cache-Control" content="no-cache">
+<title>Filecoin Governance</title>
+
 <script>
-  // Cache-busting redirect: GitHub Pages caches pages for 10 minutes.
-  location.replace('fips-dashboard-static.html?v=' + Math.floor(Date.now() / 60000));
+(function () {
+  if (!window.fetch || location.protocol === 'file:') return;
+  var meta = document.querySelector('meta[name="generated-at"]');
+  if (!meta) return;
+  var mine = meta.getAttribute('content');
+  fetch(location.pathname, { cache: 'reload' })
+    .then(function (r) { return r.ok ? r.text() : ''; })
+    .then(function (html) {
+      var m = html.match(/<meta name="generated-at" content="([^"]+)"/);
+      if (!m || m[1] <= mine) return;
+      var key = 'fips-reloaded-for';
+      try { if (sessionStorage.getItem(key) === m[1]) return; sessionStorage.setItem(key, m[1]); } catch (e) {}
+      location.reload();
+    })
+    .catch(function () {});
+})();
 </script>
-<noscript><meta http-equiv="refresh" content="0; url=fips-dashboard-static.html"></noscript>
-<title>FIPs Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --fil-blue: #0090FF; --fil-navy: #091B2A; }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Archivo', system-ui, sans-serif; color: #fff; min-height: 100vh;
-    display: flex; align-items: center; justify-content: center; padding: 16px;
-    background: radial-gradient(800px 320px at 80% 0%, rgba(0,144,255,.4), transparent 60%), var(--fil-navy);
+:root {
+  --fil-blue: #0090FF;
+  --fil-blue-strong: #0072CC;
+  --fil-navy: #091B2A;
+  --fil-navy-2: #0F2A42;
+  --fil-sky: #7CC4FF;
+
+  --bg: #F3F7FB;
+  --surface: #FFFFFF;
+  --surface-2: #EEF4FA;
+  --text: #091B2A;
+  --muted: #4B6178;
+  --border: #D7E2EE;
+  --link: #0072CC;
+  --shadow: 0 1px 2px rgba(9,27,42,.06), 0 8px 24px rgba(9,27,42,.06);
+
+  --final-bg: #DDF5E8;   --final-fg: #0B6B3A;
+  --accepted-bg: #DCEEFF;--accepted-fg: #00539A;
+  --lastcall-bg: #FFF0D1;--lastcall-fg: #8A5300;
+  --draft-bg: #E6EBF5;   --draft-fg: #34476B;
+  --active-bg: #D7F3F5;  --active-fg: #0A6670;
+  --deferred-bg: #F1EBDD;--deferred-fg: #6E5A2E;
+  --rejected-bg: #FDE2E2;--rejected-fg: #A11A1A;
+  --muted-bg: #ECEFF3;   --muted-fg: #55606C;
+  --warn-bg: #FFF6E0;    --warn-border: #F2C45A;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #06131F;
+    --surface: #0C2133;
+    --surface-2: #10293F;
+    --text: #E6F0F9;
+    --muted: #9AB0C6;
+    --border: #1D3A55;
+    --link: #6CBBFF;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    --final-bg: #0E3B27;   --final-fg: #7FE0AC;
+    --accepted-bg: #0D3256;--accepted-fg: #8CC8FF;
+    --lastcall-bg: #44310B;--lastcall-fg: #FFCB6B;
+    --draft-bg: #1E2C45;   --draft-fg: #B4C4E4;
+    --active-bg: #0C3A3F;  --active-fg: #7EDDE6;
+    --deferred-bg: #3A3221;--deferred-fg: #E0CB97;
+    --rejected-bg: #4A1717;--rejected-fg: #FFA3A3;
+    --muted-bg: #1C2733;   --muted-fg: #A8B3BF;
+    --warn-bg: #3A2E10;    --warn-border: #A8812A;
   }
-  .box { max-width: 520px; text-align: center; }
-  h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 10px; }
-  p { color: #B9CDE0; margin-bottom: 24px; }
-  .links { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  a { color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); }
-  a.primary { background: var(--fil-blue); border-color: var(--fil-blue); }
-  a:hover { border-color: var(--fil-blue); }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+a { color: var(--link); }
+a:hover { color: var(--fil-blue); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(900px 300px at 85% -20%, rgba(0,144,255,.45), transparent 60%),
+    radial-gradient(600px 260px at 0% 120%, rgba(124,196,255,.18), transparent 60%),
+    var(--fil-navy);
+  padding: 28px 0 118px;
+}
+.site-header .wrap { position: relative; z-index: 2; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fil-sky);
+}
+.eyebrow::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--fil-blue); box-shadow: 0 0 0 4px rgba(0,144,255,.25); }
+.site-header h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -.02em; margin: 10px 0 6px; }
+.site-header p.sub { color: #B9CDE0; max-width: 680px; }
+.header-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 18px; font-size: .88rem; color: #9FB6CC; }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.nav a {
+  color: #fff; text-decoration: none; font-weight: 600; font-size: .92rem;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.04); transition: background .2s, border-color .2s;
+}
+.nav a:hover { background: rgba(0,144,255,.18); border-color: rgba(0,144,255,.6); color: #fff; }
+.nav a.current { background: var(--fil-blue); border-color: var(--fil-blue); }
+
+/* ---------- Corgi ---------- */
+.ground {
+  position: absolute; left: 0; right: 0; bottom: 14px; height: 2px; z-index: 1;
+  background: repeating-linear-gradient(90deg, rgba(124,196,255,.35) 0 14px, transparent 14px 26px);
+}
+.corgi-walk {
+  position: absolute; bottom: 14px; left: -300px; width: 128px; z-index: 3;
+  animation: corgi-walk 22s linear infinite;
+  cursor: pointer;
+}
+.corgi-flip > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.corgi-flip { position: relative; animation: corgi-flip 22s steps(1) infinite; transform-origin: center; }
+/* Off-screen margins are wide enough that the ball (which runs ahead of the
+   corgi) is also hidden when they turn around. */
+@keyframes corgi-walk {
+  0%   { left: -300px; }
+  48%  { left: calc(100% + 140px); }
+  50%  { left: calc(100% + 140px); }
+  98%  { left: -300px; }
+  100% { left: -300px; }
+}
+@keyframes corgi-flip { 0% { transform: scaleX(1); } 49% { transform: scaleX(-1); } 99% { transform: scaleX(1); } }
+
+/* The FIP ball: lives inside the flipped box so it's always ahead of the
+   corgi, and counter-flips so the label stays readable. */
+.fip-ball { position: absolute; left: calc(100% + 18px); bottom: 2px; width: 40px; height: 80px; pointer-events: none; }
+.fip-ball .ball-shadow {
+  position: absolute; left: 4px; bottom: 0; width: 32px; height: 6px; border-radius: 50%;
+  background: rgba(0,0,0,.3); animation: ball-shadow .7s infinite;
+}
+.fip-ball .ball-bounce { position: absolute; left: 0; bottom: 2px; width: 40px; height: 40px; animation: ball-bounce .7s infinite; transform-origin: 50% 100%; }
+.fip-ball .ball-unflip { width: 100%; height: 100%; animation: corgi-flip 22s steps(1) infinite; transform-origin: center; }
+.fip-ball svg { display: block; width: 40px; height: 40px; }
+@keyframes ball-bounce {
+  0%   { transform: translateY(0) scale(1.18, .82); animation-timing-function: ease-out; }
+  8%   { transform: translateY(-4px) scale(1, 1); animation-timing-function: ease-out; }
+  50%  { transform: translateY(-40px) scale(1, 1); animation-timing-function: ease-in; }
+  92%  { transform: translateY(-3px) scale(1, 1); }
+  100% { transform: translateY(0) scale(1.18, .82); }
+}
+@keyframes ball-shadow {
+  0%, 100% { transform: scale(1); opacity: .9; }
+  50%      { transform: scale(.45); opacity: .35; }
+}
+.corgi-bob { animation: corgi-bob .36s ease-in-out infinite alternate; }
+@keyframes corgi-bob { from { transform: translateY(0); } to { transform: translateY(-2.5px); } }
+.leg { transform-box: fill-box; transform-origin: 50% 0; animation: corgi-step .36s ease-in-out infinite alternate; }
+.leg.b { animation-direction: alternate-reverse; }
+@keyframes corgi-step { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+.tail { transform-box: fill-box; transform-origin: 100% 60%; animation: corgi-wag .22s ease-in-out infinite alternate; }
+@keyframes corgi-wag { from { transform: rotate(-18deg); } to { transform: rotate(14deg); } }
+.ear { transform-box: fill-box; transform-origin: 50% 100%; animation: corgi-ear 3.2s ease-in-out infinite; }
+.ear.r { animation-delay: .15s; }
+@keyframes corgi-ear { 0%, 88%, 100% { transform: rotate(0); } 92% { transform: rotate(-12deg); } 96% { transform: rotate(6deg); } }
+.tongue { transform-box: fill-box; transform-origin: 50% 0; animation: corgi-pant .36s ease-in-out infinite alternate; }
+@keyframes corgi-pant { from { transform: scaleY(.85); } to { transform: scaleY(1.1); } }
+.woof {
+  position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, 4px) scale(.6);
+  background: #fff; color: var(--fil-navy); font-weight: 800; font-size: .85rem;
+  padding: 4px 10px; border-radius: 12px; opacity: 0; pointer-events: none; white-space: nowrap;
+  transition: opacity .15s, transform .15s;
+}
+.woof::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; border: 6px solid transparent; border-top-color: #fff; }
+.corgi-walk.barking .woof { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+.corgi-walk.barking .corgi-bob { animation: corgi-hop .5s ease-out 1; }
+@keyframes corgi-hop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-16px); } }
+@media (prefers-reduced-motion: reduce) {
+  .corgi-walk { animation: none; left: auto; right: 24px; }
+  .corgi-flip, .fip-ball .ball-unflip { animation: none; transform: scaleX(-1); }
+  .corgi-bob, .leg, .tail, .ear, .tongue, .fip-ball .ball-bounce, .fip-ball .ball-shadow { animation: none; }
+}
+
+/* ---------- Content ---------- */
+main { margin-top: 22px; position: relative; z-index: 4; padding-bottom: 48px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stats.compact { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
+.stats.compact .value { font-size: 1.6rem; }
+.stat {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px 18px; box-shadow: var(--shadow);
+}
+.stat .label { font-size: .76rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.stat .value { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); line-height: 1.2; margin-top: 4px; }
+.stat.accent { background: var(--fil-blue); border-color: var(--fil-blue); }
+.stat.accent .label { color: rgba(255,255,255,.85); }
+.stat.accent .value { color: #fff; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: var(--shadow); margin-top: 20px; overflow: hidden;
+}
+.card-head { padding: 18px 20px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.card-head h2 { font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; }
+.card-head .hint { color: var(--muted); font-size: .88rem; max-width: 640px; }
+.card-body { padding: 0 20px 20px; }
+.empty { color: var(--muted); font-style: italic; padding: 8px 0 4px; }
+.note { font-size: .85rem; color: var(--muted); margin-top: 12px; }
+
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table.data { width: 100%; border-collapse: collapse; font-size: .92rem; }
+table.data th {
+  text-align: left; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+  background: var(--surface-2);
+}
+table.data td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.data tr:last-child td { border-bottom: 0; }
+table.data tbody tr:hover td { background: var(--surface-2); }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.nowrap { white-space: nowrap; }
+.fip-id { font-weight: 700; text-decoration: none; white-space: nowrap; }
+.title-cell { min-width: 220px; }
+
+.status-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  font-size: .74rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.status-final { background: var(--final-bg); color: var(--final-fg); }
+.status-accepted { background: var(--accepted-bg); color: var(--accepted-fg); }
+.status-last-call { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.status-draft { background: var(--draft-bg); color: var(--draft-fg); }
+.status-active { background: var(--active-bg); color: var(--active-fg); }
+.status-deferred { background: var(--deferred-bg); color: var(--deferred-fg); }
+.status-rejected { background: var(--rejected-bg); color: var(--rejected-fg); }
+.status-withdrawn, .status-superseded { background: var(--muted-bg); color: var(--muted-fg); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; text-decoration: none;
+  padding: 4px 10px; border-radius: 8px; font-size: .86rem; font-weight: 600;
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+  transition: border-color .15s, color .15s;
+}
+.chip:hover { border-color: var(--fil-blue); color: var(--fil-blue); }
+.pr-dot { font-size: .72rem; font-weight: 700; color: #fff; background: var(--fil-blue); border-radius: 999px; padding: 0 6px; }
+
+.age { font-weight: 600; white-space: nowrap; }
+.age.old { color: var(--rejected-fg); }
+.age.mid { color: var(--lastcall-fg); }
+.pill {
+  display: inline-block; font-size: .74rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); white-space: nowrap;
+}
+.pill.approved { background: var(--final-bg); color: var(--final-fg); border-color: transparent; }
+.pill.changes { background: var(--rejected-bg); color: var(--rejected-fg); border-color: transparent; }
+.pill.waiting { background: var(--lastcall-bg); color: var(--lastcall-fg); border-color: transparent; }
+.pill.est { background: transparent; }
+
+.callout {
+  background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 12px;
+  padding: 12px 14px; font-size: .9rem;
+}
+
+.pr-group { border-top: 1px solid var(--border); padding: 14px 0; }
+.pr-group:first-child { border-top: 0; padding-top: 0; }
+.pr-group h3 { font-size: .95rem; margin-bottom: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pr-item { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; padding: 8px 12px; border-left: 3px solid var(--fil-blue); background: var(--surface-2); border-radius: 0 8px 8px 0; margin-top: 6px; }
+.pr-item a { font-weight: 600; text-decoration: none; }
+.pr-meta { color: var(--muted); font-size: .84rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+details.more > summary { cursor: pointer; color: var(--link); font-weight: 600; margin-top: 12px; }
+
+.timeline { position: relative; padding-left: 22px; }
+.timeline::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+.tl-month { position: relative; margin-bottom: 22px; }
+.tl-month::before { content: ''; position: absolute; left: -21px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--fil-blue); box-shadow: 0 0 0 4px var(--surface); }
+.tl-month h3 { font-size: 1rem; display: flex; gap: 10px; align-items: baseline; }
+.tl-month h3 span { color: var(--muted); font-size: .84rem; font-weight: 500; }
+.tl-events { margin-top: 8px; display: grid; gap: 6px; }
+.tl-event { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: start; padding: 8px 12px; background: var(--surface-2); border-radius: 8px; font-size: .9rem; }
+.tl-event time { color: var(--muted); font-variant-numeric: tabular-nums; font-size: .82rem; padding-top: 2px; }
+.tl-event .arrow { color: var(--muted); margin: 0 4px; }
+
+footer.site-footer { color: var(--muted); font-size: .85rem; padding: 24px 0 40px; border-top: 1px solid var(--border); }
+footer.site-footer p + p { margin-top: 6px; }
+
+/* ---------- Hub components ---------- */
+.grid-2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.grid-2 > .card { margin-top: 20px; }
+.stat a { color: inherit; text-decoration: none; }
+.stat .sub-value { font-size: .86rem; color: var(--muted); margin-top: 2px; }
+.stat.accent .sub-value { color: rgba(255,255,255,.85); }
+a.stat { display: block; text-decoration: none; transition: border-color .15s, transform .15s; }
+a.stat:hover { border-color: var(--fil-blue); transform: translateY(-1px); }
+.meeting-title { font-size: 1.05rem; font-weight: 700; }
+.meeting-meta { color: var(--muted); font-size: .88rem; margin: 2px 0 10px; }
+ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 600; font-size: .88rem;
+  padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+}
+.btn:hover { border-color: var(--fil-blue); color: var(--fil-blue); }
+.btn.primary { background: var(--fil-blue); border-color: var(--fil-blue); color: #fff; }
+.btn.primary:hover { background: var(--fil-blue-strong); color: #fff; }
+.passcode { font-size: .8rem; color: var(--muted); }
+.video { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #000; margin-top: 12px; }
+.video button { all: unset; cursor: pointer; position: absolute; inset: 0; display: block; }
+.video img { width: 100%; height: 100%; object-fit: cover; opacity: .85; transition: opacity .2s; }
+.video button:hover img { opacity: 1; }
+.video .play { position: absolute; left: 50%; top: 50%; width: 68px; height: 48px; margin: -24px 0 0 -34px; border-radius: 14px; background: var(--fil-blue); display: grid; place-items: center; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+.video .play::before { content: ''; border-left: 18px solid #fff; border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 4px; }
+.video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.feed { list-style: none; display: grid; gap: 2px; }
+.feed li { display: grid; grid-template-columns: 74px 104px 1fr; gap: 10px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .92rem; }
+.feed li:last-child { border-bottom: 0; }
+.feed time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kind { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; justify-self: start; white-space: nowrap; }
+.kind.fip { background: var(--accepted-bg); color: var(--accepted-fg); }
+.kind.meeting { background: var(--active-bg); color: var(--active-fg); }
+.kind.upgrade { background: var(--final-bg); color: var(--final-fg); }
+.kind.discussion { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.open-list { list-style: none; display: grid; gap: 10px; font-size: .93rem; }
+.open-list li { padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.open-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.open-list .kind { margin-right: 6px; }
+.links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+.link-card { display: block; text-decoration: none; color: var(--text); padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); transition: border-color .15s; }
+.link-card:hover { border-color: var(--fil-blue); color: var(--text); }
+.link-card strong { display: block; margin-bottom: 2px; }
+.link-card span { color: var(--muted); font-size: .86rem; }
+.search { width: 100%; max-width: 360px; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-size: .92rem; }
+.search:focus { outline: 2px solid var(--fil-blue); outline-offset: 1px; }
+.up-list { display: grid; gap: 12px; }
+.up-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--surface-2); }
+.up-card.latest { border-color: var(--fil-blue); box-shadow: 0 0 0 3px rgba(0,144,255,.12); }
+.up-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; justify-content: space-between; }
+.up-head h3 { font-size: 1.05rem; }
+.up-head h3 .nv { color: var(--fil-blue); margin-right: 6px; }
+.up-dates { color: var(--muted); font-size: .86rem; display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 8px; }
+.up-fips { display: grid; gap: 4px; font-size: .9rem; }
+.muted { color: var(--muted); }
+.small { font-size: .84rem; }
+
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 640px) {
+  .feed li { grid-template-columns: 64px 1fr; }
+  .feed li .kind { grid-column: 2; grid-row: 1; }
+  .feed li .feed-text { grid-column: 1 / -1; }
+  .stat .value { font-size: 1.6rem; }
+  .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
+  .corgi-walk { width: 104px; }
+}
 </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Filecoin Improvement Proposals</h1>
-    <p>Taking you to the dashboard…</p>
-    <div class="links">
-      <a class="primary" href="fips-dashboard-static.html">Dashboard</a>
-      <a href="fips-timeline-tracker.html">Timeline</a>
+<header class="site-header">
+  <div class="wrap">
+    <span class="eyebrow">Filecoin governance</span>
+    <h1>Filecoin Governance</h1>
+    <p class="sub">FIPs, Core Devs meetings, recordings and network upgrades in one place, built from the public GitHub records.</p>
+    <div class="header-meta">
+      <nav class="nav" aria-label="Pages"><a href="./" class="current" aria-current="page">Overview</a><a href="fips-dashboard-static.html">FIPs</a><a href="core-devs.html">Core Devs</a><a href="network-upgrades.html">Upgrades</a><a href="fips-timeline-tracker.html">Timeline</a></nav>
+      <span>Updated 2026-10-29 13:23 UTC</span>
     </div>
   </div>
+  <div class="ground" aria-hidden="true"></div>
+  <div class="corgi-walk" tabindex="0" role="button" aria-label="Pet the corgi chasing the FIP ball">
+    <span class="woof">Woof!</span>
+    <div class="corgi-flip">
+<svg viewBox="0 0 170 112" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A cartoon corgi trotting">
+  <ellipse cx="82" cy="106" rx="54" ry="4" fill="rgba(0,0,0,.28)"/>
+  <g class="corgi-bob">
+    <!-- far legs -->
+    <g class="leg b"><rect x="38" y="66" width="12" height="30" rx="6" fill="#C46F22"/><ellipse cx="44" cy="96" rx="7" ry="4" fill="#E9E2D8"/></g>
+    <g class="leg a"><rect x="98" y="66" width="12" height="30" rx="6" fill="#C46F22"/><ellipse cx="104" cy="96" rx="7" ry="4" fill="#E9E2D8"/></g>
+    <!-- tail -->
+    <g class="tail"><ellipse cx="22" cy="50" rx="13" ry="9" fill="#E58A33"/><ellipse cx="13" cy="48" rx="6" ry="5" fill="#FFF7EC"/></g>
+    <!-- body -->
+    <ellipse cx="74" cy="60" rx="50" ry="24" fill="#E58A33"/>
+    <ellipse cx="80" cy="72" rx="36" ry="11" fill="#FFF7EC"/>
+    <ellipse cx="114" cy="62" rx="16" ry="17" fill="#FFF7EC"/>
+    <!-- near legs -->
+    <g class="leg a"><rect x="50" y="68" width="13" height="30" rx="6.5" fill="#E58A33"/><ellipse cx="56.5" cy="98" rx="7.5" ry="4.5" fill="#FFF7EC"/></g>
+    <g class="leg b"><rect x="110" y="68" width="13" height="30" rx="6.5" fill="#FFF7EC"/><ellipse cx="116.5" cy="98" rx="7.5" ry="4.5" fill="#FFFFFF"/></g>
+    <!-- collar (Filecoin blue) -->
+    <path d="M106 44 q12 10 26 2" stroke="#0090FF" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="120" cy="53" r="4.2" fill="#7CC4FF" stroke="#0072CC" stroke-width="1.2"/>
+    <!-- head -->
+    <g>
+      <g class="ear"><path d="M109 30 L113 2 L128 24 Z" fill="#E58A33"/><path d="M113 25 L115 10 L123 23 Z" fill="#F7B8B0"/></g>
+      <g class="ear r"><path d="M124 23 L138 0 L144 27 Z" fill="#D4782A"/><path d="M129 22 L137 8 L140 24 Z" fill="#F7B8B0"/></g>
+      <ellipse cx="128" cy="38" rx="23" ry="19" fill="#E58A33"/>
+      <path d="M128 21 q-3 10 2 20 q8 10 22 6 l-4 -12 q-10 -4 -14 -14 z" fill="#FFF7EC"/>
+      <ellipse cx="146" cy="46" rx="16" ry="10" fill="#FFF7EC"/>
+      <ellipse cx="160" cy="42" rx="4.6" ry="3.6" fill="#1A1A1A"/>
+      <circle cx="159" cy="40.8" r="1.1" fill="#fff"/>
+      <circle cx="137" cy="33" r="3" fill="#091B2A"/>
+      <circle cx="138" cy="32" r="1" fill="#fff"/>
+      <ellipse cx="132" cy="44" rx="4.5" ry="2.8" fill="#F7A59B" opacity=".7"/>
+      <path d="M148 51 q5 4 10 -1" stroke="#5A3A22" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path class="tongue" d="M150 52 q3 9 7 0 z" fill="#F0727F"/>
+    </g>
+  </g>
+</svg>
+
+<div class="fip-ball" aria-hidden="true">
+  <div class="ball-shadow"></div>
+  <div class="ball-bounce"><div class="ball-unflip">
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="17" cy="17" r="15.5" fill="#D6EA3C" stroke="#AFC21F" stroke-width="1.2"/>
+      <path d="M4.5 8.5 C11 12 11 22 4.5 25.5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M29.5 8.5 C23 12 23 22 29.5 25.5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="12" cy="10" r="3" fill="#FFFFFF" opacity=".35"/>
+      <text x="17" y="20.5" text-anchor="middle" font-family="Archivo, system-ui, sans-serif" font-size="10" font-weight="800" fill="#091B2A" letter-spacing=".3">FIP</text>
+    </svg>
+  </div></div>
+</div>
+</div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+<section class="stats"><a class="stat" href="core-devs.html"><div class="label">Latest Core Devs</div><div class="value">#95</div><div class=sub-value>Oct 28, 2026</div></a><a class="stat" href="fips-dashboard-static.html#last-call"><div class="label">In Last Call</div><div class="value">0</div><div class=sub-value>final review windows</div></a><a class="stat" href="network-upgrades.html"><div class="label">Latest upgrade</div><div class="value">NV29</div><div class=sub-value>Solstice · Oct 19, 2026</div></a><a class="stat" href="fips-dashboard-static.html#prs"><div class="label">Open FIP PRs</div><div class="value">—</div><div class=sub-value>on the FIPs repo</div></a><a class="stat" href="#discussions"><div class="label">Active discussions</div><div class="value">—</div><div class=sub-value>updated in 30 days</div></a></section>
+<div class="grid-2"><section class="card"><div class="card-head"><h2>Latest Core Devs meeting</h2>
+<a class="hint" href="core-devs.html">All meetings →</a></div>
+<div class="card-body">
+<div class="meeting-title">Core Devs #95</div>
+<div class="meeting-meta">Oct 28, 2026 · Facilitated by Christian Taylor</div>
+<ul class="topics"><li>NV29 Solstice completion and transition to NV30 planning.</li><li>Deferred proposals and implementation scope for NV30.</li><li>FIP-0119: Increase Maximum Sector Lifetime to 10 Years.</li><li>FIP-0117: Repeated SnapDeals with Piece-Level Integrity.</li><li>Removal of the Built-in Payment Channel Actor.</li><li>FRC-0120: Filecoin Encryption Envelope.</li><li>ClearState Simplification.</li><li>NV30 implementation bandwidth, scheduling, and next steps.</li></ul>
+<div class="chips" style="margin-bottom:6px"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0067.md" target="_blank" rel="noopener" title="PoRep Security Policy &amp; Replacement Sealing Enforcement">FIP-0067</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener" title="Implicit Messages in Block Receipts">FIP-0107</a><a class="chip" href="https://github.com/filecoin-project/FIPs/pulls?q=is%3Apr+FIP-0117" target="_blank" rel="noopener" title="">FIP-0117</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener" title="(Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split">FIP-0118</a><a class="chip" href="https://github.com/filecoin-project/FIPs/pulls?q=is%3Apr+FIP-0119" target="_blank" rel="noopener" title="">FIP-0119</a></div><p class="note" style="margin-top:4px">FIPs mentioned in the notes. Mentions are not decisions.</p>
+<div class="btn-row"><a class="btn primary" href="https://youtu.be/mS7vNktSWNI?si=93tuMo-DiAhwcWSO" target="_blank" rel="noopener">▶ Recording</a><a class="btn" href="https://github.com/filecoin-project/core-devs/blob/master/Core%20Dev%20Meetings/Meeting%200095.md" target="_blank" rel="noopener">Notes</a><a class="btn" href="https://github.com/filecoin-project/core-devs/issues/229" target="_blank" rel="noopener">Agenda</a></div>
+<div class="video"><button type="button" data-yt="mS7vNktSWNI" aria-label="Play Core Devs #95 recording"><img src="https://i.ytimg.com/vi/mS7vNktSWNI/hqdefault.jpg" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></button></div>
+</div></section><section class="card"><div class="card-head"><h2>Open now</h2>
+<span class="hint">Where your input counts this week.</span></div>
+<div class="card-body"><ul class="open-list"><li class="muted">No Last Calls are open and no upgrade is scheduled right now.</li></ul><p class="note">The next meeting's agenda issue couldn't be loaded on this run.</p>
+<div class="btn-row" style="margin-top:14px"><a class="btn" href="https://github.com/filecoin-project/FIPs/discussions" target="_blank" rel="noopener">FIP discussions</a><a class="btn" href="https://github.com/filecoin-project/core-devs/issues" target="_blank" rel="noopener">Core Devs agendas</a></div>
+</div></section></div>
+<section class="card"><div class="card-head"><h2>Recent activity</h2>
+<span class="hint">Last 90 days across FIPs, Core Devs and network upgrades.</span></div>
+<div class="card-body"><ul class="feed"><li><time datetime="2026-10-28T00:00:00+00:00">Oct 28</time><span class="kind meeting">Meeting</span><span class="feed-text"><a href="https://youtu.be/mS7vNktSWNI?si=93tuMo-DiAhwcWSO" target="_blank" rel="noopener">Core Devs #95</a>: NV29 Solstice completion and transition to NV30 planning; Deferred proposals and implementation scope for NV30; FIP-0119: Increase Maximum Sector Lifetime to 10 Years</span></li><li><time datetime="2026-10-26T20:55:46+00:00">Oct 26</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a> (Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split: <span class="status-badge status-accepted">Accepted</span> → <span class="status-badge status-final">Final</span></span></li><li><time datetime="2026-10-19T12:59:30+00:00">Oct 19</time><span class="kind upgrade">Upgrade</span><span class="feed-text">NV29 Solstice activated on mainnet (FIP-0118)</span></li><li><time datetime="2026-09-28T12:59:30+00:00">Sep 28</time><span class="kind upgrade">Upgrade</span><span class="feed-text">NV29 Solstice activated on calibration (FIP-0118)</span></li><li><time datetime="2026-09-11T23:31:53+00:00">Sep 11</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a> (Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split: <span class="status-badge status-last-call">Last Call</span> → <span class="status-badge status-accepted">Accepted</span></span></li><li><time datetime="2026-09-04T16:21:46+00:00">Sep 4</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">FIP-0107</a> Implicit Messages in Block Receipts: <span class="status-badge status-last-call">Last Call</span> → <span class="status-badge status-accepted">Accepted</span></span></li><li><time datetime="2026-08-26T00:00:00+00:00">Aug 26</time><span class="kind meeting">Meeting</span><span class="feed-text"><a href="https://youtu.be/it1ft03pI4A?si=60JbSPORPuuDPBRy" target="_blank" rel="noopener">Core Devs #94</a>: FIP-0118: Solstice; FIP-0117: Repeated SnapDeals with Piece-Level Integrity; FRC-0116: JSON-RPC HTTP Conventions</span></li><li><time datetime="2026-08-14T18:48:13+00:00">Aug 14</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a> (Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split: <span class="status-badge status-draft">Draft</span> → <span class="status-badge status-last-call">Last Call</span></span></li><li><time datetime="2026-08-05T14:17:09+00:00">Aug 5</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a> (Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split listed as <span class="status-badge status-draft">Draft</span></span></li><li><time datetime="2026-08-05T00:00:00+00:00">Aug 5</time><span class="kind meeting">Meeting</span><span class="feed-text"><a href="https://youtu.be/dogDmwEpCho" target="_blank" rel="noopener">Core Devs #93</a>: FIP-0117: Repeated SnapDeals; FIP-0118: Solstice; JSON-RPC HTTP Conventions FRC</span></li></ul></div></section>
+<section class="card" id="discussions"><div class="card-head"><h2>FIP discussions</h2>
+<span class="hint">Most recently active threads on the FIPs repo, where proposals start.</span></div>
+<div class="card-body"><p class="empty">Discussions couldn't be loaded on this run. <a href="https://github.com/filecoin-project/FIPs/discussions" target="_blank" rel="noopener">Browse them on GitHub</a>.</p></div></section>
+<section class="card"><div class="card-head"><h2>Get involved</h2></div><div class="card-body"><div class="links-grid">
+<a class="link-card" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener"><strong>How the FIP process works</strong><span>FIP-0001: types, statuses and how proposals move.</span></a>
+<a class="link-card" href="https://github.com/filecoin-project/FIPs/discussions" target="_blank" rel="noopener"><strong>Start or join a discussion</strong><span>Ideas begin as FIP discussions before a draft.</span></a>
+<a class="link-card" href="fips-dashboard-static.html"><strong>Track every FIP</strong><span>Status, Last Call windows and open PRs.</span></a>
+<a class="link-card" href="core-devs.html"><strong>Core Devs meetings</strong><span>Notes, recordings and agendas back to 2020.</span></a>
+<a class="link-card" href="network-upgrades.html"><strong>Network upgrades</strong><span>What shipped when, and which FIPs it included.</span></a>
+<a class="link-card" href="mailto:governance@fil.org"><strong>Contact the governance team</strong><span>governance@fil.org</span></a>
+</div></div></section>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Read-only view of public governance records in <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a> and <a href="https://github.com/filecoin-project/core-devs" target="_blank" rel="noopener">filecoin-project/core-devs</a>. Nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors, Core Devs and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
+    <p>Generated 2026-10-29 13:23 UTC. Unofficial community tool.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var c = document.querySelector('.corgi-walk');
+  if (!c) return;
+  function bark() {
+    c.classList.remove('barking'); void c.offsetWidth; c.classList.add('barking');
+    clearTimeout(c._t); c._t = setTimeout(function () { c.classList.remove('barking'); }, 900);
+  }
+  c.addEventListener('click', bark);
+  c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); bark(); } });
+})();
+</script>
+
+
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.video button[data-yt]');
+  if (!b) return;
+  var f = document.createElement('iframe');
+  f.src = 'https://www.youtube-nocookie.com/embed/' + b.getAttribute('data-yt') + '?autoplay=1&rel=0';
+  f.title = b.getAttribute('aria-label') || 'Meeting recording';
+  f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  f.allowFullscreen = true;
+  b.parentNode.replaceChild(f, b);
+});
+</script>
+
 </body>
 </html>

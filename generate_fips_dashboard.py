@@ -120,7 +120,7 @@ def last_call_html(open_lc, past_lc):
 IN_FLIGHT_MAX_DAYS = 365
 
 
-def in_flight_html(fips, history, files, prs_grouped):
+def in_flight_html(fips, history, files, prs_grouped, discussed=None):
     """In-flight FIPs that changed status within the last year.
 
     Longer-running FIPs are left out of the table and only counted in a
@@ -139,15 +139,19 @@ def in_flight_html(fips, history, files, prs_grouped):
             continue
         meta = files.get(num, {})
         pr_count = len(prs_grouped.get(num, []))
+        m = (discussed or {}).get(num)
+        cd_cell = (f'<a href="{esc(m["notes_url"] or m["recording_url"] or "core-devs.html")}" target="_blank" rel="noopener">#{m["number"]}</a> · {date_str(m["date"])}'
+                   if m else '<span class="muted">—</span>')
         rows.append((days, f'''<tr>
 <td>{fip_link(num)}</td><td class="title-cell">{esc(f["title"])}</td>
 <td>{badge(f["status"])}</td>
 <td class="nowrap">{date_str(since)}</td><td>{age_cell(days)}</td>
 <td>{discussion_links(meta.get("_discussions", []))}</td>
+<td class="nowrap">{cd_cell}</td>
 <td class="num">{f'<a href="#pr-{num}">{pr_count}</a>' if pr_count else '0'}</td></tr>'''))
     rows.sort(key=lambda r: r[0])
     body = (f'''<div class="table-scroll"><table class="data">
-<thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th class="num">Open PRs</th></tr></thead>
+<thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th>Last at Core Devs</th><th class="num">Open PRs</th></tr></thead>
 <tbody>{"".join(r[1] for r in rows)}</tbody></table></div>''' if rows
             else '<p class="empty">No FIPs have changed status in the last year.</p>')
     if older:
@@ -258,6 +262,13 @@ def main():
     open_lc, past_lc = u.last_call_windows(history, files, fips)
     mismatches = u.status_mismatches(fips, files)
 
+    discussed = {}
+    try:
+        import core_devs as cd
+        discussed = cd.last_discussed(cd.load_meetings(cd.get_core_devs_repo()))
+    except Exception as e:
+        print(f'Warning: Core Devs data unavailable: {e}')
+
     print('Fetching open PRs and reviews...')
     raw_prs = u.fetch_open_prs()
     processed = u.process_prs(raw_prs)
@@ -267,7 +278,7 @@ def main():
     body = '\n'.join([
         stats_html(fips, open_lc, processed, prs_loaded=raw_prs is not None),
         last_call_html(open_lc, past_lc),
-        in_flight_html(fips, history, files, grouped),
+        in_flight_html(fips, history, files, grouped, discussed),
         mismatch_html(mismatches),
         prs_html(grouped, fips, loaded=raw_prs is not None),
         by_status_html(fips, grouped),

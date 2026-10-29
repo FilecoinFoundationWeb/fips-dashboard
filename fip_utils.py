@@ -185,15 +185,16 @@ def _git(repo_dir, *args):
     ).stdout
 
 
-def get_fips_repo(path=None):
-    """Return a path to an up-to-date local clone of filecoin-project/FIPs.
+def get_repo(git_url, env_var, default_name, path=None):
+    """Return a path to an up-to-date local clone of a public repo.
 
-    Uses FIPS_REPO_DIR if set (handy for local runs), otherwise clones into a
-    temporary directory. A full clone (~25 MB) is used because the history
-    walk reads hundreds of README versions; a blob-filtered clone would
-    fetch each one separately and run several times slower.
+    Uses the directory in `env_var` if set (handy for local runs and for
+    sharing one clone between scripts in CI), otherwise clones into a
+    temporary directory. Full clones are used because the history walk reads
+    hundreds of README versions; a blob-filtered clone would fetch each one
+    separately and run several times slower.
     """
-    path = path or os.environ.get('FIPS_REPO_DIR')
+    path = path or os.environ.get(env_var)
     if path and os.path.isdir(os.path.join(path, '.git')):
         try:
             _git(path, 'fetch', '-q', 'origin')
@@ -202,14 +203,16 @@ def get_fips_repo(path=None):
             print(f'Warning: could not update {path}: {e.stderr.strip()}')
         return path
 
-    path = path or os.path.join(tempfile.gettempdir(), 'fips-src')
+    path = path or os.path.join(tempfile.gettempdir(), default_name)
     if os.path.isdir(path):
         shutil.rmtree(path)
-    subprocess.run(
-        ['git', 'clone', '-q', FIPS_GIT_URL, path],
-        check=True,
-    )
+    subprocess.run(['git', 'clone', '-q', git_url, path], check=True)
     return path
+
+
+def get_fips_repo(path=None):
+    """Local clone of filecoin-project/FIPs (FIPS_REPO_DIR to reuse one)."""
+    return get_repo(FIPS_GIT_URL, 'FIPS_REPO_DIR', 'fips-src', path)
 
 
 def read_readme(repo_dir, sha='HEAD'):
@@ -338,6 +341,64 @@ def make_github_request(url):
     req.add_header('User-Agent', 'fips-dashboard')
     with urllib.request.urlopen(req) as response:
         return json.loads(response.read().decode('utf-8'))
+
+
+def github_graphql(query, variables=None):
+    """POST a GraphQL query (needs GITHUB_TOKEN). Returns data or None."""
+    token = os.environ.get('GITHUB_TOKEN', '')
+    if not token:
+        return None
+    body = json.dumps({'query': query, 'variables': variables or {}}).encode()
+    req = urllib.request.Request('https://api.github.com/graphql', data=body, method='POST')
+    req.add_header('Authorization', f'bearer {token}')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('User-Agent', 'fips-dashboard')
+    try:
+        with urllib.request.urlopen(req) as response:
+            payload = json.loads(response.read().decode('utf-8'))
+    except Exception as e:
+        print(f'Warning: GraphQL request failed: {e}')
+        return None
+    if payload.get('errors'):
+        print(f"Warning: GraphQL errors: {payload['errors'][:1]}")
+    return payload.get('data')
+
+
+DISCUSSIONS_QUERY = """
+query($owner: String!, $name: String!, $n: Int!) {
+  repository(owner: $owner, name: $name) {
+    discussions(first: $n, orderBy: {field: UPDATED_AT, direction: DESC}) {
+      nodes {
+        number title url createdAt updatedAt
+        author { login }
+        category { name }
+        comments { totalCount }
+      }
+    }
+  }
+}
+"""
+
+
+def fetch_discussions(owner, name, n=20):
+    """Recently updated GitHub Discussions for a repo, or None if unavailable."""
+    data = github_graphql(DISCUSSIONS_QUERY, {'owner': owner, 'name': name, 'n': n})
+    try:
+        nodes = data['repository']['discussions']['nodes']
+    except (TypeError, KeyError):
+        return None
+    out = []
+    for d in nodes:
+        out.append({
+            'number': d['number'], 'title': d['title'], 'url': d['url'],
+            'created': datetime.fromisoformat(d['createdAt'].replace('Z', '+00:00')),
+            'updated': datetime.fromisoformat(d['updatedAt'].replace('Z', '+00:00')),
+            'author': (d.get('author') or {}).get('login', 'ghost'),
+            'category': (d.get('category') or {}).get('name', ''),
+            'comments': (d.get('comments') or {}).get('totalCount', 0),
+            'repo': f'{owner}/{name}',
+        })
+    return out
 
 
 def _paged(url):

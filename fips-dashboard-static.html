@@ -1,552 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Real-time dashboard tracking the status of all Filecoin Improvement Proposals (FIPs), including open pull requests and status changes.">
-    <title>Filecoin Improvement Proposals (FIPs) Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Read-only dashboard of Filecoin Improvement Proposals: status, time in status, Last Call windows, open PRs and review state.">
+<meta name="color-scheme" content="light dark">
+<title>Filecoin Improvement Proposals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fil-blue: #0090FF;
+  --fil-blue-strong: #0072CC;
+  --fil-navy: #091B2A;
+  --fil-navy-2: #0F2A42;
+  --fil-sky: #7CC4FF;
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+  --bg: #F3F7FB;
+  --surface: #FFFFFF;
+  --surface-2: #EEF4FA;
+  --text: #091B2A;
+  --muted: #4B6178;
+  --border: #D7E2EE;
+  --link: #0072CC;
+  --shadow: 0 1px 2px rgba(9,27,42,.06), 0 8px 24px rgba(9,27,42,.06);
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
+  --final-bg: #DDF5E8;   --final-fg: #0B6B3A;
+  --accepted-bg: #DCEEFF;--accepted-fg: #00539A;
+  --lastcall-bg: #FFF0D1;--lastcall-fg: #8A5300;
+  --draft-bg: #E6EBF5;   --draft-fg: #34476B;
+  --active-bg: #D7F3F5;  --active-fg: #0A6670;
+  --deferred-bg: #F1EBDD;--deferred-fg: #6E5A2E;
+  --rejected-bg: #FDE2E2;--rejected-fg: #A11A1A;
+  --muted-bg: #ECEFF3;   --muted-fg: #55606C;
+  --warn-bg: #FFF6E0;    --warn-border: #F2C45A;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #06131F;
+    --surface: #0C2133;
+    --surface-2: #10293F;
+    --text: #E6F0F9;
+    --muted: #9AB0C6;
+    --border: #1D3A55;
+    --link: #6CBBFF;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    --final-bg: #0E3B27;   --final-fg: #7FE0AC;
+    --accepted-bg: #0D3256;--accepted-fg: #8CC8FF;
+    --lastcall-bg: #44310B;--lastcall-fg: #FFCB6B;
+    --draft-bg: #1E2C45;   --draft-fg: #B4C4E4;
+    --active-bg: #0C3A3F;  --active-fg: #7EDDE6;
+    --deferred-bg: #3A3221;--deferred-fg: #E0CB97;
+    --rejected-bg: #4A1717;--rejected-fg: #FFA3A3;
+    --muted-bg: #1C2733;   --muted-fg: #A8B3BF;
+    --warn-bg: #3A2E10;    --warn-border: #A8812A;
+  }
+}
 
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+a { color: var(--link); }
+a:hover { color: var(--fil-blue); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+/* ---------- Header ---------- */
+.site-header {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(900px 300px at 85% -20%, rgba(0,144,255,.45), transparent 60%),
+    radial-gradient(600px 260px at 0% 120%, rgba(124,196,255,.18), transparent 60%),
+    var(--fil-navy);
+  padding: 28px 0 118px;
+}
+.site-header .wrap { position: relative; z-index: 2; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fil-sky);
+}
+.eyebrow::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--fil-blue); box-shadow: 0 0 0 4px rgba(0,144,255,.25); }
+.site-header h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -.02em; margin: 10px 0 6px; }
+.site-header p.sub { color: #B9CDE0; max-width: 680px; }
+.header-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 18px; font-size: .88rem; color: #9FB6CC; }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.nav a {
+  color: #fff; text-decoration: none; font-weight: 600; font-size: .92rem;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.04); transition: background .2s, border-color .2s;
+}
+.nav a:hover { background: rgba(0,144,255,.18); border-color: rgba(0,144,255,.6); color: #fff; }
+.nav a.current { background: var(--fil-blue); border-color: var(--fil-blue); }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
+/* ---------- Corgi ---------- */
+.ground {
+  position: absolute; left: 0; right: 0; bottom: 14px; height: 2px; z-index: 1;
+  background: repeating-linear-gradient(90deg, rgba(124,196,255,.35) 0 14px, transparent 14px 26px);
+}
+.corgi-walk {
+  position: absolute; bottom: 14px; left: -140px; width: 128px; z-index: 3;
+  animation: corgi-walk 26s linear infinite;
+  cursor: pointer;
+}
+.corgi-walk svg { display: block; width: 100%; height: auto; overflow: visible; }
+.corgi-flip { animation: corgi-flip 26s steps(1) infinite; transform-origin: center; }
+@keyframes corgi-walk {
+  0%   { left: -140px; }
+  48%  { left: calc(100% + 20px); }
+  50%  { left: calc(100% + 20px); }
+  98%  { left: -140px; }
+  100% { left: -140px; }
+}
+@keyframes corgi-flip { 0% { transform: scaleX(1); } 49% { transform: scaleX(-1); } 99% { transform: scaleX(1); } }
+.corgi-bob { animation: corgi-bob .36s ease-in-out infinite alternate; }
+@keyframes corgi-bob { from { transform: translateY(0); } to { transform: translateY(-2.5px); } }
+.leg { transform-box: fill-box; transform-origin: 50% 0; animation: corgi-step .36s ease-in-out infinite alternate; }
+.leg.b { animation-direction: alternate-reverse; }
+@keyframes corgi-step { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+.tail { transform-box: fill-box; transform-origin: 100% 60%; animation: corgi-wag .22s ease-in-out infinite alternate; }
+@keyframes corgi-wag { from { transform: rotate(-18deg); } to { transform: rotate(14deg); } }
+.ear { transform-box: fill-box; transform-origin: 50% 100%; animation: corgi-ear 3.2s ease-in-out infinite; }
+.ear.r { animation-delay: .15s; }
+@keyframes corgi-ear { 0%, 88%, 100% { transform: rotate(0); } 92% { transform: rotate(-12deg); } 96% { transform: rotate(6deg); } }
+.tongue { transform-box: fill-box; transform-origin: 50% 0; animation: corgi-pant .36s ease-in-out infinite alternate; }
+@keyframes corgi-pant { from { transform: scaleY(.85); } to { transform: scaleY(1.1); } }
+.woof {
+  position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, 4px) scale(.6);
+  background: #fff; color: var(--fil-navy); font-weight: 800; font-size: .85rem;
+  padding: 4px 10px; border-radius: 12px; opacity: 0; pointer-events: none; white-space: nowrap;
+  transition: opacity .15s, transform .15s;
+}
+.woof::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; border: 6px solid transparent; border-top-color: #fff; }
+.corgi-walk.barking .woof { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+.corgi-walk.barking .corgi-bob { animation: corgi-hop .5s ease-out 1; }
+@keyframes corgi-hop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-16px); } }
+@media (prefers-reduced-motion: reduce) {
+  .corgi-walk { animation: none; left: auto; right: 24px; }
+  .corgi-flip { animation: none; transform: scaleX(-1); }
+  .corgi-bob, .leg, .tail, .ear, .tongue { animation: none; }
+}
 
-        .last-updated {
-            margin-top: 15px;
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
+/* ---------- Content ---------- */
+main { margin-top: 22px; position: relative; z-index: 4; padding-bottom: 48px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stats.compact { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
+.stats.compact .value { font-size: 1.6rem; }
+.stat {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px 18px; box-shadow: var(--shadow);
+}
+.stat .label { font-size: .76rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.stat .value { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); line-height: 1.2; margin-top: 4px; }
+.stat.accent { background: var(--fil-blue); border-color: var(--fil-blue); }
+.stat.accent .label { color: rgba(255,255,255,.85); }
+.stat.accent .value { color: #fff; }
 
-        .controls {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: var(--shadow); margin-top: 20px; overflow: hidden;
+}
+.card-head { padding: 18px 20px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.card-head h2 { font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; }
+.card-head .hint { color: var(--muted); font-size: .88rem; max-width: 640px; }
+.card-body { padding: 0 20px 20px; }
+.empty { color: var(--muted); font-style: italic; padding: 8px 0 4px; }
+.note { font-size: .85rem; color: var(--muted); margin-top: 12px; }
 
-        .refresh-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table.data { width: 100%; border-collapse: collapse; font-size: .92rem; }
+table.data th {
+  text-align: left; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+  background: var(--surface-2);
+}
+table.data td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.data tr:last-child td { border-bottom: 0; }
+table.data tbody tr:hover td { background: var(--surface-2); }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.nowrap { white-space: nowrap; }
+.fip-id { font-weight: 700; text-decoration: none; white-space: nowrap; }
+.title-cell { min-width: 220px; }
 
-        .refresh-btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
+.status-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  font-size: .74rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.status-final { background: var(--final-bg); color: var(--final-fg); }
+.status-accepted { background: var(--accepted-bg); color: var(--accepted-fg); }
+.status-last-call { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.status-draft { background: var(--draft-bg); color: var(--draft-fg); }
+.status-active { background: var(--active-bg); color: var(--active-fg); }
+.status-deferred { background: var(--deferred-bg); color: var(--deferred-fg); }
+.status-rejected { background: var(--rejected-bg); color: var(--rejected-fg); }
+.status-withdrawn, .status-superseded { background: var(--muted-bg); color: var(--muted-fg); }
 
-        .refresh-btn:active {
-            transform: translateY(0);
-        }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; text-decoration: none;
+  padding: 4px 10px; border-radius: 8px; font-size: .86rem; font-weight: 600;
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+  transition: border-color .15s, color .15s;
+}
+.chip:hover { border-color: var(--fil-blue); color: var(--fil-blue); }
+.pr-dot { font-size: .72rem; font-weight: 700; color: #fff; background: var(--fil-blue); border-radius: 999px; padding: 0 6px; }
 
-        .status-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-        }
+.age { font-weight: 600; white-space: nowrap; }
+.age.old { color: var(--rejected-fg); }
+.age.mid { color: var(--lastcall-fg); }
+.pill {
+  display: inline-block; font-size: .74rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); white-space: nowrap;
+}
+.pill.approved { background: var(--final-bg); color: var(--final-fg); border-color: transparent; }
+.pill.changes { background: var(--rejected-bg); color: var(--rejected-fg); border-color: transparent; }
+.pill.waiting { background: var(--lastcall-bg); color: var(--lastcall-fg); border-color: transparent; }
+.pill.est { background: transparent; }
 
-        .status-table thead {
-            background: #f8f9fa;
-        }
+.callout {
+  background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 12px;
+  padding: 12px 14px; font-size: .9rem;
+}
 
-        .status-table th {
-            padding: 18px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #e0e0e0;
-            font-size: 1.1em;
-        }
+.pr-group { border-top: 1px solid var(--border); padding: 14px 0; }
+.pr-group:first-child { border-top: 0; padding-top: 0; }
+.pr-group h3 { font-size: .95rem; margin-bottom: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pr-item { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; padding: 8px 12px; border-left: 3px solid var(--fil-blue); background: var(--surface-2); border-radius: 0 8px 8px 0; margin-top: 6px; }
+.pr-item a { font-weight: 600; text-decoration: none; }
+.pr-meta { color: var(--muted); font-size: .84rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
-        .status-table td {
-            padding: 18px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: top;
-        }
+details.more > summary { cursor: pointer; color: var(--link); font-weight: 600; margin-top: 12px; }
 
-        .status-table tbody tr:hover {
-            background: #f8f9fa;
-            transition: background 0.2s;
-        }
+.timeline { position: relative; padding-left: 22px; }
+.timeline::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+.tl-month { position: relative; margin-bottom: 22px; }
+.tl-month::before { content: ''; position: absolute; left: -21px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--fil-blue); box-shadow: 0 0 0 4px var(--surface); }
+.tl-month h3 { font-size: 1rem; display: flex; gap: 10px; align-items: baseline; }
+.tl-month h3 span { color: var(--muted); font-size: .84rem; font-weight: 500; }
+.tl-events { margin-top: 8px; display: grid; gap: 6px; }
+.tl-event { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: start; padding: 8px 12px; background: var(--surface-2); border-radius: 8px; font-size: .9rem; }
+.tl-event time { color: var(--muted); font-variant-numeric: tabular-nums; font-size: .82rem; padding-top: 2px; }
+.tl-event .arrow { color: var(--muted); margin: 0 4px; }
 
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+footer.site-footer { color: var(--muted); font-size: .85rem; padding: 24px 0 40px; border-top: 1px solid var(--border); }
+footer.site-footer p + p { margin-top: 6px; }
 
-        .status-final {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-draft {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-accepted {
-            background: #cce5ff;
-            color: #004085;
-        }
-
-        .status-deferred {
-            background: #ffeaa7;
-            color: #856404;
-        }
-
-        .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-withdrawn {
-            background: #e2e3e5;
-            color: #383d41;
-        }
-
-        .status-active {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status-last-call {
-            background: #f0ad4e;
-            color: #fff;
-        }
-
-        .status-superseded {
-            background: #e7e7e7;
-            color: #555;
-        }
-
-        .count {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .fips-list {
-            margin-top: 10px;
-        }
-
-        .fips-list a {
-            display: inline-block;
-            margin: 4px 8px 4px 0;
-            padding: 6px 12px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.9em;
-            transition: all 0.2s;
-        }
-
-        .fips-list a:hover {
-            background: #5568d3;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
-
-        .stats-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f8f9fa;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            color: #666;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        .stat-card .number {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .pr-badge-small {
-            display: inline-block;
-            background: #28a745;
-            color: white;
-            font-size: 0.75em;
-            padding: 2px 6px;
-            border-radius: 10px;
-            margin-left: 4px;
-            font-weight: 600;
-        }
-
-        .prs-section {
-            margin-top: 40px;
-            padding: 30px;
-            border-top: 2px solid #e0e0e0;
-        }
-
-        .prs-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-
-        .fip-pr-group {
-            margin-bottom: 25px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        .fip-pr-header {
-            font-size: 1.2em;
-            margin-bottom: 12px;
-            color: #333;
-        }
-
-        .pr-count {
-            color: #666;
-            font-size: 0.9em;
-            font-weight: normal;
-        }
-
-        .pr-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .pr-item {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 3px solid #667eea;
-        }
-
-        .pr-link {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .pr-link:hover {
-            text-decoration: underline;
-        }
-
-        .pr-meta {
-            color: #666;
-            font-size: 0.85em;
-        }
-
-        .no-prs {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-style: italic;
-        }
-    </style>
+@media (max-width: 640px) {
+  .site-header { padding-bottom: 104px; }
+  .stat .value { font-size: 1.6rem; }
+  .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
+  .corgi-walk { width: 104px; }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>&#x1f4ca; Filecoin Improvement Proposals Dashboard</h1>
-            <p>Real-time status tracking of all FIPs</p>
-            <div class="last-updated">Last updated: 2026-10-29 12:10:58</div>
-        </div>
-
-        <div class="controls">
-            <div style="display: flex; gap: 10px;">
-                <button class="refresh-btn" onclick="location.reload()">&#x1f504; Refresh Page</button>
-                <a href="fips-timeline-tracker.html" style="background: #28a745; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: inline-block;">&#x1f4c5; View Timeline Tracker</a>
-            </div>
-            <div><span style="color: #28a745;">&#x2705; Data loaded</span></div>
-        </div>
-
-        <div class="stats-summary">
-            <div class="stat-card">
-                <h3>Total FIPs</h3>
-                <div class="number">97</div>
-            </div>
-            <div class="stat-card">
-                <h3>Final</h3>
-                <div class="number">73</div>
-            </div>
-            <div class="stat-card">
-                <h3>Draft</h3>
-                <div class="number">6</div>
-            </div>
-            <div class="stat-card">
-                <h3>Active (Accepted/Last Call)</h3>
-                <div class="number">3</div>
-            </div>
-        </div>
-
-        <table class="status-table">
-            <thead>
-                <tr>
-                    <th>Status</th>
-                    <th>Count</th>
-                    <th>FIPs</th>
-                </tr>
-            </thead>
-            <tbody>
-
-                    <tr>
-                        <td><span class="status-badge status-final">Final</span></td>
-                        <td><span class="count">73</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0002.md" target="_blank" title="Free Faults on Newly Faulted Sectors of a Missed WindowPoSt">FIP-0002</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0004.md" target="_blank" title="Liquidity Improvement for Storage Miners">FIP-0004</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0005.md" target="_blank" title="Remove ineffective reward vesting">FIP-0005</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0007.md" target="_blank" title="h/amt-v3">FIP-0007</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0008.md" target="_blank" title="Add miner batched sector pre-commit method">FIP-0008</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0009.md" target="_blank" title="Exempt Window PoSts from BaseFee burn">FIP-0009</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0010.md" target="_blank" title="Off-Chain Window PoSt Verification">FIP-0010</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0011.md" target="_blank" title="Remove reward auction from reporting consensus faults">FIP-0011</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0012.md" target="_blank" title="DataCap Top up for FIL+ Client Addresses">FIP-0012</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0013.md" target="_blank" title="Add ProveCommitSectorAggregated method to reduce on-chain congestion">FIP-0013</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0014.md" target="_blank" title="Allow V1 proof sectors to be extended up to a maximum of 540 days">FIP-0014</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0015.md" target="_blank" title="Revert FIP-0009(Exempt Window PoSts from BaseFee burn)">FIP-0015</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0018.md" target="_blank" title="New miner terminology proposal">FIP-0018</a> <span class="pr-badge-small" title="1 open PR">&#x1f500; 1</span>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0019.md" target="_blank" title="Snap Deals">FIP-0019</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0020.md" target="_blank" title="Add return value to WithdrawBalance">FIP-0020</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0021.md" target="_blank" title="Correct quality calculation on expiration">FIP-0021</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0022.md" target="_blank" title="Bad deals don&#x27;t fail PublishStorageDeals">FIP-0022</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0023.md" target="_blank" title="Break ties between tipsets of equal weights">FIP-0023</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0024.md" target="_blank" title="BatchBalancer &amp; BatchDiscount Post -Hyperdrive adjustment">FIP-0024</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0026.md" target="_blank" title="Extend sector fault cutoff period from 2 weeks to 6 weeks">FIP-0026</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0027.md" target="_blank" title="Change type of DealProposal Label field from a (Golang) String to a Union">FIP-0027</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0028.md" target="_blank" title="Remove DataCap and verified client status from client address">FIP-0028</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0029.md" target="_blank" title="Beneficiary address for storage providers">FIP-0029</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0030.md" target="_blank" title="Introducing the Filecoin Virtual Machine (FVM)">FIP-0030</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0031.md" target="_blank" title="Atomic switch to non-programmable FVM">FIP-0031</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0032.md" target="_blank" title="Gas model adjustment for non-programmable FVM">FIP-0032</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0034.md" target="_blank" title="Fix pre-commit deposit independent of sector content">FIP-0034</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0041.md" target="_blank" title="Forward Compatibility for PreCommit and ReplicaUpdate">FIP-0041</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0044.md" target="_blank" title="Standard Authentication Method for Actors">FIP-0044</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0045.md" target="_blank" title="De-couple verified registry from markets">FIP-0045</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0048.md" target="_blank" title="f4 Address Class">FIP-0048</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0049.md" target="_blank" title="Actor Events">FIP-0049</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0050.md" target="_blank" title="API Between User-Programmed Actors and Built-In Actors">FIP-0050</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0052.md" target="_blank" title="Increase max sector commitment to 3.5 years">FIP-0052</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0054.md" target="_blank" title="Filecoin EVM Runtime (FEVM)">FIP-0054</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0055.md" target="_blank" title="Supporting Ethereum Accounts, Addresses, and Transactions">FIP-0055</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0057.md" target="_blank" title="Update Gas Charging Schedule and System Limits for FEVM">FIP-0057</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0059.md" target="_blank" title="Synthetic PoRep">FIP-0059</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0060.md" target="_blank" title="Set market deal maintenance interval to 30 days">FIP-0060</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0061.md" target="_blank" title="WindowPoSt Grindability Fix">FIP-0061</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0062.md" target="_blank" title="Fallback Method Handler for the Multisig Actor">FIP-0062</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0063.md" target="_blank" title="Switching to new Drand mainnet network">FIP-0063</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0065.md" target="_blank" title="Ignore built-in market locked balance in circulating supply calculation">FIP-0065</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0071.md" target="_blank" title="Deterministic State Access (IPLD Reachability)">FIP-0071</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0072.md" target="_blank" title="Improved event syscall API">FIP-0072</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0073.md" target="_blank" title="Remove beneficiary from the self_destruct syscall">FIP-0073</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0074.md" target="_blank" title="Remove cron-based automatic deal settlement">FIP-0074</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0075.md" target="_blank" title="Improvements to the FVM randomness syscalls">FIP-0075</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0076.md" target="_blank" title="Direct data onboarding">FIP-0076</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0077.md" target="_blank" title="Add Cost Opportunity For New Miner Creation">FIP-0077</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0079.md" target="_blank" title="Add BLS Aggregate Signatures to FVM">FIP-0079</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0081.md" target="_blank" title="Introduce lower bound for sector initial pledge">FIP-0081</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0083.md" target="_blank" title="Add built-in Actor events in the Verified Registry, Miner and Market Actors">FIP-0083</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0084.md" target="_blank" title="Remove Storage Miner Actor Method `ProveCommitSectors`">FIP-0084</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0085.md" target="_blank" title="Convert f090 Mining Reserve actor to a keyless account actor">FIP-0085</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0086.md" target="_blank" title="Fast Finality in Filecoin (F3)">FIP-0086</a> <span class="pr-badge-small" title="1 open PR">&#x1f500; 1</span>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0091.md" target="_blank" title="Add support for Homestead and EIP-155 Ethereum Transactions (&quot;legacy&quot; Ethereum Transactions)">FIP-0091</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0092.md" target="_blank" title="Non-Interactive PoRep">FIP-0092</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0094.md" target="_blank" title="Add Support for EIP-5656 (MCOPY Opcode) in the FEVM">FIP-0094</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0095.md" target="_blank" title="Add FEVM precompile to fetch beacon digest from chain history">FIP-0095</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0097.md" target="_blank" title="Add Support for EIP-1153 (Transient Storage) in the FEVM">FIP-0097</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0098.md" target="_blank" title="Simplify termination fee calculation to a fixed percentage of initial pledge">FIP-0098</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0100.md" target="_blank" title="Removing Batch Balancer, Replacing It With a Per-sector Fee and Removing Gas-limited Constraints">FIP-0100</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0101.md" target="_blank" title="Removal of the ProveCommitAggregate method from the miner actor">FIP-0101</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0103.md" target="_blank" title="Removal of the ExtendSectorExpiration method from the miner actor">FIP-0103</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0105.md" target="_blank" title="Add Support for EIP-2537 (BLS12-381 Precompiles) in the FEVM">FIP-0105</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0106.md" target="_blank" title="Removal of the ProveReplicaUpdates method from the miner actor">FIP-0106</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0109.md" target="_blank" title="Enable smart contract notifications for Direct Data Onboarding (DDO)">FIP-0109</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0112.md" target="_blank" title="Export Sector Liveness Check to FEVM">FIP-0112</a> <span class="pr-badge-small" title="1 open PR">&#x1f500; 1</span>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0113.md" target="_blank" title="secp256r1 (P-256) P256VERIFY Precompile for FEVM">FIP-0113</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0114.md" target="_blank" title="Add Support for EIP-7939 (CLZ Opcode) in the FEVM">FIP-0114</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0115.md" target="_blank" title="Premium Percentile Base Fee Target">FIP-0115</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" title="(Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split">FIP-0118</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge status-draft">Draft</span></td>
-                        <td><span class="count">6</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0039.md" target="_blank" title="Filecoin Message Replay Protection">FIP-0039</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0078.md" target="_blank" title="Remove Restrictions on the Minting of Datacap">FIP-0078</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0080.md" target="_blank" title="Phasing Out Fil+ and Restoring Deal Quality Multiplier to 1x">FIP-0080</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0096.md" target="_blank" title="Convert fundraising remainder address(es) to keyless account actor(s)">FIP-0096</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0110.md" target="_blank" title="Allow Shorter Deal Durations">FIP-0110</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0111.md" target="_blank" title="Add Support for EIP-7702 (Set Code for EOAs) in the FEVM">FIP-0111</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge status-deferred">Deferred</span></td>
-                        <td><span class="count">5</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0006.md" target="_blank" title="No repay debt requirement for DeclareFaultsRecovered">FIP-0006</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0016.md" target="_blank" title="Pack arbitrary data in CC sectors">FIP-0016</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0017.md" target="_blank" title="Three-messages lightweight sector updates">FIP-0017</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0025.md" target="_blank" title="Handle expired deals in ProveCommit">FIP-0025</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0033.md" target="_blank" title="Explicit premium for FIL+ verified deals">FIP-0033</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge status-withdrawn">Withdrawn</span></td>
-                        <td><span class="count">3</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0035.md" target="_blank" title="Support actors as built-in storage market clients">FIP-0035</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0037.md" target="_blank" title="Gas model adjustment for user programmability">FIP-0037</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0064.md" target="_blank" title="Add Parameters to Base Fee Mechanism">FIP-0064</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge status-rejected">Rejected</span></td>
-                        <td><span class="count">3</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0036.md" target="_blank" title="Introducing a Sector Duration Multiple for Longer Term Sector Commitment">FIP-0036</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0056.md" target="_blank" title="Sector Duration Multiplier">FIP-0056</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0070.md" target="_blank" title="Allow SPs to move partitions between deadlines">FIP-0070</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge status-accepted">Accepted</span></td>
-                        <td><span class="count">3</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0067.md" target="_blank" title="PoRep Security Policy &amp; Replacement Sealing Enforcement">FIP-0067</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0082.md" target="_blank" title="Add support for aggregated replica update proofs">FIP-0082</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" title="Implicit Messages in Block Receipts">FIP-0107</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td><span class="count">2</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" title="FIP Purpose and Guidelines">FIP-0001</a> <span class="pr-badge-small" title="1 open PR">&#x1f500; 1</span>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0003.md" target="_blank" title="Filecoin Plus Principles">FIP-0003</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge status-superseded">Superseded</span></td>
-                        <td><span class="count">2</span></td>
-                        <td>
-                            <div class="fips-list">
-                                <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0047.md" target="_blank" title="Proof Expiration &amp; PoRep Security Policy">FIP-0047</a>
-                            <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0090.md" target="_blank" title="Non-Interactive PoRep">FIP-0090</a>
-                            </div>
-                        </td>
-                    </tr>
-            </tbody>
-        </table>
-
-        <div class="prs-section"><h2>Open Pull Requests (6 total)</h2><div class="fip-pr-group"><div class="fip-pr-header"><strong>FIP-0001</strong> <span class="pr-count">(1 PR)</span></div><div class="pr-list">
-                <div class="pr-item">
-                    <a href="https://github.com/filecoin-project/FIPs/pull/1298" target="_blank" class="pr-link">#1298: Update FIP Editor List</a>
-                    <span class="pr-meta">By @ThatGuyLLC &bull; 2026-10-29</span>
-                </div>
-            </div></div><div class="fip-pr-group"><div class="fip-pr-header"><strong>FIP-0018</strong> <span class="pr-count">(1 PR)</span></div><div class="pr-list">
-                <div class="pr-item">
-                    <a href="https://github.com/filecoin-project/FIPs/pull/1296" target="_blank" class="pr-link">#1296: Update README.md for FIP-018 to Final</a>
-                    <span class="pr-meta">By @ThatGuyLLC &bull; 2026-10-19</span>
-                </div>
-            </div></div><div class="fip-pr-group"><div class="fip-pr-header"><strong>FIP-0086</strong> <span class="pr-count">(1 PR)</span></div><div class="pr-list">
-                <div class="pr-item">
-                    <a href="https://github.com/filecoin-project/FIPs/pull/1226" target="_blank" class="pr-link">#1226: update f3 FIP-0086 with deltaBackOffMax</a>
-                    <span class="pr-meta">By @hanabi1224 &bull; 2026-01-16</span>
-                </div>
-            </div></div><div class="fip-pr-group"><div class="fip-pr-header"><strong>FIP-0112</strong> <span class="pr-count">(1 PR)</span></div><div class="pr-list">
-                <div class="pr-item">
-                    <a href="https://github.com/filecoin-project/FIPs/pull/1259" target="_blank" class="pr-link">#1259: Fixing up old error model</a>
-                    <span class="pr-meta">By @ZenGround0 &bull; 2026-04-14</span>
-                </div>
-            </div></div><div class="fip-pr-group"><div class="fip-pr-header"><strong>FIP-0117</strong> <span class="pr-count">(1 PR)</span></div><div class="pr-list">
-                <div class="pr-item">
-                    <a href="https://github.com/filecoin-project/FIPs/pull/1269" target="_blank" class="pr-link">#1269: FIP-0117: Repeated SnapDeals with Piece-Level Integrity</a>
-                    <span class="pr-meta">By @lucaniz &bull; 2026-06-26</span>
-                </div>
-            </div></div><div class="fip-pr-group"><div class="fip-pr-header"><strong>FIP-0119</strong> <span class="pr-count">(1 PR)</span></div><div class="pr-list">
-                <div class="pr-item">
-                    <a href="https://github.com/filecoin-project/FIPs/pull/1293" target="_blank" class="pr-link">#1293: Add FIP: Increase maximum sector lifetime to 10 years</a>
-                    <span class="pr-meta">By @lucaniz &bull; 2026-10-09</span>
-                </div>
-            </div></div></div>
+<header class="site-header">
+  <div class="wrap">
+    <span class="eyebrow">Filecoin governance</span>
+    <h1>Filecoin Improvement Proposals</h1>
+    <p class="sub">Where every FIP stands, how long it has been there, and what is waiting on review.</p>
+    <div class="header-meta">
+      <nav class="nav" aria-label="Pages"><a href="fips-dashboard-static.html" class="current" aria-current="page">Dashboard</a><a href="fips-timeline-tracker.html">Timeline</a><a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">FIPs repo ↗</a></nav>
+      <span>Updated 2026-10-29 11:08 UTC</span>
     </div>
+  </div>
+  <div class="ground" aria-hidden="true"></div>
+  <div class="corgi-walk" tabindex="0" role="button" aria-label="Pet the corgi">
+    <span class="woof">Woof!</span>
+    <div class="corgi-flip">
+<svg viewBox="0 0 170 112" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A cartoon corgi trotting">
+  <ellipse cx="82" cy="106" rx="54" ry="4" fill="rgba(0,0,0,.28)"/>
+  <g class="corgi-bob">
+    <!-- far legs -->
+    <g class="leg b"><rect x="38" y="66" width="12" height="30" rx="6" fill="#C46F22"/><ellipse cx="44" cy="96" rx="7" ry="4" fill="#E9E2D8"/></g>
+    <g class="leg a"><rect x="98" y="66" width="12" height="30" rx="6" fill="#C46F22"/><ellipse cx="104" cy="96" rx="7" ry="4" fill="#E9E2D8"/></g>
+    <!-- tail -->
+    <g class="tail"><ellipse cx="22" cy="50" rx="13" ry="9" fill="#E58A33"/><ellipse cx="13" cy="48" rx="6" ry="5" fill="#FFF7EC"/></g>
+    <!-- body -->
+    <ellipse cx="74" cy="60" rx="50" ry="24" fill="#E58A33"/>
+    <ellipse cx="80" cy="72" rx="36" ry="11" fill="#FFF7EC"/>
+    <ellipse cx="114" cy="62" rx="16" ry="17" fill="#FFF7EC"/>
+    <!-- near legs -->
+    <g class="leg a"><rect x="50" y="68" width="13" height="30" rx="6.5" fill="#E58A33"/><ellipse cx="56.5" cy="98" rx="7.5" ry="4.5" fill="#FFF7EC"/></g>
+    <g class="leg b"><rect x="110" y="68" width="13" height="30" rx="6.5" fill="#FFF7EC"/><ellipse cx="116.5" cy="98" rx="7.5" ry="4.5" fill="#FFFFFF"/></g>
+    <!-- collar (Filecoin blue) -->
+    <path d="M106 44 q12 10 26 2" stroke="#0090FF" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="120" cy="53" r="4.2" fill="#7CC4FF" stroke="#0072CC" stroke-width="1.2"/>
+    <!-- head -->
+    <g>
+      <g class="ear"><path d="M109 30 L113 2 L128 24 Z" fill="#E58A33"/><path d="M113 25 L115 10 L123 23 Z" fill="#F7B8B0"/></g>
+      <g class="ear r"><path d="M124 23 L138 0 L144 27 Z" fill="#D4782A"/><path d="M129 22 L137 8 L140 24 Z" fill="#F7B8B0"/></g>
+      <ellipse cx="128" cy="38" rx="23" ry="19" fill="#E58A33"/>
+      <path d="M128 21 q-3 10 2 20 q8 10 22 6 l-4 -12 q-10 -4 -14 -14 z" fill="#FFF7EC"/>
+      <ellipse cx="146" cy="46" rx="16" ry="10" fill="#FFF7EC"/>
+      <ellipse cx="160" cy="42" rx="4.6" ry="3.6" fill="#1A1A1A"/>
+      <circle cx="159" cy="40.8" r="1.1" fill="#fff"/>
+      <circle cx="137" cy="33" r="3" fill="#091B2A"/>
+      <circle cx="138" cy="32" r="1" fill="#fff"/>
+      <ellipse cx="132" cy="44" rx="4.5" ry="2.8" fill="#F7A59B" opacity=".7"/>
+      <path d="M148 51 q5 4 10 -1" stroke="#5A3A22" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path class="tongue" d="M150 52 q3 9 7 0 z" fill="#F0727F"/>
+    </g>
+  </g>
+</svg>
+</div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+<section class="stats"><div class="stat"><div class="label">Total FIPs</div><div class="value">97</div></div><div class="stat"><div class="label">In Last Call</div><div class="value">0</div></div><div class="stat"><div class="label">Draft</div><div class="value">6</div></div><div class="stat"><div class="label">Accepted</div><div class="value">3</div></div><div class="stat"><div class="label">Final</div><div class="value">73</div></div><div class="stat"><div class="label">Open PRs</div><div class="value">—</div></div></section>
+<section class="card" id="last-call">
+<div class="card-head"><h2>Last Call</h2>
+<span class="hint">The final review window before a FIP moves on. Per FIP-0001, editors set a review end date, normally 14 days out. Dates here are when the README showed the change.</span></div>
+<div class="card-body"><p class="empty">No FIPs are in Last Call right now.</p><details class="more"><summary>Recent Last Calls (10 of 66)</summary>
+<div class="table-scroll" style="margin-top:10px"><table class="data">
+<thead><tr><th>FIP</th><th>Title</th><th>Entered</th><th>Left</th><th class="num">Days</th><th>Moved to</th></tr></thead>
+<tbody><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a></td><td class="title-cell">(Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split</td>
+<td class="nowrap">2026-08-14</td><td class="nowrap">2026-09-11</td>
+<td class="num">28</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">FIP-0107</a></td><td class="title-cell">Implicit Messages in Block Receipts</td>
+<td class="nowrap">2025-06-30</td><td class="nowrap">2026-09-04</td>
+<td class="num">431</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0115.md" target="_blank" rel="noopener">FIP-0115</a></td><td class="title-cell">Premium Percentile Base Fee Target</td>
+<td class="nowrap">2026-04-14</td><td class="nowrap">2026-04-21</td>
+<td class="num">7</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0112.md" target="_blank" rel="noopener">FIP-0112</a></td><td class="title-cell">Export Sector Liveness Check to FEVM</td>
+<td class="nowrap">2026-03-23</td><td class="nowrap">2026-04-14</td>
+<td class="num">22</td><td><span class="status-badge status-accepted">Approved</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0077.md" target="_blank" rel="noopener">FIP-0077</a></td><td class="title-cell">Add Cost Opportunity For New Miner Creation</td>
+<td class="nowrap">2025-05-29</td><td class="nowrap">2025-09-11</td>
+<td class="num">105</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0103.md" target="_blank" rel="noopener">FIP-0103</a></td><td class="title-cell">Removal of the ExtendSectorExpiration method from the miner actor</td>
+<td class="nowrap">2025-06-30</td><td class="nowrap">2025-09-11</td>
+<td class="num">73</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0106.md" target="_blank" rel="noopener">FIP-0106</a></td><td class="title-cell">Removal of the ProveReplicaUpdates method from the miner actor</td>
+<td class="nowrap">2025-06-30</td><td class="nowrap">2025-09-11</td>
+<td class="num">73</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0109.md" target="_blank" rel="noopener">FIP-0109</a></td><td class="title-cell">Enable smart contract notifications for Direct Data Onboarding (DDO)</td>
+<td class="nowrap">2025-08-18</td><td class="nowrap">2025-09-11</td>
+<td class="num">24</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0100.md" target="_blank" rel="noopener">FIP-0100</a></td><td class="title-cell">Removing Batch Balancer, Replacing It With a Per-sector Fee and Removing Gas-limited Constraints</td>
+<td class="nowrap">2025-02-24</td><td class="nowrap">2025-03-14</td>
+<td class="num">17</td><td><span class="status-badge status-accepted">Accepted</span></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0098.md" target="_blank" rel="noopener">FIP-0098</a></td><td class="title-cell">Simplify termination fee calculation to a fixed percentage of initial pledge</td>
+<td class="nowrap">2025-01-28</td><td class="nowrap">2025-02-24</td>
+<td class="num">27</td><td><span class="status-badge status-accepted">Accepted</span></td></tr></tbody></table></div></details></div></section>
+<section class="card" id="in-flight">
+<div class="card-head"><h2>In flight</h2>
+<span class="hint">Draft, Last Call, Accepted and Deferred FIPs, longest-waiting first. Age is a prompt to check in, not a judgment.</span></div>
+<div class="card-body"><div class="table-scroll"><table class="data">
+<thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th class="num">Open PRs</th></tr></thead>
+<tbody><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0006.md" target="_blank" rel="noopener">FIP-0006</a></td><td class="title-cell">No repay debt requirement for DeclareFaultsRecovered</td>
+<td><span class="status-badge status-deferred">Deferred</span></td>
+<td class="nowrap">2021-01-16</td><td><span class="age old">5.8 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/issues/21" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0017.md" target="_blank" rel="noopener">FIP-0017</a></td><td class="title-cell">Three-messages lightweight sector updates</td>
+<td><span class="status-badge status-deferred">Deferred</span></td>
+<td class="nowrap">2022-01-05</td><td><span class="age old">4.8 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/issues/131" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0016.md" target="_blank" rel="noopener">FIP-0016</a></td><td class="title-cell">Pack arbitrary data in CC sectors</td>
+<td><span class="status-badge status-deferred">Deferred</span></td>
+<td class="nowrap">2022-03-12</td><td><span class="age old">4.6 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/issues/57" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0025.md" target="_blank" rel="noopener">FIP-0025</a></td><td class="title-cell">Handle expired deals in ProveCommit</td>
+<td><span class="status-badge status-deferred">Deferred</span></td>
+<td class="nowrap">2022-03-12</td><td><span class="age old">4.6 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/issues/152" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0033.md" target="_blank" rel="noopener">FIP-0033</a></td><td class="title-cell">Explicit premium for FIL+ verified deals</td>
+<td><span class="status-badge status-deferred">Deferred</span></td>
+<td class="nowrap">2022-06-01</td><td><span class="age old">4.4 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/243" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0039.md" target="_blank" rel="noopener">FIP-0039</a></td><td class="title-cell">Filecoin Message Replay Protection</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td class="nowrap">2022-07-08</td><td><span class="age old">4.3 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/301" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0067.md" target="_blank" rel="noopener">FIP-0067</a></td><td class="title-cell">PoRep Security Policy &amp; Replacement Sealing Enforcement</td>
+<td><span class="status-badge status-accepted">Accepted</span></td>
+<td class="nowrap">2023-08-28</td><td><span class="age old">3.2 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/727" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0078.md" target="_blank" rel="noopener">FIP-0078</a></td><td class="title-cell">Remove Restrictions on the Minting of Datacap</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td class="nowrap">2023-10-11</td><td><span class="age old">3.0 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/844" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0080.md" target="_blank" rel="noopener">FIP-0080</a></td><td class="title-cell">Phasing Out Fil+ and Restoring Deal Quality Multiplier to 1x</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td class="nowrap">2023-11-07</td><td><span class="age old">3.0 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/774" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0082.md" target="_blank" rel="noopener">FIP-0082</a></td><td class="title-cell">Add support for aggregated replica update proofs</td>
+<td><span class="status-badge status-accepted">Accepted</span></td>
+<td class="nowrap">2024-09-18</td><td><span class="age old">2.1 years</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/752" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0096.md" target="_blank" rel="noopener">FIP-0096</a></td><td class="title-cell">Convert fundraising remainder address(es) to keyless account actor(s)</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td class="nowrap">2024-12-12</td><td><span class="age old">23 months</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/1033" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0110.md" target="_blank" rel="noopener">FIP-0110</a></td><td class="title-cell">Allow Shorter Deal Durations</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td class="nowrap">2025-11-14</td><td><span class="age mid">11 months</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/1205" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0111.md" target="_blank" rel="noopener">FIP-0111</a></td><td class="title-cell">Add Support for EIP-7702 (Set Code for EOAs) in the FEVM</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td class="nowrap">2026-01-20</td><td><span class="age mid">9 months</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/1143" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">FIP-0107</a></td><td class="title-cell">Implicit Messages in Block Receipts</td>
+<td><span class="status-badge status-accepted">Accepted</span></td>
+<td class="nowrap">2026-09-04</td><td><span class="age ">54 days</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/1149" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr></tbody></table></div></div></section>
+<section class="card" id="consistency">
+<div class="card-head"><h2>Consistency check</h2>
+<span class="hint">Compares the README table with the <code>status:</code> line in each FIP's own file.</span></div>
+<div class="card-body"><div class="table-scroll"><table class="data">
+<thead><tr><th>FIP</th><th>Title</th><th>README says</th><th>FIP file says</th><th>Note</th></tr></thead>
+<tbody><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0009.md" target="_blank" rel="noopener">FIP-0009</a></td><td class="title-cell">Exempt Window PoSts from BaseFee burn</td>
+<td><span class="status-badge status-final">Final</span></td>
+<td><span class="status-badge status-superseded">Superseded</span></td>
+<td></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0016.md" target="_blank" rel="noopener">FIP-0016</a></td><td class="title-cell">Pack arbitrary data in CC sectors</td>
+<td><span class="status-badge status-deferred">Deferred</span></td>
+<td><span class="status-badge status-rejected">Rejected</span></td>
+<td></td></tr><tr>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0039.md" target="_blank" rel="noopener">FIP-0039</a></td><td class="title-cell">Filecoin Message Replay Protection</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td><span class="status-badge status-rejected">Rejected</span></td>
+<td></td></tr></tbody></table></div>
+<p class="note">Flagged for FIP editors to look at. The dashboard doesn't decide which one is right.</p></div></section>
+<section class="card" id="prs">
+<div class="card-head"><h2>Open pull requests (0)</h2>
+<span class="hint">Matched to FIPs by the files each PR changes, then by title. Review state is the latest decisive review from each reviewer.</span></div>
+<div class="card-body"><div class="callout">Couldn't load pull requests from the GitHub API on this run (rate limit or network). They'll reappear on the next update.</div></div></section>
+<section class="card" id="by-status">
+<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FRCs are excluded. Blue dots show open PRs.</span></div>
+<div class="card-body"><div class="table-scroll"><table class="data">
+<thead><tr><th>Status</th><th class="num">Count</th><th>FIPs</th></tr></thead>
+<tbody><tr><td><span class="status-badge status-draft">Draft</span></td><td class="num"><strong>6</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0039.md" target="_blank" rel="noopener" title="Filecoin Message Replay Protection">FIP-0039</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0078.md" target="_blank" rel="noopener" title="Remove Restrictions on the Minting of Datacap">FIP-0078</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0080.md" target="_blank" rel="noopener" title="Phasing Out Fil+ and Restoring Deal Quality Multiplier to 1x">FIP-0080</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0096.md" target="_blank" rel="noopener" title="Convert fundraising remainder address(es) to keyless account actor(s)">FIP-0096</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0110.md" target="_blank" rel="noopener" title="Allow Shorter Deal Durations">FIP-0110</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0111.md" target="_blank" rel="noopener" title="Add Support for EIP-7702 (Set Code for EOAs) in the FEVM">FIP-0111</a></div></td></tr><tr><td><span class="status-badge status-accepted">Accepted</span></td><td class="num"><strong>3</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0067.md" target="_blank" rel="noopener" title="PoRep Security Policy &amp; Replacement Sealing Enforcement">FIP-0067</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0082.md" target="_blank" rel="noopener" title="Add support for aggregated replica update proofs">FIP-0082</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener" title="Implicit Messages in Block Receipts">FIP-0107</a></div></td></tr><tr><td><span class="status-badge status-deferred">Deferred</span></td><td class="num"><strong>5</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0006.md" target="_blank" rel="noopener" title="No repay debt requirement for DeclareFaultsRecovered">FIP-0006</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0016.md" target="_blank" rel="noopener" title="Pack arbitrary data in CC sectors">FIP-0016</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0017.md" target="_blank" rel="noopener" title="Three-messages lightweight sector updates">FIP-0017</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0025.md" target="_blank" rel="noopener" title="Handle expired deals in ProveCommit">FIP-0025</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0033.md" target="_blank" rel="noopener" title="Explicit premium for FIL+ verified deals">FIP-0033</a></div></td></tr><tr><td><span class="status-badge status-active">Active</span></td><td class="num"><strong>2</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener" title="FIP Purpose and Guidelines">FIP-0001</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0003.md" target="_blank" rel="noopener" title="Filecoin Plus Principles">FIP-0003</a></div></td></tr><tr><td><span class="status-badge status-final">Final</span></td><td class="num"><strong>73</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0002.md" target="_blank" rel="noopener" title="Free Faults on Newly Faulted Sectors of a Missed WindowPoSt">FIP-0002</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0004.md" target="_blank" rel="noopener" title="Liquidity Improvement for Storage Miners">FIP-0004</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0005.md" target="_blank" rel="noopener" title="Remove ineffective reward vesting">FIP-0005</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0007.md" target="_blank" rel="noopener" title="h/amt-v3">FIP-0007</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0008.md" target="_blank" rel="noopener" title="Add miner batched sector pre-commit method">FIP-0008</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0009.md" target="_blank" rel="noopener" title="Exempt Window PoSts from BaseFee burn">FIP-0009</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0010.md" target="_blank" rel="noopener" title="Off-Chain Window PoSt Verification">FIP-0010</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0011.md" target="_blank" rel="noopener" title="Remove reward auction from reporting consensus faults">FIP-0011</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0012.md" target="_blank" rel="noopener" title="DataCap Top up for FIL+ Client Addresses">FIP-0012</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0013.md" target="_blank" rel="noopener" title="Add ProveCommitSectorAggregated method to reduce on-chain congestion">FIP-0013</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0014.md" target="_blank" rel="noopener" title="Allow V1 proof sectors to be extended up to a maximum of 540 days">FIP-0014</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0015.md" target="_blank" rel="noopener" title="Revert FIP-0009(Exempt Window PoSts from BaseFee burn)">FIP-0015</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0018.md" target="_blank" rel="noopener" title="New miner terminology proposal">FIP-0018</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0019.md" target="_blank" rel="noopener" title="Snap Deals">FIP-0019</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0020.md" target="_blank" rel="noopener" title="Add return value to WithdrawBalance">FIP-0020</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0021.md" target="_blank" rel="noopener" title="Correct quality calculation on expiration">FIP-0021</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0022.md" target="_blank" rel="noopener" title="Bad deals don&#x27;t fail PublishStorageDeals">FIP-0022</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0023.md" target="_blank" rel="noopener" title="Break ties between tipsets of equal weights">FIP-0023</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0024.md" target="_blank" rel="noopener" title="BatchBalancer &amp; BatchDiscount Post -Hyperdrive adjustment">FIP-0024</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0026.md" target="_blank" rel="noopener" title="Extend sector fault cutoff period from 2 weeks to 6 weeks">FIP-0026</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0027.md" target="_blank" rel="noopener" title="Change type of DealProposal Label field from a (Golang) String to a Union">FIP-0027</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0028.md" target="_blank" rel="noopener" title="Remove DataCap and verified client status from client address">FIP-0028</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0029.md" target="_blank" rel="noopener" title="Beneficiary address for storage providers">FIP-0029</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0030.md" target="_blank" rel="noopener" title="Introducing the Filecoin Virtual Machine (FVM)">FIP-0030</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0031.md" target="_blank" rel="noopener" title="Atomic switch to non-programmable FVM">FIP-0031</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0032.md" target="_blank" rel="noopener" title="Gas model adjustment for non-programmable FVM">FIP-0032</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0034.md" target="_blank" rel="noopener" title="Fix pre-commit deposit independent of sector content">FIP-0034</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0041.md" target="_blank" rel="noopener" title="Forward Compatibility for PreCommit and ReplicaUpdate">FIP-0041</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0044.md" target="_blank" rel="noopener" title="Standard Authentication Method for Actors">FIP-0044</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0045.md" target="_blank" rel="noopener" title="De-couple verified registry from markets">FIP-0045</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0048.md" target="_blank" rel="noopener" title="f4 Address Class">FIP-0048</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0049.md" target="_blank" rel="noopener" title="Actor Events">FIP-0049</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0050.md" target="_blank" rel="noopener" title="API Between User-Programmed Actors and Built-In Actors">FIP-0050</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0052.md" target="_blank" rel="noopener" title="Increase max sector commitment to 3.5 years">FIP-0052</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0054.md" target="_blank" rel="noopener" title="Filecoin EVM Runtime (FEVM)">FIP-0054</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0055.md" target="_blank" rel="noopener" title="Supporting Ethereum Accounts, Addresses, and Transactions">FIP-0055</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0057.md" target="_blank" rel="noopener" title="Update Gas Charging Schedule and System Limits for FEVM">FIP-0057</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0059.md" target="_blank" rel="noopener" title="Synthetic PoRep">FIP-0059</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0060.md" target="_blank" rel="noopener" title="Set market deal maintenance interval to 30 days">FIP-0060</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0061.md" target="_blank" rel="noopener" title="WindowPoSt Grindability Fix">FIP-0061</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0062.md" target="_blank" rel="noopener" title="Fallback Method Handler for the Multisig Actor">FIP-0062</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0063.md" target="_blank" rel="noopener" title="Switching to new Drand mainnet network">FIP-0063</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0065.md" target="_blank" rel="noopener" title="Ignore built-in market locked balance in circulating supply calculation">FIP-0065</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0071.md" target="_blank" rel="noopener" title="Deterministic State Access (IPLD Reachability)">FIP-0071</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0072.md" target="_blank" rel="noopener" title="Improved event syscall API">FIP-0072</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0073.md" target="_blank" rel="noopener" title="Remove beneficiary from the self_destruct syscall">FIP-0073</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0074.md" target="_blank" rel="noopener" title="Remove cron-based automatic deal settlement">FIP-0074</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0075.md" target="_blank" rel="noopener" title="Improvements to the FVM randomness syscalls">FIP-0075</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0076.md" target="_blank" rel="noopener" title="Direct data onboarding">FIP-0076</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0077.md" target="_blank" rel="noopener" title="Add Cost Opportunity For New Miner Creation">FIP-0077</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0079.md" target="_blank" rel="noopener" title="Add BLS Aggregate Signatures to FVM">FIP-0079</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0081.md" target="_blank" rel="noopener" title="Introduce lower bound for sector initial pledge">FIP-0081</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0083.md" target="_blank" rel="noopener" title="Add built-in Actor events in the Verified Registry, Miner and Market Actors">FIP-0083</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0084.md" target="_blank" rel="noopener" title="Remove Storage Miner Actor Method `ProveCommitSectors`">FIP-0084</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0085.md" target="_blank" rel="noopener" title="Convert f090 Mining Reserve actor to a keyless account actor">FIP-0085</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0086.md" target="_blank" rel="noopener" title="Fast Finality in Filecoin (F3)">FIP-0086</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0091.md" target="_blank" rel="noopener" title="Add support for Homestead and EIP-155 Ethereum Transactions (&quot;legacy&quot; Ethereum Transactions)">FIP-0091</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0092.md" target="_blank" rel="noopener" title="Non-Interactive PoRep">FIP-0092</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0094.md" target="_blank" rel="noopener" title="Add Support for EIP-5656 (MCOPY Opcode) in the FEVM">FIP-0094</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0095.md" target="_blank" rel="noopener" title="Add FEVM precompile to fetch beacon digest from chain history">FIP-0095</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0097.md" target="_blank" rel="noopener" title="Add Support for EIP-1153 (Transient Storage) in the FEVM">FIP-0097</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0098.md" target="_blank" rel="noopener" title="Simplify termination fee calculation to a fixed percentage of initial pledge">FIP-0098</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0100.md" target="_blank" rel="noopener" title="Removing Batch Balancer, Replacing It With a Per-sector Fee and Removing Gas-limited Constraints">FIP-0100</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0101.md" target="_blank" rel="noopener" title="Removal of the ProveCommitAggregate method from the miner actor">FIP-0101</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0103.md" target="_blank" rel="noopener" title="Removal of the ExtendSectorExpiration method from the miner actor">FIP-0103</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0105.md" target="_blank" rel="noopener" title="Add Support for EIP-2537 (BLS12-381 Precompiles) in the FEVM">FIP-0105</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0106.md" target="_blank" rel="noopener" title="Removal of the ProveReplicaUpdates method from the miner actor">FIP-0106</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0109.md" target="_blank" rel="noopener" title="Enable smart contract notifications for Direct Data Onboarding (DDO)">FIP-0109</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0112.md" target="_blank" rel="noopener" title="Export Sector Liveness Check to FEVM">FIP-0112</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0113.md" target="_blank" rel="noopener" title="secp256r1 (P-256) P256VERIFY Precompile for FEVM">FIP-0113</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0114.md" target="_blank" rel="noopener" title="Add Support for EIP-7939 (CLZ Opcode) in the FEVM">FIP-0114</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0115.md" target="_blank" rel="noopener" title="Premium Percentile Base Fee Target">FIP-0115</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener" title="(Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split">FIP-0118</a></div></td></tr><tr><td><span class="status-badge status-superseded">Superseded</span></td><td class="num"><strong>2</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0047.md" target="_blank" rel="noopener" title="Proof Expiration &amp; PoRep Security Policy">FIP-0047</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0090.md" target="_blank" rel="noopener" title="Non-Interactive PoRep">FIP-0090</a></div></td></tr><tr><td><span class="status-badge status-withdrawn">Withdrawn</span></td><td class="num"><strong>3</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0035.md" target="_blank" rel="noopener" title="Support actors as built-in storage market clients">FIP-0035</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0037.md" target="_blank" rel="noopener" title="Gas model adjustment for user programmability">FIP-0037</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0064.md" target="_blank" rel="noopener" title="Add Parameters to Base Fee Mechanism">FIP-0064</a></div></td></tr><tr><td><span class="status-badge status-rejected">Rejected</span></td><td class="num"><strong>3</strong></td><td><div class="chips"><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0036.md" target="_blank" rel="noopener" title="Introducing a Sector Duration Multiple for Longer Term Sector Commitment">FIP-0036</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0056.md" target="_blank" rel="noopener" title="Sector Duration Multiplier">FIP-0056</a><a class="chip" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0070.md" target="_blank" rel="noopener" title="Allow SPs to move partitions between deadlines">FIP-0070</a></div></td></tr></tbody></table></div></div></section>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Read-only view of <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a>. Status dates come from the README's git history; nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
+    <p>Generated 2026-10-29 11:08 UTC. Unofficial community tool.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var c = document.querySelector('.corgi-walk');
+  if (!c) return;
+  function bark() {
+    c.classList.remove('barking'); void c.offsetWidth; c.classList.add('barking');
+    clearTimeout(c._t); c._t = setTimeout(function () { c.classList.remove('barking'); }, 900);
+  }
+  c.addEventListener('click', bark);
+  c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); bark(); } });
+})();
+</script>
+
 </body>
 </html>

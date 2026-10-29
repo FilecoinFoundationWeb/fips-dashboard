@@ -1,638 +1,273 @@
 #!/usr/bin/env python3
-"""
-Script to generate a static FIPs dashboard HTML file
+"""Generate the static FIPs dashboard (fips-dashboard-static.html).
+
+Data sources (all read-only):
+  * a local clone of filecoin-project/FIPs: README table, its full git
+    history, and each FIP file's front matter
+  * the GitHub API: open pull requests, the files they touch, their reviews
 """
 
-import urllib.request
-import json
-import re
 from collections import defaultdict
-from datetime import datetime
-from fip_utils import get_status_class, parse_fip_table, html_escape, make_github_request
+from datetime import datetime, timezone
 
-FIPS_REPO_URL = 'https://raw.githubusercontent.com/filecoin-project/FIPs/master/README.md'
-FIPS_BASE_URL = 'https://github.com/filecoin-project/FIPs/blob/master/'
-GITHUB_API_BASE = 'https://api.github.com/repos/filecoin-project/FIPs'
+import fip_utils as u
+from fip_utils import html_escape as esc
+from theme import page
 
-def fetch_readme():
-    """Fetch the README from GitHub"""
-    try:
-        with urllib.request.urlopen(FIPS_REPO_URL) as response:
-            return response.read().decode('utf-8')
-    except Exception as e:
-        print(f"Error fetching README: {e}")
-        return None
+OUTPUT_FILE = 'fips-dashboard-static.html'
 
-def parse_fips(text):
-    """Parse FIPs from the README markdown"""
-    return parse_fip_table(text)
-
-def fetch_open_prs():
-    """Fetch all open pull requests with pagination."""
-    all_prs = []
-    page = 1
-
-    while True:
-        url = f"{GITHUB_API_BASE}/pulls?state=open&per_page=100&page={page}"
-        try:
-            prs = make_github_request(url)
-            if not prs:
-                break
-            all_prs.extend(prs)
-            if len(prs) < 100:
-                break
-            page += 1
-        except Exception as e:
-            print(f"Warning: Could not fetch PRs (page {page}): {e}")
-            break
-
-    return all_prs
-
-def extract_fip_from_title(title):
-    """Extract the subject FIP number from a PR title only.
-
-    Only looks at the title to avoid false associations from
-    body references (e.g. 'builds on FIP-0019' is context, not subject).
-    Skips placeholder patterns like FIPXXXX.
-    """
-    if not title:
-        return []
-
-    # Skip placeholder patterns (FIPXXXX, FIP-XXXX)
-    if re.search(r'FIP[-\s]?[Xx]{2,}', title, re.IGNORECASE):
-        return []
-
-    fip_numbers = set()
-    matches = re.findall(r'FIP[-\s]?(\d{1,4})', title, re.IGNORECASE)
-    for match in matches:
-        fip_numbers.add(match.zfill(4))
-    return sorted(list(fip_numbers))
+# Statuses where a FIP is still moving through the process.
+IN_FLIGHT = ('Draft', 'Last Call', 'Accepted', 'Deferred')
+STATUS_ORDER = ['Last Call', 'Draft', 'Accepted', 'Deferred', 'Active', 'Final',
+                'Superseded', 'Withdrawn', 'Rejected']
 
 
-def extract_fip_from_files(pr_number):
-    """Extract FIP numbers from the actual files changed in a PR.
-
-    This is the ground truth — if a PR modifies FIPS/fip-0117.md,
-    then it's about FIP-0117 regardless of what the title/body say.
-    """
-    try:
-        files = make_github_request(
-            f"{GITHUB_API_BASE}/pulls/{pr_number}/files"
-        )
-        fip_numbers = set()
-        for f in files:
-            m = re.search(r'FIPS/fip-(\d+)\.md', f.get('filename', ''), re.IGNORECASE)
-            if m:
-                fip_numbers.add(m.group(1).zfill(4))
-        return sorted(list(fip_numbers))
-    except Exception as e:
-        print(f"Warning: Could not fetch files for PR #{pr_number}: {e}")
-        return []
+def badge(status):
+    return f'<span class="status-badge {u.get_status_class(status)}">{esc(status)}</span>'
 
 
-def process_prs(prs):
-    """Process PRs and extract FIP information.
+def fip_link(num):
+    return f'<a class="fip-id" href="{esc(u.fip_url(num))}" target="_blank" rel="noopener">FIP-{esc(num)}</a>'
 
-    Uses a priority system:
-    1. FIP numbers from actual files changed (ground truth)
-    2. FIP numbers from the PR title (subject FIP)
-    3. If neither found, marked as 'General'
-    Body text is NOT searched to avoid false associations.
-    """
-    fip_prs = {}
-    for pr in prs:
-        title = pr.get('title', '')
-        pr_num = pr.get('number')
 
-        # Priority 1: Check actual files changed
-        fip_numbers = extract_fip_from_files(pr_num)
+def date_str(d):
+    return d.strftime('%Y-%m-%d') if d else '—'
 
-        # Priority 2: Fall back to title extraction
-        if not fip_numbers:
-            fip_numbers = extract_fip_from_title(title)
 
-        # If still nothing, skip (don't create false associations)
-        if not fip_numbers:
-            print(f"  PR #{pr_num}: No FIP number found ('{title[:60]}')")
+def age_cell(days):
+    if days is None:
+        return '<span class="age">—</span>'
+    cls = 'old' if days >= 365 else 'mid' if days >= 180 else ''
+    return f'<span class="age {cls}">{esc(u.humanize_days(days))}</span>'
+
+
+def discussion_links(urls):
+    if not urls:
+        return '<span class="pill">none listed</span>'
+    out = []
+    for i, url in enumerate(urls):
+        label = 'Discussion' if len(urls) == 1 else f'Discussion {i + 1}'
+        out.append(f'<a href="{esc(url)}" target="_blank" rel="noopener">{label}</a>')
+    return ' · '.join(out)
+
+
+def review_pill(state):
+    cls = ('approved' if state.startswith('Approved') else
+           'changes' if state == 'Changes requested' else
+           'waiting' if state == 'Awaiting review' else '')
+    return f'<span class="pill {cls}">{esc(state)}</span>'
+
+
+# ---------------------------------------------------------------------------
+# Sections
+# ---------------------------------------------------------------------------
+
+def stats_html(fips, open_lc, prs, prs_loaded=True):
+    counts = defaultdict(int)
+    for f in fips.values():
+        counts[f['status']] += 1
+    cards = [
+        ('Total FIPs', len(fips), False),
+        ('In Last Call', len(open_lc), bool(open_lc)),
+        ('Draft', counts['Draft'], False),
+        ('Accepted', counts['Accepted'], False),
+        ('Final', counts['Final'], False),
+        ('Open PRs', len({p['number'] for p in prs}) if prs or prs_loaded else '—', False),
+    ]
+    return '<section class="stats">' + ''.join(
+        f'<div class="stat{" accent" if accent else ""}"><div class="label">{esc(label)}</div>'
+        f'<div class="value">{value}</div></div>'
+        for label, value, accent in cards
+    ) + '</section>'
+
+
+def last_call_html(open_lc, past_lc):
+    now = datetime.now(timezone.utc)
+    if open_lc:
+        rows = []
+        for w in open_lc:
+            left = (w['end'] - now).days
+            left_txt = f'{left} days left' if left > 0 else ('ends today' if left == 0 else f'ended {-left} days ago')
+            est = ' <span class="pill est" title="No review-period-end set; FIP-0001 default of 14 days">est.</span>' if w['estimated_end'] else ''
+            rows.append(f'''<tr>
+<td>{fip_link(w["number"])}</td><td class="title-cell">{esc(w["title"])}</td>
+<td class="nowrap">{date_str(w["start"])}</td>
+<td class="nowrap">{date_str(w["end"])}{est}</td>
+<td class="nowrap"><strong>{esc(left_txt)}</strong></td>
+<td>{discussion_links(w["discussions"])}</td></tr>''')
+        current = f'''<div class="table-scroll"><table class="data">
+<thead><tr><th>FIP</th><th>Title</th><th>Entered</th><th>Review ends</th><th>Window</th><th>Where to comment</th></tr></thead>
+<tbody>{"".join(rows)}</tbody></table></div>'''
+    else:
+        current = '<p class="empty">No FIPs are in Last Call right now.</p>'
+
+    past_rows = ''.join(f'''<tr>
+<td>{fip_link(w["number"])}</td><td class="title-cell">{esc(w["title"])}</td>
+<td class="nowrap">{date_str(w["start"])}</td><td class="nowrap">{date_str(w["exit"])}</td>
+<td class="num">{w["days"]}</td><td>{badge(w["outcome"])}</td></tr>''' for w in past_lc[:10])
+    past = ''
+    if past_lc:
+        past = f'''<details class="more"><summary>Recent Last Calls ({min(10, len(past_lc))} of {len(past_lc)})</summary>
+<div class="table-scroll" style="margin-top:10px"><table class="data">
+<thead><tr><th>FIP</th><th>Title</th><th>Entered</th><th>Left</th><th class="num">Days</th><th>Moved to</th></tr></thead>
+<tbody>{past_rows}</tbody></table></div></details>'''
+
+    return f'''<section class="card" id="last-call">
+<div class="card-head"><h2>Last Call</h2>
+<span class="hint">The final review window before a FIP moves on. Per FIP-0001, editors set a review end date, normally 14 days out. Dates here are when the README showed the change.</span></div>
+<div class="card-body">{current}{past}</div></section>'''
+
+
+def in_flight_html(fips, history, files, prs_grouped):
+    rows = []
+    for num, f in fips.items():
+        if f['status'] not in IN_FLIGHT:
             continue
+        since = u.current_status_since(history, num, f['status'])
+        days = u.days_between(since) if since else None
+        meta = files.get(num, {})
+        pr_count = len(prs_grouped.get(num, []))
+        rows.append((days if days is not None else -1, f'''<tr>
+<td>{fip_link(num)}</td><td class="title-cell">{esc(f["title"])}</td>
+<td>{badge(f["status"])}</td>
+<td class="nowrap">{date_str(since)}</td><td>{age_cell(days)}</td>
+<td>{discussion_links(meta.get("_discussions", []))}</td>
+<td class="num">{f'<a href="#pr-{num}">{pr_count}</a>' if pr_count else '0'}</td></tr>'''))
+    rows.sort(key=lambda r: r[0], reverse=True)
+    body = (f'''<div class="table-scroll"><table class="data">
+<thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th class="num">Open PRs</th></tr></thead>
+<tbody>{"".join(r[1] for r in rows)}</tbody></table></div>''' if rows
+            else '<p class="empty">No FIPs are currently in flight.</p>')
+    return f'''<section class="card" id="in-flight">
+<div class="card-head"><h2>In flight</h2>
+<span class="hint">Draft, Last Call, Accepted and Deferred FIPs, longest-waiting first. Age is a prompt to check in, not a judgment.</span></div>
+<div class="card-body">{body}</div></section>'''
 
-        pr_info = {
-            'number': pr_num,
-            'title': title,
-            'url': pr.get('html_url'),
-            'author': pr.get('user', {}).get('login', 'Unknown'),
-            'created_at': pr.get('created_at', ''),
-        }
 
-        for fip_num in fip_numbers:
-            if fip_num not in fip_prs:
-                fip_prs[fip_num] = []
-            fip_prs[fip_num].append(pr_info)
+def mismatch_html(mismatches):
+    if not mismatches:
+        body = '<p class="empty">README and FIP files agree on every status.</p>'
+    else:
+        rows = ''.join(f'''<tr>
+<td>{fip_link(m["number"])}</td><td class="title-cell">{esc(m["title"])}</td>
+<td>{badge(m["readme"]) if m["readme"] else '<span class="pill">not listed</span>'}</td>
+<td>{badge(m["file"]) if m["file"] else '<span class="pill">no file</span>'}</td>
+<td>{esc(m["note"])}</td></tr>''' for m in mismatches)
+        body = f'''<div class="table-scroll"><table class="data">
+<thead><tr><th>FIP</th><th>Title</th><th>README says</th><th>FIP file says</th><th>Note</th></tr></thead>
+<tbody>{rows}</tbody></table></div>
+<p class="note">Flagged for FIP editors to look at. The dashboard doesn't decide which one is right.</p>'''
+    return f'''<section class="card" id="consistency">
+<div class="card-head"><h2>Consistency check</h2>
+<span class="hint">Compares the README table with the <code>status:</code> line in each FIP's own file.</span></div>
+<div class="card-body">{body}</div></section>'''
 
-    return fip_prs
 
-def generate_prs_section_html(fip_prs):
-    """Generate HTML for PRs section with XSS-safe output."""
-    if not fip_prs:
-        return '<div class="no-prs">No open PRs found.</div>'
-    
-    # Get all unique PRs
-    all_prs = []
-    seen_prs = set()
-    for fip_num, prs in fip_prs.items():
-        for pr in prs:
-            if pr['number'] not in seen_prs:
-                all_prs.append((fip_num, pr))
-                seen_prs.add(pr['number'])
-    
-    if not all_prs:
-        return '<div class="no-prs">No open PRs found.</div>'
-    
-    # Group by FIP
-    html = '<div class="prs-section">'
-    html += f'<h2>Open Pull Requests ({len(seen_prs)} total)</h2>'
-    
-    # Sort FIPs with PRs
-    sorted_fips = sorted(fip_prs.keys())
-    
-    for fip_num in sorted_fips:
-        prs = fip_prs[fip_num]
-        safe_fip = html_escape(fip_num)
-        html += f'<div class="fip-pr-group">'
-        html += f'<div class="fip-pr-header"><strong>FIP-{safe_fip}</strong> <span class="pr-count">({len(prs)} PR{"s" if len(prs) > 1 else ""})</span></div>'
-        html += '<div class="pr-list">'
-        for pr in prs:
-            created_date = datetime.fromisoformat(pr['created_at'].replace('Z', '+00:00')).strftime('%Y-%m-%d')
-            safe_title = html_escape(pr['title'])
-            safe_author = html_escape(pr['author'])
-            safe_url = html_escape(pr['url'])
-            html += f'''
-                <div class="pr-item">
-                    <a href="{safe_url}" target="_blank" class="pr-link">#{pr['number']}: {safe_title}</a>
-                    <span class="pr-meta">By @{safe_author} &bull; {created_date}</span>
-                </div>
-            '''
-        html += '</div></div>'
-    
-    html += '</div>'
-    return html
+def by_status_html(fips, prs_grouped):
+    groups = defaultdict(list)
+    for num, f in fips.items():
+        groups[f['status']].append(num)
+    order = [s for s in STATUS_ORDER if s in groups] + sorted(s for s in groups if s not in STATUS_ORDER)
+    rows = []
+    for status in order:
+        chips = []
+        for num in sorted(groups[status], key=int):
+            n = len(prs_grouped.get(num, []))
+            dot = f' <span class="pr-dot" title="{n} open PR{"s" if n != 1 else ""}">{n}</span>' if n else ''
+            chips.append(f'<a class="chip" href="{esc(u.fip_url(num))}" target="_blank" rel="noopener" '
+                         f'title="{esc(fips[num]["title"])}">FIP-{num}{dot}</a>')
+        rows.append(f'<tr><td>{badge(status)}</td><td class="num"><strong>{len(groups[status])}</strong></td>'
+                    f'<td><div class="chips">{"".join(chips)}</div></td></tr>')
+    return f'''<section class="card" id="by-status">
+<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FRCs are excluded. Blue dots show open PRs.</span></div>
+<div class="card-body"><div class="table-scroll"><table class="data">
+<thead><tr><th>Status</th><th class="num">Count</th><th>FIPs</th></tr></thead>
+<tbody>{"".join(rows)}</tbody></table></div></div></section>'''
 
-def generate_html(fips, fip_prs=None):
-    """Generate the HTML dashboard"""
-    if fip_prs is None:
-        fip_prs = {}
-    
-    # Group FIPs by status
-    status_groups = defaultdict(list)
-    for fip in fips:
-        status = fip['status']
-        if 'Superseded' in status:
-            status = 'Superseded'
-        status_groups[status].append(fip)
-    
-    # Sort statuses by count
-    sorted_statuses = sorted(status_groups.keys(), key=lambda x: len(status_groups[x]), reverse=True)
-    
-    # Generate table rows
-    table_rows = []
-    for status in sorted_statuses:
-        fips_in_status = sorted(status_groups[status], key=lambda x: int(x['number']))
-        status_class = get_status_class(status)
-        safe_status = html_escape(status)
-        
-        # Generate FIP links (only FIPs, no FRCs)
-        fip_links = []
-        for fip in fips_in_status:
-            fip_path = f"FIPS/fip-{fip['number']}.md"
-            url = f"{FIPS_BASE_URL}{fip_path}"
-            fip_num = fip['number']
-            safe_title = html_escape(fip['title'])
-            
-            # Check if there are PRs for this FIP
-            pr_badges = ''
-            if fip_num in fip_prs:
-                pr_count = len(fip_prs[fip_num])
-                pr_badges = f' <span class="pr-badge-small" title="{pr_count} open PR{"s" if pr_count > 1 else ""}">&#x1f500; {pr_count}</span>'
-            
-            fip_links.append(f'<a href="{url}" target="_blank" title="{safe_title}">FIP-{fip["number"]}</a>{pr_badges}')
-        
-        fip_links_html = '\n                            '.join(fip_links)
-        
-        table_rows.append(f'''
-                    <tr>
-                        <td><span class="status-badge {status_class}">{safe_status}</span></td>
-                        <td><span class="count">{len(fips_in_status)}</span></td>
-                        <td>
-                            <div class="fips-list">
-                                {fip_links_html}
-                            </div>
-                        </td>
-                    </tr>''')
-    
-    # Calculate stats
-    total_fips = len(fips)
-    final_count = len(status_groups.get('Final', []))
-    draft_count = len(status_groups.get('Draft', []))
-    active_count = len(status_groups.get('Accepted', [])) + len(status_groups.get('Last Call', []))
-    
-    html = f'''<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Real-time dashboard tracking the status of all Filecoin Improvement Proposals (FIPs), including open pull requests and status changes.">
-    <title>Filecoin Improvement Proposals (FIPs) Dashboard</title>
-    <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
 
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }}
+def prs_html(prs_grouped, fips, loaded=True):
+    unique = {pr['number'] for prs in prs_grouped.values() for pr in prs}
+    if not loaded:
+        body = ('<div class="callout">Couldn\'t load pull requests from the GitHub API on this run '
+                '(rate limit or network). They\'ll reappear on the next update.</div>')
+    elif not unique:
+        body = '<p class="empty">No open PRs found.</p>'
+    else:
+        keys = sorted((k for k in prs_grouped if k != 'General'), key=int)
+        if 'General' in prs_grouped:
+            keys.append('General')
+        groups = []
+        for key in keys:
+            if key == 'General':
+                head = '<h3>General FIP-related</h3>'
+                anchor = 'pr-general'
+            else:
+                status = fips.get(key, {}).get('status')
+                t = fips.get(key, {}).get("title", "")
+                pill = f'<span class="pill">{esc(t[:80])}</span>' if t else '<span class="pill">not yet in README</span>'
+                head = f'<h3>{fip_link(key)} {badge(status) if status else ""} {pill}</h3>'
+                anchor = f'pr-{key}'
+            items = []
+            for pr in sorted(prs_grouped[key], key=lambda p: p['updated_at'], reverse=True):
+                idle = pr['idle_days']
+                items.append(f'''<div class="pr-item">
+<a href="{esc(pr["url"])}" target="_blank" rel="noopener">#{pr["number"]}: {esc(pr["title"])}</a>
+<span class="pr-meta">{review_pill(pr["review"])}<span>@{esc(pr["author"])}</span>
+<span>opened {esc(pr["created_at"][:10])}</span>
+<span>{"active today" if idle == 0 else f"idle {idle} day" + ("s" if idle != 1 else "")}</span></span></div>''')
+            groups.append(f'<div class="pr-group" id="{anchor}">{head}{"".join(items)}</div>')
+        body = ''.join(groups)
+    return f'''<section class="card" id="prs">
+<div class="card-head"><h2>Open pull requests ({len(unique)})</h2>
+<span class="hint">Matched to FIPs by the files each PR changes, then by title. Review state is the latest decisive review from each reviewer.</span></div>
+<div class="card-body">{body}</div></section>'''
 
-        .container {{
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }}
 
-        .header {{
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }}
-
-        .header h1 {{
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }}
-
-        .header p {{
-            opacity: 0.9;
-            font-size: 1.1em;
-        }}
-
-        .last-updated {{
-            margin-top: 15px;
-            font-size: 0.9em;
-            opacity: 0.8;
-        }}
-
-        .controls {{
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }}
-
-        .refresh-btn {{
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s;
-        }}
-
-        .refresh-btn:hover {{
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }}
-
-        .refresh-btn:active {{
-            transform: translateY(0);
-        }}
-
-        .status-table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-        }}
-
-        .status-table thead {{
-            background: #f8f9fa;
-        }}
-
-        .status-table th {{
-            padding: 18px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #e0e0e0;
-            font-size: 1.1em;
-        }}
-
-        .status-table td {{
-            padding: 18px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: top;
-        }}
-
-        .status-table tbody tr:hover {{
-            background: #f8f9fa;
-            transition: background 0.2s;
-        }}
-
-        .status-badge {{
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }}
-
-        .status-final {{
-            background: #d4edda;
-            color: #155724;
-        }}
-
-        .status-draft {{
-            background: #fff3cd;
-            color: #856404;
-        }}
-
-        .status-accepted {{
-            background: #cce5ff;
-            color: #004085;
-        }}
-
-        .status-deferred {{
-            background: #ffeaa7;
-            color: #856404;
-        }}
-
-        .status-rejected {{
-            background: #f8d7da;
-            color: #721c24;
-        }}
-
-        .status-withdrawn {{
-            background: #e2e3e5;
-            color: #383d41;
-        }}
-
-        .status-active {{
-            background: #d1ecf1;
-            color: #0c5460;
-        }}
-
-        .status-last-call {{
-            background: #f0ad4e;
-            color: #fff;
-        }}
-
-        .status-superseded {{
-            background: #e7e7e7;
-            color: #555;
-        }}
-
-        .count {{
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #333;
-        }}
-
-        .fips-list {{
-            margin-top: 10px;
-        }}
-
-        .fips-list a {{
-            display: inline-block;
-            margin: 4px 8px 4px 0;
-            padding: 6px 12px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.9em;
-            transition: all 0.2s;
-        }}
-
-        .fips-list a:hover {{
-            background: #5568d3;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }}
-
-        .stats-summary {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f8f9fa;
-        }}
-
-        .stat-card {{
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }}
-
-        .stat-card h3 {{
-            color: #666;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }}
-
-        .stat-card .number {{
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #667eea;
-        }}
-
-        .pr-badge-small {{
-            display: inline-block;
-            background: #28a745;
-            color: white;
-            font-size: 0.75em;
-            padding: 2px 6px;
-            border-radius: 10px;
-            margin-left: 4px;
-            font-weight: 600;
-        }}
-
-        .prs-section {{
-            margin-top: 40px;
-            padding: 30px;
-            border-top: 2px solid #e0e0e0;
-        }}
-
-        .prs-section h2 {{
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }}
-
-        .fip-pr-group {{
-            margin-bottom: 25px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-        }}
-
-        .fip-pr-header {{
-            font-size: 1.2em;
-            margin-bottom: 12px;
-            color: #333;
-        }}
-
-        .pr-count {{
-            color: #666;
-            font-size: 0.9em;
-            font-weight: normal;
-        }}
-
-        .pr-list {{
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }}
-
-        .pr-item {{
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 3px solid #667eea;
-        }}
-
-        .pr-link {{
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 4px;
-        }}
-
-        .pr-link:hover {{
-            text-decoration: underline;
-        }}
-
-        .pr-meta {{
-            color: #666;
-            font-size: 0.85em;
-        }}
-
-        .no-prs {{
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-style: italic;
-        }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>&#x1f4ca; Filecoin Improvement Proposals Dashboard</h1>
-            <p>Real-time status tracking of all FIPs</p>
-            <div class="last-updated">Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
-        </div>
-
-        <div class="controls">
-            <div style="display: flex; gap: 10px;">
-                <button class="refresh-btn" onclick="location.reload()">&#x1f504; Refresh Page</button>
-                <a href="fips-timeline-tracker.html" style="background: #28a745; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: inline-block;">&#x1f4c5; View Timeline Tracker</a>
-            </div>
-            <div><span style="color: #28a745;">&#x2705; Data loaded</span></div>
-        </div>
-
-        <div class="stats-summary">
-            <div class="stat-card">
-                <h3>Total FIPs</h3>
-                <div class="number">{total_fips}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Final</h3>
-                <div class="number">{final_count}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Draft</h3>
-                <div class="number">{draft_count}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Active (Accepted/Last Call)</h3>
-                <div class="number">{active_count}</div>
-            </div>
-        </div>
-
-        <table class="status-table">
-            <thead>
-                <tr>
-                    <th>Status</th>
-                    <th>Count</th>
-                    <th>FIPs</th>
-                </tr>
-            </thead>
-            <tbody>
-{''.join(table_rows)}
-            </tbody>
-        </table>
-
-        {generate_prs_section_html(fip_prs)}
-    </div>
-</body>
-</html>'''
-    
-    return html
+# ---------------------------------------------------------------------------
 
 def main():
-    print("Fetching FIPs data from GitHub...")
-    text = fetch_readme()
-    
-    if not text:
-        print("Failed to fetch README")
-        return
-    
-    print("Parsing FIPs...")
-    fips = parse_fips(text)
-    print(f"Found {len(fips)} FIPs")
-    
-    # Data validation: don't generate empty dashboard
-    if len(fips) == 0:
-        print("ERROR: No FIPs parsed. Aborting to avoid overwriting existing dashboard.")
-        return
-    
-    print("Fetching open PRs...")
-    prs = fetch_open_prs()
-    fip_prs = {}
-    if prs:
-        fip_prs = process_prs(prs)
-        total_prs = sum(len(pr_list) for pr_list in fip_prs.values())
-        print(f"Found {total_prs} PR(s) related to {len(fip_prs)} FIP(s)")
-    
-    print("Generating HTML dashboard...")
-    html = generate_html(fips, fip_prs)
-    
-    output_file = 'fips-dashboard-static.html'
-    with open(output_file, 'w', encoding='utf-8') as f:
+    print('Cloning / updating filecoin-project/FIPs...')
+    repo = u.get_fips_repo()
+
+    fips = {f['number']: f for f in u.parse_fip_table(u.read_readme(repo))}
+    print(f'Found {len(fips)} FIPs in README')
+    if not fips:
+        print('ERROR: No FIPs parsed. Aborting to avoid overwriting existing dashboard.')
+        return 1
+
+    print('Reading README history and FIP files...')
+    history, _ = u.build_status_history(repo)
+    files = u.load_fip_files(repo)
+    open_lc, past_lc = u.last_call_windows(history, files, fips)
+    mismatches = u.status_mismatches(fips, files)
+
+    print('Fetching open PRs and reviews...')
+    raw_prs = u.fetch_open_prs()
+    processed = u.process_prs(raw_prs)
+    grouped = u.prs_by_fip(processed)
+    print(f'{len(processed)} FIP-related PR(s); {len(open_lc)} in Last Call; {len(mismatches)} mismatch(es)')
+
+    body = '\n'.join([
+        stats_html(fips, open_lc, processed, prs_loaded=raw_prs is not None),
+        last_call_html(open_lc, past_lc),
+        in_flight_html(fips, history, files, grouped),
+        mismatch_html(mismatches),
+        prs_html(grouped, fips, loaded=raw_prs is not None),
+        by_status_html(fips, grouped),
+    ])
+
+    html = page(
+        title='Filecoin Improvement Proposals',
+        description='Read-only dashboard of Filecoin Improvement Proposals: status, time in status, Last Call windows, open PRs and review state.',
+        current='dashboard',
+        subtitle='Where every FIP stands, how long it has been there, and what is waiting on review.',
+        body_html=body,
+    )
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write(html)
-    
-    print(f"Dashboard generated successfully: {output_file}")
-    print(f"Open {output_file} in your browser to view the dashboard")
+    print(f'Dashboard generated: {OUTPUT_FILE}')
+    return 0
+
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

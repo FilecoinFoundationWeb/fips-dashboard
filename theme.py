@@ -113,20 +113,44 @@ a:hover { color: var(--fil-blue); }
   background: repeating-linear-gradient(90deg, rgba(124,196,255,.35) 0 14px, transparent 14px 26px);
 }
 .corgi-walk {
-  position: absolute; bottom: 14px; left: -140px; width: 128px; z-index: 3;
-  animation: corgi-walk 26s linear infinite;
+  position: absolute; bottom: 14px; left: -300px; width: 128px; z-index: 3;
+  animation: corgi-walk 22s linear infinite;
   cursor: pointer;
 }
-.corgi-walk svg { display: block; width: 100%; height: auto; overflow: visible; }
-.corgi-flip { animation: corgi-flip 26s steps(1) infinite; transform-origin: center; }
+.corgi-flip > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.corgi-flip { position: relative; animation: corgi-flip 22s steps(1) infinite; transform-origin: center; }
+/* Off-screen margins are wide enough that the ball (which runs ahead of the
+   corgi) is also hidden when they turn around. */
 @keyframes corgi-walk {
-  0%   { left: -140px; }
-  48%  { left: calc(100% + 20px); }
-  50%  { left: calc(100% + 20px); }
-  98%  { left: -140px; }
-  100% { left: -140px; }
+  0%   { left: -300px; }
+  48%  { left: calc(100% + 140px); }
+  50%  { left: calc(100% + 140px); }
+  98%  { left: -300px; }
+  100% { left: -300px; }
 }
 @keyframes corgi-flip { 0% { transform: scaleX(1); } 49% { transform: scaleX(-1); } 99% { transform: scaleX(1); } }
+
+/* The FIP ball: lives inside the flipped box so it's always ahead of the
+   corgi, and counter-flips so the label stays readable. */
+.fip-ball { position: absolute; left: calc(100% + 18px); bottom: 2px; width: 40px; height: 80px; pointer-events: none; }
+.fip-ball .ball-shadow {
+  position: absolute; left: 4px; bottom: 0; width: 32px; height: 6px; border-radius: 50%;
+  background: rgba(0,0,0,.3); animation: ball-shadow .7s infinite;
+}
+.fip-ball .ball-bounce { position: absolute; left: 0; bottom: 2px; width: 40px; height: 40px; animation: ball-bounce .7s infinite; transform-origin: 50% 100%; }
+.fip-ball .ball-unflip { width: 100%; height: 100%; animation: corgi-flip 22s steps(1) infinite; transform-origin: center; }
+.fip-ball svg { display: block; width: 40px; height: 40px; }
+@keyframes ball-bounce {
+  0%   { transform: translateY(0) scale(1.18, .82); animation-timing-function: ease-out; }
+  8%   { transform: translateY(-4px) scale(1, 1); animation-timing-function: ease-out; }
+  50%  { transform: translateY(-40px) scale(1, 1); animation-timing-function: ease-in; }
+  92%  { transform: translateY(-3px) scale(1, 1); }
+  100% { transform: translateY(0) scale(1.18, .82); }
+}
+@keyframes ball-shadow {
+  0%, 100% { transform: scale(1); opacity: .9; }
+  50%      { transform: scale(.45); opacity: .35; }
+}
 .corgi-bob { animation: corgi-bob .36s ease-in-out infinite alternate; }
 @keyframes corgi-bob { from { transform: translateY(0); } to { transform: translateY(-2.5px); } }
 .leg { transform-box: fill-box; transform-origin: 50% 0; animation: corgi-step .36s ease-in-out infinite alternate; }
@@ -151,8 +175,8 @@ a:hover { color: var(--fil-blue); }
 @keyframes corgi-hop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-16px); } }
 @media (prefers-reduced-motion: reduce) {
   .corgi-walk { animation: none; left: auto; right: 24px; }
-  .corgi-flip { animation: none; transform: scaleX(-1); }
-  .corgi-bob, .leg, .tail, .ear, .tongue { animation: none; }
+  .corgi-flip, .fip-ball .ball-unflip { animation: none; transform: scaleX(-1); }
+  .corgi-bob, .leg, .tail, .ear, .tongue, .fip-ball .ball-bounce, .fip-ball .ball-shadow { animation: none; }
 }
 
 /* ---------- Content ---------- */
@@ -331,6 +355,22 @@ FRESHNESS_JS = """
 </script>
 """
 
+# A tennis ball with "FIP" on it, for the corgi to chase.
+FIP_BALL = """
+<div class="fip-ball" aria-hidden="true">
+  <div class="ball-shadow"></div>
+  <div class="ball-bounce"><div class="ball-unflip">
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="17" cy="17" r="15.5" fill="#D6EA3C" stroke="#AFC21F" stroke-width="1.2"/>
+      <path d="M4.5 8.5 C11 12 11 22 4.5 25.5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M29.5 8.5 C23 12 23 22 29.5 25.5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="12" cy="10" r="3" fill="#FFFFFF" opacity=".35"/>
+      <text x="17" y="20.5" text-anchor="middle" font-family="Archivo, system-ui, sans-serif" font-size="10" font-weight="800" fill="#091B2A" letter-spacing=".3">FIP</text>
+    </svg>
+  </div></div>
+</div>
+"""
+
 CORGI_JS = """
 <script>
 (function () {
@@ -388,9 +428,9 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
     </div>
   </div>
   <div class="ground" aria-hidden="true"></div>
-  <div class="corgi-walk" tabindex="0" role="button" aria-label="Pet the corgi">
+  <div class="corgi-walk" tabindex="0" role="button" aria-label="Pet the corgi chasing the FIP ball">
     <span class="woof">Woof!</span>
-    <div class="corgi-flip">{CORGI_SVG}</div>
+    <div class="corgi-flip">{CORGI_SVG}{FIP_BALL}</div>
   </div>
 </header>
 <main>

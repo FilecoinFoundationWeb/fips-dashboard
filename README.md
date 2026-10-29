@@ -17,6 +17,9 @@ A read-only dashboard for the [Filecoin Improvement Proposals](https://github.co
 - Every status change in the README, dated by commit and linked to it, back to December 2020.
 - A count of transitions (e.g. Draft → Last Call) over the last 24 months.
 
+**Internal report** (not published)
+- `python3 internal_report.py` writes `internal/fips-internal-report.html`: every in-flight FIP with its full time in status and authors, the complete Last Call history, the consistency check and PRs idle 30+ days. `internal/` is gitignored and the workflow never commits it, so it stays off GitHub Pages. Share the file directly.
+
 ## How it works
 
 The scripts clone `filecoin-project/FIPs` (about 25 MB) and read the README table, its full git history and each FIP file's front matter locally. Only pull-request data comes from the GitHub API. Everything is Python standard library; no `pip install` needed.
@@ -28,6 +31,7 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and read the README tabl
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |
 | `fips_timeline_tracker.py` | Builds `fips-timeline-tracker.html` |
 | `fetch_fip_prs.py` | Prints open PRs and review state to the terminal |
+| `internal_report.py` | Builds the unpublished internal report in `internal/` |
 
 ## Usage
 
@@ -52,7 +56,7 @@ If the PR lookup fails (rate limit, network), the dashboard still builds and sho
 - Status dates are when the README table showed the change, which can lag the decision itself by a few days.
 - The README table only goes back to December 2020; FIPs whose status hasn't changed since then show that date as a floor.
 - Colors use the public Filecoin palette (Filecoin Blue `#0090FF`, Filecoin Dark `#091B2A`) and Filecoin Foundation's Archivo typeface. Tokens are at the top of `theme.py` if the official brand guide differs.
-- The corgi is clickable.
+- The corgi chases a FIP tennis ball, and it's clickable.
 
 ## License
 

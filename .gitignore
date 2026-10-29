@@ -6,3 +6,6 @@ __pycache__/
 *.csv
 .DS_Store
 Thumbs.db
+
+# Internal report output (never published)
+internal/

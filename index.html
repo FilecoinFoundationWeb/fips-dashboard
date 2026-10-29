@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta http-equiv="refresh" content="0; url=fips-dashboard-static.html">
+<meta http-equiv="Cache-Control" content="no-cache">
+<script>
+  // Cache-busting redirect: GitHub Pages caches pages for 10 minutes.
+  location.replace('fips-dashboard-static.html?v=' + Math.floor(Date.now() / 60000));
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=fips-dashboard-static.html"></noscript>
 <title>FIPs Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -306,6 +306,31 @@ CORGI_SVG = """
 </svg>
 """
 
+# GitHub Pages serves pages with a 10-minute browser cache that can't be
+# changed. On load, re-fetch this page from the network (cache: 'reload' also
+# refreshes the browser's cached copy) and, if a newer build exists, reload
+# once so visitors never sit on a stale version.
+FRESHNESS_JS = """
+<script>
+(function () {
+  if (!window.fetch || location.protocol === 'file:') return;
+  var meta = document.querySelector('meta[name="generated-at"]');
+  if (!meta) return;
+  var mine = meta.getAttribute('content');
+  fetch(location.pathname, { cache: 'reload' })
+    .then(function (r) { return r.ok ? r.text() : ''; })
+    .then(function (html) {
+      var m = html.match(/<meta name="generated-at" content="([^"]+)"/);
+      if (!m || m[1] <= mine) return;
+      var key = 'fips-reloaded-for';
+      try { if (sessionStorage.getItem(key) === m[1]) return; sessionStorage.setItem(key, m[1]); } catch (e) {}
+      location.reload();
+    })
+    .catch(function () {});
+})();
+</script>
+"""
+
 CORGI_JS = """
 <script>
 (function () {
@@ -344,7 +369,10 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="{html_escape(description)}">
 <meta name="color-scheme" content="light dark">
+<meta name="generated-at" content="{generated_at.strftime('%Y-%m-%dT%H:%M:%SZ')}">
+<meta http-equiv="Cache-Control" content="no-cache">
 <title>{html_escape(title)}</title>
+{FRESHNESS_JS}
 {FONT_LINK}
 <style>{CSS}</style>
 </head>

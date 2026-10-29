@@ -8,7 +8,7 @@ A read-only dashboard for the [Filecoin Improvement Proposals](https://github.co
 
 **Dashboard** (`fips-dashboard-static.html`)
 - **Last Call**: FIPs currently in Last Call, when they entered, when the review period ends (`review-period-end` from the FIP file, or the FIP-0001 default of 14 days, marked *est.*) and where to comment. Past Last Calls with their outcome and duration.
-- **In flight**: every Draft, Last Call, Accepted and Deferred FIP with the date it entered that status and how long it has been there, longest-waiting first.
+- **In flight**: Draft, Last Call, Accepted and Deferred FIPs that changed status in the last year, with the date and time since. Longer-running ones are only counted in a footnote (they still appear under All FIPs by status).
 - **Consistency check**: FIPs where the README table and the FIP's own `status:` line disagree, or that appear in only one of them. Flagged for editors; the dashboard doesn't say which is right.
 - **Open pull requests**: matched to FIPs by the files they change, with review state (approved, changes requested, awaiting review, draft) and days since last activity.
 - **All FIPs by status**, with open-PR counts.
@@ -16,6 +16,9 @@ A read-only dashboard for the [Filecoin Improvement Proposals](https://github.co
 **Timeline** (`fips-timeline-tracker.html`)
 - Every status change in the README, dated by commit and linked to it, back to December 2020.
 - A count of transitions (e.g. Draft → Last Call) over the last 24 months.
+
+**Internal report** (not published)
+- `python3 internal_report.py` writes `internal/fips-internal-report.html`: every in-flight FIP with its full time in status and authors, the complete Last Call history, the consistency check and PRs idle 30+ days. `internal/` is gitignored and the workflow never commits it, so it stays off GitHub Pages. Share the file directly.
 
 ## How it works
 
@@ -28,6 +31,7 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and read the README tabl
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |
 | `fips_timeline_tracker.py` | Builds `fips-timeline-tracker.html` |
 | `fetch_fip_prs.py` | Prints open PRs and review state to the terminal |
+| `internal_report.py` | Builds the unpublished internal report in `internal/` |
 
 ## Usage
 
@@ -52,7 +56,7 @@ If the PR lookup fails (rate limit, network), the dashboard still builds and sho
 - Status dates are when the README table showed the change, which can lag the decision itself by a few days.
 - The README table only goes back to December 2020; FIPs whose status hasn't changed since then show that date as a floor.
 - Colors use the public Filecoin palette (Filecoin Blue `#0090FF`, Filecoin Dark `#091B2A`) and Filecoin Foundation's Archivo typeface. Tokens are at the top of `theme.py` if the official brand guide differs.
-- The corgi is clickable.
+- The corgi chases a FIP tennis ball, and it's clickable.
 
 ## License
 

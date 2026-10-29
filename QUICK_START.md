@@ -42,7 +42,7 @@ Follow the prompts, and you're done! Your dashboard will be live in minutes.
 4. **Your dashboard is live!**
    - Main: `https://YOUR_USERNAME.github.io/fips-dashboard/fips-dashboard-static.html`
    - Timeline: `https://YOUR_USERNAME.github.io/fips-dashboard/fips-timeline-tracker.html`
-   - Index: `https://YOUR_USERNAME.github.io/fips-dashboard/`
+   - Index: `https://YOUR_USERNAME.github.io/fips-dashboard/` (redirects to the dashboard)
 
 ## 📋 What Gets Published
 

@@ -22,19 +22,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          # Core dashboard uses stdlib only — no pip packages needed
       
       - name: Generate Dashboard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FIPS_REPO_DIR: ${{ runner.temp }}/fips-src
         run: |
+          # Scripts are stdlib-only; they clone filecoin-project/FIPs themselves.
           python3 generate_fips_dashboard.py
           python3 fips_timeline_tracker.py
       
@@ -42,7 +39,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add *.html
+          git add fips-dashboard-static.html fips-timeline-tracker.html
           if ! git diff --staged --quiet; then
             git commit -m "Auto-update dashboard $(date +'%Y-%m-%d %H:%M:%S')"
             git push

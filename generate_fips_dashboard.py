@@ -37,8 +37,7 @@ def date_str(d):
 def age_cell(days):
     if days is None:
         return '<span class="age">—</span>'
-    cls = 'old' if days >= 365 else 'mid' if days >= 180 else ''
-    return f'<span class="age {cls}">{esc(u.humanize_days(days))}</span>'
+    return f'<span class="age">{esc(u.humanize_days(days))}</span>'
 
 
 def discussion_links(urls):
@@ -118,29 +117,47 @@ def last_call_html(open_lc, past_lc):
 <div class="card-body">{current}{past}</div></section>'''
 
 
+IN_FLIGHT_MAX_DAYS = 365
+
+
 def in_flight_html(fips, history, files, prs_grouped):
+    """In-flight FIPs that changed status within the last year.
+
+    Longer-running FIPs are left out of the table and only counted in a
+    footnote, so the page doesn't spotlight how long individual proposals
+    have been waiting. They still appear under "All FIPs by status".
+    """
     rows = []
+    older = 0
     for num, f in fips.items():
         if f['status'] not in IN_FLIGHT:
             continue
         since = u.current_status_since(history, num, f['status'])
         days = u.days_between(since) if since else None
+        if days is None or days > IN_FLIGHT_MAX_DAYS:
+            older += 1
+            continue
         meta = files.get(num, {})
         pr_count = len(prs_grouped.get(num, []))
-        rows.append((days if days is not None else -1, f'''<tr>
+        rows.append((days, f'''<tr>
 <td>{fip_link(num)}</td><td class="title-cell">{esc(f["title"])}</td>
 <td>{badge(f["status"])}</td>
 <td class="nowrap">{date_str(since)}</td><td>{age_cell(days)}</td>
 <td>{discussion_links(meta.get("_discussions", []))}</td>
 <td class="num">{f'<a href="#pr-{num}">{pr_count}</a>' if pr_count else '0'}</td></tr>'''))
-    rows.sort(key=lambda r: r[0], reverse=True)
+    rows.sort(key=lambda r: r[0])
     body = (f'''<div class="table-scroll"><table class="data">
 <thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th class="num">Open PRs</th></tr></thead>
 <tbody>{"".join(r[1] for r in rows)}</tbody></table></div>''' if rows
-            else '<p class="empty">No FIPs are currently in flight.</p>')
+            else '<p class="empty">No FIPs have changed status in the last year.</p>')
+    if older:
+        body += (f'<p class="note">* {older} other in-flight FIP{"s have" if older != 1 else " has"} '
+                 'been in the same status for more than a year and '
+                 f'{"are" if older != 1 else "is"} not listed here. '
+                 'See <a href="#by-status">All FIPs by status</a>.</p>')
     return f'''<section class="card" id="in-flight">
 <div class="card-head"><h2>In flight</h2>
-<span class="hint">Draft, Last Call, Accepted and Deferred FIPs, longest-waiting first. Age is a prompt to check in, not a judgment.</span></div>
+<span class="hint">Draft, Last Call, Accepted and Deferred FIPs that changed status in the last year, most recent first.*</span></div>
 <div class="card-body">{body}</div></section>'''
 
 

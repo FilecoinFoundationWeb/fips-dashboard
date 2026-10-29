@@ -8,7 +8,7 @@ A read-only dashboard for the [Filecoin Improvement Proposals](https://github.co
 
 **Dashboard** (`fips-dashboard-static.html`)
 - **Last Call**: FIPs currently in Last Call, when they entered, when the review period ends (`review-period-end` from the FIP file, or the FIP-0001 default of 14 days, marked *est.*) and where to comment. Past Last Calls with their outcome and duration.
-- **In flight**: every Draft, Last Call, Accepted and Deferred FIP with the date it entered that status and how long it has been there, longest-waiting first.
+- **In flight**: Draft, Last Call, Accepted and Deferred FIPs that changed status in the last year, with the date and time since. Longer-running ones are only counted in a footnote (they still appear under All FIPs by status).
 - **Consistency check**: FIPs where the README table and the FIP's own `status:` line disagree, or that appear in only one of them. Flagged for editors; the dashboard doesn't say which is right.
 - **Open pull requests**: matched to FIPs by the files they change, with review state (approved, changes requested, awaiting review, draft) and days since last activity.
 - **All FIPs by status**, with open-PR counts.

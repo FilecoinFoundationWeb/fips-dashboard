@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Read-only dashboard of Filecoin Improvement Proposals: status, time in status, Last Call windows, open PRs and review state.">
 <meta name="color-scheme" content="light dark">
-<meta name="generated-at" content="2026-10-29T12:55:43Z">
+<meta name="generated-at" content="2026-10-29T13:00:05Z">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>Filecoin Improvement Proposals</title>
 
@@ -289,7 +289,7 @@ footer.site-footer p + p { margin-top: 6px; }
     <p class="sub">Where every FIP stands, how long it has been there, and what is waiting on review.</p>
     <div class="header-meta">
       <nav class="nav" aria-label="Pages"><a href="fips-dashboard-static.html" class="current" aria-current="page">Dashboard</a><a href="fips-timeline-tracker.html">Timeline</a><a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">FIPs repo ↗</a></nav>
-      <span>Updated 2026-10-29 12:55 UTC</span>
+      <span>Updated 2026-10-29 13:00 UTC</span>
     </div>
   </div>
   <div class="ground" aria-hidden="true"></div>
@@ -376,80 +376,25 @@ footer.site-footer p + p { margin-top: 6px; }
 <td class="num">27</td><td><span class="status-badge status-accepted">Accepted</span></td></tr></tbody></table></div></details></div></section>
 <section class="card" id="in-flight">
 <div class="card-head"><h2>In flight</h2>
-<span class="hint">Draft, Last Call, Accepted and Deferred FIPs, longest-waiting first. Age is a prompt to check in, not a judgment.</span></div>
+<span class="hint">Draft, Last Call, Accepted and Deferred FIPs that changed status in the last year, most recent first.*</span></div>
 <div class="card-body"><div class="table-scroll"><table class="data">
 <thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th class="num">Open PRs</th></tr></thead>
 <tbody><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0006.md" target="_blank" rel="noopener">FIP-0006</a></td><td class="title-cell">No repay debt requirement for DeclareFaultsRecovered</td>
-<td><span class="status-badge status-deferred">Deferred</span></td>
-<td class="nowrap">2021-01-16</td><td><span class="age old">5.8 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/issues/21" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0017.md" target="_blank" rel="noopener">FIP-0017</a></td><td class="title-cell">Three-messages lightweight sector updates</td>
-<td><span class="status-badge status-deferred">Deferred</span></td>
-<td class="nowrap">2022-01-05</td><td><span class="age old">4.8 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/issues/131" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0016.md" target="_blank" rel="noopener">FIP-0016</a></td><td class="title-cell">Pack arbitrary data in CC sectors</td>
-<td><span class="status-badge status-deferred">Deferred</span></td>
-<td class="nowrap">2022-03-12</td><td><span class="age old">4.6 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/issues/57" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0025.md" target="_blank" rel="noopener">FIP-0025</a></td><td class="title-cell">Handle expired deals in ProveCommit</td>
-<td><span class="status-badge status-deferred">Deferred</span></td>
-<td class="nowrap">2022-03-12</td><td><span class="age old">4.6 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/issues/152" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0033.md" target="_blank" rel="noopener">FIP-0033</a></td><td class="title-cell">Explicit premium for FIL+ verified deals</td>
-<td><span class="status-badge status-deferred">Deferred</span></td>
-<td class="nowrap">2022-06-01</td><td><span class="age old">4.4 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/243" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0039.md" target="_blank" rel="noopener">FIP-0039</a></td><td class="title-cell">Filecoin Message Replay Protection</td>
-<td><span class="status-badge status-draft">Draft</span></td>
-<td class="nowrap">2022-07-08</td><td><span class="age old">4.3 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/301" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0067.md" target="_blank" rel="noopener">FIP-0067</a></td><td class="title-cell">PoRep Security Policy &amp; Replacement Sealing Enforcement</td>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">FIP-0107</a></td><td class="title-cell">Implicit Messages in Block Receipts</td>
 <td><span class="status-badge status-accepted">Accepted</span></td>
-<td class="nowrap">2023-08-28</td><td><span class="age old">3.2 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/727" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0078.md" target="_blank" rel="noopener">FIP-0078</a></td><td class="title-cell">Remove Restrictions on the Minting of Datacap</td>
-<td><span class="status-badge status-draft">Draft</span></td>
-<td class="nowrap">2023-10-11</td><td><span class="age old">3.0 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/844" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0080.md" target="_blank" rel="noopener">FIP-0080</a></td><td class="title-cell">Phasing Out Fil+ and Restoring Deal Quality Multiplier to 1x</td>
-<td><span class="status-badge status-draft">Draft</span></td>
-<td class="nowrap">2023-11-07</td><td><span class="age old">3.0 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/774" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0082.md" target="_blank" rel="noopener">FIP-0082</a></td><td class="title-cell">Add support for aggregated replica update proofs</td>
-<td><span class="status-badge status-accepted">Accepted</span></td>
-<td class="nowrap">2024-09-18</td><td><span class="age old">2.1 years</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/752" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0096.md" target="_blank" rel="noopener">FIP-0096</a></td><td class="title-cell">Convert fundraising remainder address(es) to keyless account actor(s)</td>
-<td><span class="status-badge status-draft">Draft</span></td>
-<td class="nowrap">2024-12-12</td><td><span class="age old">23 months</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/1033" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0110.md" target="_blank" rel="noopener">FIP-0110</a></td><td class="title-cell">Allow Shorter Deal Durations</td>
-<td><span class="status-badge status-draft">Draft</span></td>
-<td class="nowrap">2025-11-14</td><td><span class="age mid">11 months</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/1205" target="_blank" rel="noopener">Discussion</a></td>
+<td class="nowrap">2026-09-04</td><td><span class="age">54 days</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/1149" target="_blank" rel="noopener">Discussion</a></td>
 <td class="num">0</td></tr><tr>
 <td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0111.md" target="_blank" rel="noopener">FIP-0111</a></td><td class="title-cell">Add Support for EIP-7702 (Set Code for EOAs) in the FEVM</td>
 <td><span class="status-badge status-draft">Draft</span></td>
-<td class="nowrap">2026-01-20</td><td><span class="age mid">9 months</span></td>
+<td class="nowrap">2026-01-20</td><td><span class="age">9 months</span></td>
 <td><a href="https://github.com/filecoin-project/FIPs/discussions/1143" target="_blank" rel="noopener">Discussion</a></td>
 <td class="num">0</td></tr><tr>
-<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">FIP-0107</a></td><td class="title-cell">Implicit Messages in Block Receipts</td>
-<td><span class="status-badge status-accepted">Accepted</span></td>
-<td class="nowrap">2026-09-04</td><td><span class="age ">54 days</span></td>
-<td><a href="https://github.com/filecoin-project/FIPs/discussions/1149" target="_blank" rel="noopener">Discussion</a></td>
-<td class="num">0</td></tr></tbody></table></div></div></section>
+<td><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0110.md" target="_blank" rel="noopener">FIP-0110</a></td><td class="title-cell">Allow Shorter Deal Durations</td>
+<td><span class="status-badge status-draft">Draft</span></td>
+<td class="nowrap">2025-11-14</td><td><span class="age">11 months</span></td>
+<td><a href="https://github.com/filecoin-project/FIPs/discussions/1205" target="_blank" rel="noopener">Discussion</a></td>
+<td class="num">0</td></tr></tbody></table></div><p class="note">* 11 other in-flight FIPs have been in the same status for more than a year and are not listed here. See <a href="#by-status">All FIPs by status</a>.</p></div></section>
 <section class="card" id="consistency">
 <div class="card-head"><h2>Consistency check</h2>
 <span class="hint">Compares the README table with the <code>status:</code> line in each FIP's own file.</span></div>
@@ -511,7 +456,7 @@ footer.site-footer p + p { margin-top: 6px; }
 <footer class="site-footer">
   <div class="wrap">
     <p>Read-only view of <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a>. Status dates come from the README's git history; nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
-    <p>Generated 2026-10-29 12:55 UTC. Unofficial community tool.</p>
+    <p>Generated 2026-10-29 13:00 UTC. Unofficial community tool.</p>
   </div>
 </footer>
 

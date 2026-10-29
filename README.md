@@ -1,6 +1,6 @@
 # Filecoin Improvement Proposals (FIPs) Dashboard
 
-🔗 **Live Dashboard: https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html**
+🔗 **Live:** [Dashboard](https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html) · [Timeline](https://thatguyllc.github.io/fips-dashboard/fips-timeline-tracker.html) · [thatguyllc.github.io/fips-dashboard](https://thatguyllc.github.io/fips-dashboard/)
 
 A read-only dashboard for the [Filecoin Improvement Proposals](https://github.com/filecoin-project/FIPs) process. It surfaces where every FIP stands and what is waiting on someone, so authors and FIP editors can spot things faster. It never changes a status, assigns a number or decides an outcome; that stays with the process in [FIP-0001](https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md).
 

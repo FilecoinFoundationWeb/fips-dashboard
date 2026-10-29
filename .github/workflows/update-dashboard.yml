@@ -1,4 +1,4 @@
-name: Update FIPs Dashboard
+name: Update Governance Hub
 
 on:
   schedule:
@@ -30,16 +30,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIPS_REPO_DIR: ${{ runner.temp }}/fips-src
+          CORE_DEVS_REPO_DIR: ${{ runner.temp }}/core-devs-src
         run: |
-          # Scripts are stdlib-only; they clone filecoin-project/FIPs themselves.
+          # Scripts are stdlib-only; they clone filecoin-project/FIPs and core-devs themselves.
           python3 generate_fips_dashboard.py
           python3 fips_timeline_tracker.py
+          python3 generate_hub.py
       
       - name: Commit and Push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add fips-dashboard-static.html fips-timeline-tracker.html
+          git add index.html fips-dashboard-static.html fips-timeline-tracker.html core-devs.html network-upgrades.html
           if ! git diff --staged --quiet; then
             git commit -m "Auto-update dashboard $(date +'%Y-%m-%d %H:%M:%S')"
             git push

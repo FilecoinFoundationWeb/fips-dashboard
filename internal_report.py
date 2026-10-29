@@ -38,7 +38,7 @@ def aged(days):
     return f'<span class="age {cls}">{esc(u.humanize_days(days))}</span>'
 
 
-def in_flight_full(fips, history, files, grouped, prs_loaded=True):
+def in_flight_full(fips, history, files, grouped, prs_loaded=True, discussed=None):
     rows = []
     for num, f in fips.items():
         if f['status'] not in IN_FLIGHT:
@@ -47,16 +47,18 @@ def in_flight_full(fips, history, files, grouped, prs_loaded=True):
         days = u.days_between(since) if since else None
         meta = files.get(num, {})
         n = len(grouped.get(num, []))
+        m = (discussed or {}).get(num)
+        cd_cell = f'#{m["number"]} · {date_str(m["date"])}' if m else '—'
         rows.append((days if days is not None else 10 ** 6, f'''<tr>
 <td>{fip_link(num)}</td><td class="title-cell">{esc(f["title"])}</td><td>{esc(f["authors"])}</td>
 <td>{badge(f["status"])}</td><td class="nowrap">{date_str(since)}</td><td>{aged(days)}</td>
-<td>{discussion_links(meta.get("_discussions", []))}</td><td class="num">{n if prs_loaded else '—'}</td></tr>'''))
+<td>{discussion_links(meta.get("_discussions", []))}</td><td class="nowrap">{cd_cell}</td><td class="num">{n if prs_loaded else '—'}</td></tr>'''))
     rows.sort(key=lambda r: r[0], reverse=True)
     over = sum(1 for d, _ in rows if d > 365)
     return f'''<section class="card"><div class="card-head"><h2>All in-flight FIPs ({len(rows)})</h2>
 <span class="hint">{over} have been in the same status for over a year. These are left off the public page.</span></div>
 <div class="card-body"><div class="table-scroll"><table class="data">
-<thead><tr><th>FIP</th><th>Title</th><th>Authors</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th class="num">Open PRs</th></tr></thead>
+<thead><tr><th>FIP</th><th>Title</th><th>Authors</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th>Last at Core Devs</th><th class="num">Open PRs</th></tr></thead>
 <tbody>{"".join(r for _, r in rows)}</tbody></table></div></div></section>'''
 
 
@@ -102,13 +104,19 @@ def main():
     history, _ = u.build_status_history(repo)
     files = u.load_fip_files(repo)
     open_lc, past_lc = u.last_call_windows(history, files, fips)
+    try:
+        import core_devs as cd
+        discussed = cd.last_discussed(cd.load_meetings(cd.get_core_devs_repo()))
+    except Exception as e:
+        print(f'Warning: Core Devs data unavailable: {e}')
+        discussed = {}
     raw = u.fetch_open_prs()
     processed = u.process_prs(raw)
     grouped = u.prs_by_fip(processed)
 
     stamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     pr_note = '' if raw is not None else '<div class="callout" style="margin-top:20px">Couldn\'t load PRs from the GitHub API on this run, so PR counts are missing.</div>'
-    body = '\n'.join([pr_note, in_flight_full(fips, history, files, grouped, raw is not None), last_call_history(open_lc, past_lc),
+    body = '\n'.join([pr_note, in_flight_full(fips, history, files, grouped, raw is not None, discussed), last_call_history(open_lc, past_lc),
                       mismatch_html(u.status_mismatches(fips, files)), stale_prs(processed)])
 
     html = f'''<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">

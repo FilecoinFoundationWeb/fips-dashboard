@@ -559,7 +559,6 @@ STAGES = [
      '—'),
 ]
 SIDE_STAGES = [
-    ('Deferred', 'Core FIPs put off for a future network upgrade. Can return to Draft.'),
     ('Rejected', 'Fundamentally broken, or a core FIP Core Devs won\'t implement.'),
     ('Withdrawn', 'The author has withdrawn the proposal.'),
     ('Superseded', 'Was Final, but another Final FIP has replaced it.'),
@@ -678,7 +677,6 @@ def lifecycle_page(ctx):
         ('Draft', 'draft', lambda n: draft_note(n)),
         ('Last Call', 'lastcall', lambda n: (f'Review ends {fmt_date(lc_end[n]["end"], False)}' + (' (est.)' if lc_end[n]['estimated_end'] else '')) if n in lc_end else ''),
         ('Accepted', 'accepted', accepted_note),
-        ('Deferred', 'deferred', lambda n: draft_note(n)),
     ]
     col_html = []
     for key, cls, note in cols:
@@ -686,7 +684,7 @@ def lifecycle_page(ctx):
         lis = ''.join(item(n, note(n)) for n in nums) or '<li class="muted small">None right now.</li>'
         col_html.append(f'<div class="board-col {cls}" id="stage-{key.lower().replace(" ", "-")}"><h3>{key} <span class="muted">{len(nums)}</span></h3><ul>{lis}</ul></div>')
     board = (f'<section class="card"><div class="card-head"><h2>Where open FIPs are now</h2>'
-             '<span class="hint">Every FIP that hasn\'t reached a final outcome, longest in stage first.</span></div>'
+             '<span class="hint">Every FIP in Draft, Last Call or Accepted, longest in stage first.</span></div>'
              f'<div class="card-body"><div class="board">{"".join(col_html)}</div>'
              f'<p class="note">Time in stage is measured from when the FIPs README showed the change, which can lag the decision by a few days.'
              f'{" Upgrade candidates come from the NV" + str(plan["nv"]) + " planning discussion." if plan else ""}</p></div></section>')

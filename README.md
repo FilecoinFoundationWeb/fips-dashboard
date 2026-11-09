@@ -13,8 +13,8 @@ One place to keep up with Filecoin governance. It pulls the public records in [f
 - Most recently active FIP discussions, and links for getting involved.
 
 **Lifecycle** (`index.html`, the home page; `fip-lifecycle.html` redirects here)
-- **How a FIP moves**: the FIP-0001 path (Idea → Draft → Last Call → Accepted → Final) with how many FIPs are at each stage and the median time to the next one, plus the side outcomes (Deferred, Rejected, Withdrawn, Superseded, Active).
-- **Where open FIPs are now**: every Draft, Last Call, Accepted and Deferred FIP with time in stage, when Core Devs or the implementers last discussed it, and whether it's a candidate for the next upgrade or already shipped.
+- **How a FIP moves**: the FIP-0001 path (Idea → Draft → Last Call → Accepted → Final) with how many FIPs are at each stage and the median time to the next one, plus the side outcomes (Rejected, Withdrawn, Superseded, Active).
+- **Where open FIPs are now**: every Draft, Last Call and Accepted FIP with time in stage, when Core Devs or the implementers last discussed it, and whether it's a candidate for the next upgrade or already shipped.
 - **Live on mainnet, still Accepted**: FIPs shipped in an activated upgrade but not yet marked Final, flagged for editors.
 - **How long stages take** (medians over 2 years) and a **stage guide** paraphrasing FIP-0001.
 

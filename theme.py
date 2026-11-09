@@ -532,9 +532,9 @@ FILECOIN_LOGO = '''<svg aria-hidden="true" focusable="false" class="brand-mark" 
 
 
 NAV = [
-    ('overview', 'Overview', './'),
+    ('lifecycle', 'Lifecycle', './'),
+    ('overview', 'Overview', 'overview.html'),
     ('dashboard', 'FIPs', 'fips-dashboard-static.html'),
-    ('lifecycle', 'Lifecycle', 'fip-lifecycle.html'),
     ('coredevs', 'Core Devs', 'core-devs.html'),
     ('implementers', 'Implementers', 'implementers.html'),
     ('upgrades', 'Upgrades', 'network-upgrades.html'),

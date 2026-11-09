@@ -45,7 +45,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add index.html fips-dashboard-static.html fips-timeline-tracker.html core-devs.html implementers.html fip-lifecycle.html network-upgrades.html
+          git add index.html overview.html fips-dashboard-static.html fips-timeline-tracker.html core-devs.html implementers.html fip-lifecycle.html network-upgrades.html
           if ! git diff --staged --quiet; then
             git commit -m "Auto-update dashboard $(date +'%Y-%m-%d %H:%M:%S')"
             git push

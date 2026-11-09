@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Generate the governance hub pages:
 
-  index.html             Overview: latest meeting, what's open, activity feed
+  index.html             FIP lifecycle (the home page): stages, where open FIPs are, timings
+  overview.html          Overview: latest meeting, what's open, activity feed
+  fip-lifecycle.html     Redirect to the home page, for old links
   core-devs.html         Core Devs meetings, recordings, FIPs on the agenda
   network-upgrades.html  Network upgrades and the FIPs they shipped
 
@@ -737,6 +739,15 @@ def lifecycle_page(ctx):
     )
 
 
+# Old address of the lifecycle page, which is now the home page.
+REDIRECT_HOME = '''<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>FIP Lifecycle</title>
+<meta http-equiv="refresh" content="0; url=./">
+<link rel="canonical" href="./"></head>
+<body><p>The FIP lifecycle is now the home page: <a href="./">open it</a>.</p></body></html>
+'''
+
+
 READY_PILL = {'ready': 'approved', 'risk': 'waiting', 'deferred-in': 'changes', 'deferred-out': '', 'none': '', 'unknown': ''}
 READY_SHORT = {'ready': 'Ready', 'risk': 'At risk', 'deferred-in': 'Carried over', 'deferred-out': 'Next upgrade',
                'none': 'Not upgrade-bound', 'unknown': '—'}
@@ -892,9 +903,9 @@ def main():
     if not ctx['fips']:
         print('ERROR: No FIPs parsed. Aborting to avoid overwriting pages.')
         return 1
-    for name, fn in (('index.html', overview), ('core-devs.html', core_devs_page),
+    for name, fn in (('index.html', lifecycle_page), ('overview.html', overview),
+                     ('fip-lifecycle.html', lambda _ctx: REDIRECT_HOME), ('core-devs.html', core_devs_page),
                      ('implementers.html', implementers_page),
-                     ('fip-lifecycle.html', lifecycle_page),
                      ('network-upgrades.html', upgrades_page)):
         with open(name, 'w', encoding='utf-8') as f:
             f.write(fn(ctx))

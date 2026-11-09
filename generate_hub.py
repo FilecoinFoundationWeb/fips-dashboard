@@ -14,12 +14,15 @@ from datetime import datetime, timedelta, timezone
 
 import fip_utils as u
 import core_devs as cd
+import implementers as impl
 from fip_utils import html_escape as esc
 from theme import page
 from generate_fips_dashboard import badge, fip_link, date_str
 
 FEED_DAYS = 90
 AGENDA_WINDOW = 6  # meetings
+CALLS_SHOWN = 200  # implementers' calls listed on the Implementers page
+UPGRADES_SHOWN = 4  # recent upgrades with their implementers' discussions
 
 
 def fmt_date(d, with_year=True):
@@ -84,6 +87,31 @@ def meeting_buttons(m, primary_recording=True):
     if m['passcode'] and m['recording_url']:
         html += f'<div class="passcode">Recording passcode: <code>{esc(m["passcode"])}</code></div>'
     return html
+
+
+def call_links(c):
+    """Inline links for an implementers' call."""
+    links = []
+    if c['recording_url']:
+        links.append(f'<a href="{esc(c["recording_url"])}" target="_blank" rel="noopener">Recording</a>')
+    if c['notes_url']:
+        links.append(f'<a href="{esc(c["notes_url"])}" target="_blank" rel="noopener">Notes</a>')
+    if c['agenda_url']:
+        links.append(f'<a href="{esc(c["agenda_url"])}" target="_blank" rel="noopener">Agenda</a>')
+    if c['page_url']:
+        links.append(f'<a href="{esc(c["page_url"])}" target="_blank" rel="noopener">Notion</a>')
+    return ' · '.join(links)
+
+
+def convo_label(c):
+    """(kind class, kind label, linked title) for a Core Devs meeting or implementers' call."""
+    if c.get('kind') == 'implementers':
+        url = c['recording_url'] or c['notes_url'] or c['page_url']
+        title = esc(c['title'])
+        return 'impl', 'Implementers', (f'<a href="{esc(url)}" target="_blank" rel="noopener">{title}</a>' if url else title)
+    url = c['notes_url'] or c['recording_url']
+    title = f'Core Devs #{c["number"]}'
+    return 'meeting', 'Core Devs', (f'<a href="{esc(url)}" target="_blank" rel="noopener">{title}</a>' if url else title)
 
 
 def video(m):
@@ -182,6 +210,13 @@ def overview(ctx):
             link = m['recording_url'] or m['notes_url']
             title = f'<a href="{esc(link)}" target="_blank" rel="noopener">Core Devs #{m["number"]}</a>' if link else f'Core Devs #{m["number"]}'
             feed.append((m['date'], 'meeting', 'Meeting', f'{title}{": " + esc(topics) if topics else ""}'))
+    for c in ctx['calls']:
+        if c['date'] and cutoff <= c['date'] <= now:
+            _, _, title = convo_label(c)
+            fl = ', '.join(f'FIP-{f}' for f in c['fips'][:4])
+            summary = ': ' + esc(c['summary'][:140]) if c['summary'] else ''
+            fips_note = f' <span class="muted small">({fl})</span>' if fl else ''
+            feed.append((c['date'], 'impl', 'Implementers', f'{title}{summary}{fips_note}'))
     for x in upgrades:
         for net, when in (('mainnet', x['mainnet']), ('calibration', x['calibration'])):
             if when and cutoff <= when <= now:
@@ -195,7 +230,7 @@ def overview(ctx):
     feed_html = ''.join(f'<li><time datetime="{d.isoformat()}">{fmt_date(d, False)}</time><span class="kind {k}">{label}</span>'
                         f'<span class="feed-text">{text}</span></li>' for d, k, label, text in feed[:30])
     feed_card = f'''<section class="card"><div class="card-head"><h2>Recent activity</h2>
-<span class="hint">Last {FEED_DAYS} days across FIPs, Core Devs and network upgrades.</span></div>
+<span class="hint">Last {FEED_DAYS} days across FIPs, Core Devs, implementers' calls and network upgrades.</span></div>
 <div class="card-body">{f'<ul class="feed">{feed_html}</ul>' if feed_html else '<p class="empty">Nothing in the last 90 days.</p>'}</div></section>'''
 
     # Discussions
@@ -216,6 +251,7 @@ def overview(ctx):
 <a class="link-card" href="https://github.com/filecoin-project/FIPs/discussions" target="_blank" rel="noopener"><strong>Start or join a discussion</strong><span>Ideas begin as FIP discussions before a draft.</span></a>
 <a class="link-card" href="fips-dashboard-static.html"><strong>Track every FIP</strong><span>Status, Last Call windows and open PRs.</span></a>
 <a class="link-card" href="core-devs.html"><strong>Core Devs meetings</strong><span>Notes, recordings and agendas back to 2020.</span></a>
+<a class="link-card" href="implementers.html"><strong>Implementers' calls</strong><span>How upgrades get built: calls, recordings and what each one covered.</span></a>
 <a class="link-card" href="network-upgrades.html"><strong>Network upgrades</strong><span>What shipped when, and which FIPs it included.</span></a>
 <a class="link-card" href="mailto:governance@fil.org"><strong>Contact the governance team</strong><span>governance@fil.org</span></a>
 </div></div></section>'''
@@ -334,6 +370,168 @@ function filterMeetings(q) {{
 # Network upgrades
 # ---------------------------------------------------------------------------
 
+def upgrade_convo_html(hits, open_=False, limit=12):
+    """Collapsible list of the Core Devs meetings and implementers' calls that discussed an upgrade."""
+    if not hits:
+        return ''
+    n_cd = sum(1 for c, _ in hits if c.get('kind') != 'implementers')
+    n_im = len(hits) - n_cd
+    parts = [p for p in (f'{n_cd} Core Devs' if n_cd else '', f"{n_im} implementers'" if n_im else '') if p]
+    items = []
+    for c, reason in hits[:limit]:
+        kind, label, title = convo_label(c)
+        items.append(f'<li><time>{fmt_date(c["date"])}</time><span class="kind {kind}">{label}</span>'
+                     f'<span>{title} <span class="muted small">{esc(reason)}</span></span></li>')
+    if len(hits) > limit:
+        items.append(f'<li class="muted small">+{len(hits) - limit} earlier</li>')
+    plural = 's' if len(hits) != 1 else ''
+    return (f'<details class="up-convo"{" open" if open_ else ""}>'
+            f'<summary>Discussed in {len(hits)} call{plural} <span class="muted small">({", ".join(parts)})</span></summary>'
+            f'<ul class="convo-list">{"".join(items)}</ul></details>')
+
+
+def implementers_page(ctx):
+    """The Implementers tab: latest call, upgrade discussions and the full call log."""
+    calls, source, upgrades = ctx['calls'], ctx['calls_source'], ctx['upgrades']
+    now = datetime.now(timezone.utc)
+    dated = [c for c in calls if c['date'] and c['date'] <= now]
+    latest = dated[0] if dated else None
+    recent = [c for c in dated if (now - c['date']).days <= FEED_DAYS]
+    impl_hits = {n: [(c, r) for c, r in hits if c.get('kind') == 'implementers']
+                 for n, hits in ctx['upgrade_conv'].items()}
+
+    def stat(href, label, value, sub=''):
+        return (f'<a class="stat" href="{href}"><div class="label">{esc(label)}</div>'
+                f'<div class="value">{value}</div>{f"<div class=sub-value>{sub}</div>" if sub else ""}</a>')
+
+    stats = '<section class="stats">' + ''.join([
+        stat('#calls-log', 'Calls logged', len(calls) if source else '—', 'in the implementers\' log' if source else 'log not loaded'),
+        stat('#latest-call', 'Latest call', fmt_date(latest['date'], False) if latest else '—',
+             ago(latest['date']) if latest else ''),
+        stat('#calls-log', f'Last {FEED_DAYS} days', len(recent) if source else '—', 'calls held'),
+        stat('#upgrade-talk', 'Upgrades discussed', sum(1 for h in impl_hits.values() if h) if source else '—',
+             'named or FIPs covered'),
+    ]) + '</section>'
+
+    # Latest call
+    if latest:
+        chips = ''.join(fip_chip(f) for f in latest['fips'])
+        ups = [n for n, hits in impl_hits.items() if any(c is latest for c, _ in hits)]
+        up_chips = ''.join(f'<a class="chip" href="network-upgrades.html#nv{esc(str(n))}">NV{esc(str(n))}</a>' for n in ups)
+        links = call_links(latest)
+        summary = f'<p>{esc(latest["summary"])}</p>' if latest['summary'] else ''
+        tags = (f'<div class="chips" style="margin:8px 0 4px">{up_chips}{chips}</div>'
+                '<p class="note" style="margin-top:4px">Upgrades and FIPs mentioned. Mentions are not decisions.</p>'
+                if chips or up_chips else '')
+        vid = ''
+        if latest.get('youtube_id'):
+            v = esc(latest['youtube_id'])
+            vid = (f'<div class="video"><button type="button" data-yt="{v}" aria-label="Play recording">'
+                   f'<img src="https://i.ytimg.com/vi/{v}/hqdefault.jpg" alt="" loading="lazy">'
+                   '<span class="play" aria-hidden="true"></span></button></div>')
+        latest_card = (f'<section class="card" id="latest-call"><div class="card-head"><h2>Latest implementers\' call</h2>'
+                       f'<a class="hint" href="#calls-log">All calls →</a></div><div class="card-body">'
+                       f'<div class="meeting-title">{esc(latest["title"])}</div>'
+                       f'<div class="meeting-meta">{fmt_date(latest["date"])}{" · " + esc(", ".join(latest["types"])) if latest["types"] else ""}</div>'
+                       f'{summary}{tags}{f"<div class=btn-row>{links}</div>" if links else ""}{vid}</div></section>')
+    else:
+        latest_card = ('<section class="card" id="latest-call"><div class="card-head"><h2>Latest implementers\' call</h2></div>'
+                       '<div class="card-body"><p class="empty">No calls to show yet.</p></div></section>')
+
+    about = ('<section class="card"><div class="card-head"><h2>About the implementers\' calls</h2></div><div class="card-body">'
+             '<p>Filecoin implementation teams meet regularly to coordinate network upgrades: scope, timelines, '
+             'test vectors, calibration and mainnet readiness, and blockers on accepted FIPs. Core Devs sets priorities; '
+             'these calls are where implementers work out how and when they ship.</p>'
+             '<div class="btn-row">' + ext('network-upgrades.html', 'Network upgrades') + ext('core-devs.html', 'Core Devs meetings') + '</div>'
+             '</div></section>')
+
+    # Upgrade discussions: upcoming plus the most recent live upgrades
+    upcoming = [x for x in upgrades if x['mainnet'] and x['mainnet'] > now or not x['mainnet']]
+    live = [x for x in upgrades if x['mainnet'] and x['mainnet'] <= now]
+    shown = (upcoming + live)[:UPGRADES_SHOWN]
+    blocks = []
+    for x in shown:
+        hits = impl_hits.get(x['number'], [])
+        state = ('<span class="pill waiting">Upcoming</span>' if x['mainnet'] and x['mainnet'] > now else
+                 '<span class="pill approved">Live</span>' if x['mainnet'] else '<span class="pill">Not scheduled</span>')
+        items = ''.join(
+            f'<li><time>{fmt_date(c["date"])}</time><span class="kind impl">Implementers</span>'
+            f'<span>{convo_label(c)[2]} <span class="muted small">{esc(r)}</span></span></li>' for c, r in hits[:8])
+        if len(hits) > 8:
+            items += f'<li class="muted small">+{len(hits) - 8} earlier</li>'
+        all_n = len(ctx['upgrade_conv'].get(x['number'], []))
+        body = (f'<ul class="convo-list">{items}</ul>' if items else
+                '<p class="muted small" style="margin-top:6px">No implementers\' calls in the log discussed this upgrade.</p>')
+        blocks.append(f'<div class="up-card" id="impl-nv{esc(str(x["number"]))}"><div class="up-head">'
+                      f'<h3><span class="nv">NV{esc(str(x["number"]))}</span>{esc(x["name"])}</h3>{state}</div>'
+                      f'<div class="up-dates"><span>Mainnet: <strong>{fmt_date(x["mainnet"])}</strong></span>'
+                      f'<span>{len(hits)} implementers\' call{"s" if len(hits) != 1 else ""}</span>'
+                      f'<span><a href="network-upgrades.html#nv{esc(str(x["number"]))}">{"All " + str(all_n) + " calls" if all_n != 1 else "1 call"} incl. Core Devs →</a></span></div>'
+                      f'{body}</div>')
+    upgrade_card = (f'<section class="card" id="upgrade-talk"><div class="card-head"><h2>Network upgrade discussions</h2>'
+                    '<span class="hint">Implementers\' calls that named each upgrade or discussed its FIPs before activation.</span></div>'
+                    f'<div class="card-body"><div class="up-list">{"".join(blocks)}</div></div></section>'
+                    if source and blocks else '')
+
+    body = '\n'.join([
+        stats,
+        f'<div class="grid-2">{latest_card}{about}</div>',
+        upgrade_card,
+        implementers_card(ctx),
+    ])
+    return page(
+        title="Implementers' Calls",
+        description="Filecoin implementers' calls: recordings, notes and which network upgrades and FIPs each call discussed.",
+        current='implementers',
+        subtitle="Every implementers' call with its recording and notes, tied to the network upgrades and FIPs it discussed.",
+        body_html=body,
+    )
+
+
+def implementers_card(ctx):
+    """Full implementers' call log table."""
+    calls, source = ctx['calls'], ctx['calls_source']
+    head = "<section class=\"card\" id=\"calls-log\"><div class=\"card-head\"><h2>All implementers' calls"
+    if source is None:
+        return (head + '</h2></div><div class="card-body"><p class="empty">'
+                "The implementers' call log couldn't be loaded on this run.</p></div></section>")
+    up_by = {}
+    for num, hits in ctx['upgrade_conv'].items():
+        for c, _ in hits:
+            up_by.setdefault(id(c), []).append(num)
+    rows = []
+    for c in calls[:CALLS_SHOWN]:
+        ups_for = sorted(up_by.get(id(c), []), key=lambda n: (isinstance(n, int), n), reverse=True)
+        chips = ''.join(f'<a class="chip" href="network-upgrades.html#nv{esc(str(n))}">NV{esc(str(n))}</a>' for n in ups_for[:3])
+        chips += ''.join(fip_chip(f) for f in c['fips'][:6])
+        search = ' '.join([c['title'], fmt_date(c['date']), c['summary'], ' '.join(c['types']),
+                           ' '.join('FIP-' + f + ' ' + str(int(f)) for f in c['fips']),
+                           ' '.join(f'nv{n}' for n in ups_for)]).lower()
+        summary = f'<div class="muted small">{esc(c["summary"][:200])}</div>' if c['summary'] else ''
+        rows.append(f'<tr data-search="{esc(search)}"><td class="nowrap">{fmt_date(c["date"])}</td>'
+                    f'<td class="title-cell"><strong>{esc(c["title"])}</strong>{summary}</td>'
+                    f'<td><div class="chips">{chips}</div></td>'
+                    f'<td class="nowrap">{call_links(c) or "<span class=muted>—</span>"}</td></tr>')
+    if rows:
+        table = ('<div class="table-scroll"><table class="data" id="calls"><thead><tr><th>Date</th><th>Call</th>'
+                 '<th>Upgrades and FIPs</th><th>Links</th></tr></thead><tbody>' + ''.join(rows) + '</tbody></table></div>'
+                 '<p class="empty" id="no-call-match" hidden>No calls match.</p>')
+    else:
+        table = "<p class=\"empty\">No implementers' calls logged yet.</p>"
+    src = ("the implementers' meeting log in Notion" if source == 'notion'
+           else "an export of the implementers' meeting log")
+    more = f' Showing the latest {CALLS_SHOWN} of {len(calls)}.' if len(calls) > CALLS_SHOWN else ''
+    return (head + f' ({len(calls)})</h2>'
+            '<input class="search" type="search" placeholder="Filter by FIP, NV or topic" '
+            "aria-label=\"Filter implementers' calls\" oninput=\"filterCalls(this.value)\"></div>"
+            f'<div class="card-body">{table}<p class="note">From {src}. An upgrade tag means the call named that '
+            f'upgrade or discussed its FIPs; mentions are not decisions.{more}</p></div></section>'
+            '<script>function filterCalls(q) { q = (q || "").toLowerCase().trim();'
+            ' var rows = document.querySelectorAll("#calls tbody tr"), shown = 0;'
+            ' rows.forEach(function (r) { var hit = !q || r.getAttribute("data-search").indexOf(q) !== -1; r.hidden = !hit; if (hit) shown++; });'
+            ' var e = document.getElementById("no-call-match"); if (e) e.hidden = shown !== 0; }</script>')
+
+
 def upgrades_page(ctx):
     fips, files, upgrades = ctx['fips'], ctx['files'], ctx['upgrades']
     now = datetime.now(timezone.utc)
@@ -352,10 +550,11 @@ def upgrades_page(ctx):
                   if x['actors'] else '')
         epoch = f' · epoch {x["mainnet_epoch"]:,}' if x['mainnet_epoch'] else ''
         doc = f'<a href="{esc(x["doc_url"])}" target="_blank" rel="noopener">Upgrade notes</a>' if x['doc_url'] else ''
+        convo = upgrade_convo_html(ctx['upgrade_conv'].get(x['number'], []), open_=bool(upcoming or x is latest_live))
         cards.append(f'''<div class="up-card{" latest" if x is latest_live else ""}" id="nv{esc(str(x["number"]))}">
 <div class="up-head"><h3><span class="nv">NV{esc(str(x["number"]))}</span>{esc(x["name"])}</h3>{state}</div>
 <div class="up-dates"><span>Mainnet: <strong>{fmt_date(x["mainnet"])}</strong>{epoch}</span><span>Calibration: {fmt_date(x["calibration"])}</span>{f"<span>{actors}</span>" if actors else ""}{f"<span>{doc}</span>" if doc else ""}</div>
-<div class="up-fips">{fip_lines}</div></div>''')
+<div class="up-fips">{fip_lines}</div>{convo}</div>''')
 
     # Accepted FIPs not yet in any upgrade
     waiting = [n for n, f in sorted(fips.items()) if f['status'] == 'Accepted' and n not in shipped]
@@ -376,7 +575,7 @@ def upgrades_page(ctx):
         title='Network Upgrades',
         description='Every Filecoin network upgrade with activation dates, actors versions and the FIPs it shipped.',
         current='upgrades',
-        subtitle='What shipped when: every network upgrade, its activation dates and the FIPs it included.',
+        subtitle='What shipped when: every network upgrade, its activation dates, the FIPs it included and the calls where it was discussed.',
         body_html=body,
     )
 
@@ -404,13 +603,26 @@ def load_context():
     }
 
 
+def add_conversations(ctx):
+    """Load implementers' calls and link them and Core Devs meetings to upgrades."""
+    calls, source = impl.load_calls()
+    for m in ctx['meetings']:
+        m['kind'] = 'coredevs'
+    for c in calls:
+        c['kind'] = 'implementers'
+    ctx['calls'], ctx['calls_source'] = calls, source
+    ctx['upgrade_conv'] = cd.upgrade_conversations(ctx['upgrades'], ctx['meetings'] + calls)
+
+
 def main():
     ctx = load_context()
+    add_conversations(ctx)
     CTX.update(ctx)
     if not ctx['fips']:
         print('ERROR: No FIPs parsed. Aborting to avoid overwriting pages.')
         return 1
     for name, fn in (('index.html', overview), ('core-devs.html', core_devs_page),
+                     ('implementers.html', implementers_page),
                      ('network-upgrades.html', upgrades_page)):
         with open(name, 'w', encoding='utf-8') as f:
             f.write(fn(ctx))

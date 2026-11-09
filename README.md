@@ -1,6 +1,6 @@
 # Filecoin Governance Hub
 
-🔗 **Live:** [Overview](https://thatguyllc.github.io/fips-dashboard/) · [FIPs](https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html) · [Core Devs](https://thatguyllc.github.io/fips-dashboard/core-devs.html) · [Upgrades](https://thatguyllc.github.io/fips-dashboard/network-upgrades.html) · [Timeline](https://thatguyllc.github.io/fips-dashboard/fips-timeline-tracker.html)
+🔗 **Live:** [Overview](https://thatguyllc.github.io/fips-dashboard/) · [FIPs](https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html) · [Core Devs](https://thatguyllc.github.io/fips-dashboard/core-devs.html) · [Implementers](https://thatguyllc.github.io/fips-dashboard/implementers.html) · [Upgrades](https://thatguyllc.github.io/fips-dashboard/network-upgrades.html) · [Timeline](https://thatguyllc.github.io/fips-dashboard/fips-timeline-tracker.html)
 
 One place to keep up with Filecoin governance. It pulls the public records in [filecoin-project/FIPs](https://github.com/filecoin-project/FIPs) and [filecoin-project/core-devs](https://github.com/filecoin-project/core-devs) into a readable site: proposals and their status, Core Devs meetings with recordings and notes, network upgrades, and open discussions. It's read-only. It never changes a status, assigns a number or decides an outcome; that stays with the process in [FIP-0001](https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md).
 
@@ -16,8 +16,14 @@ One place to keep up with Filecoin governance. It pulls the public records in [f
 - Latest meeting in detail, and **FIPs on the agenda**: every FIP mentioned in the last 6 meetings' notes, how often, when it was last discussed and whether it has shipped. Mentions are shown as discussion, not decisions.
 - A searchable archive of every meeting (filter by FIP number, meeting number or topic) with recording, notes or slides, and agenda links.
 
+**Implementers** (`implementers.html`)
+- The latest implementers' call: summary, upgrades and FIPs mentioned, recording (playable in the page for YouTube) and notes.
+- **Network upgrade discussions**: for the upcoming and most recent upgrades, the implementers' calls that named each one or discussed its FIPs.
+- The full call log from the implementers' meeting database in Notion, searchable by FIP, NV or topic.
+
 **Upgrades** (`network-upgrades.html`)
 - Every network upgrade from `upgrades.json`: mainnet and calibration dates, epoch, actors version, included FIPs and the upgrade write-up.
+- **Discussed in N calls**: the Core Devs meetings and implementers' calls that discussed each upgrade. A call counts when it names the upgrade (NV27, "network upgrade 27" or its name, e.g. Golden Week) or mentions one of its FIPs in the 400 days before mainnet activation. Each entry says which.
 - **Accepted, not yet in an upgrade**: Accepted FIPs not listed in any upgrade, with when Core Devs last discussed them.
 
 **FIPs** (`fips-dashboard-static.html`)
@@ -42,7 +48,8 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 |---|---|
 | `fip_utils.py` | Parsing (README table across its historical layouts, FIP front matter), git history, status timeline, Last Call windows, PR matching and review state |
 | `core_devs.py` | Core Devs meetings (README table + notes), recordings, FIP mentions, network upgrades, open agenda issues |
-| `generate_hub.py` | Builds `index.html`, `core-devs.html` and `network-upgrades.html` |
+| `implementers.py` | Implementers' calls from the Notion meetings database (API or CSV export) |
+| `generate_hub.py` | Builds `index.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |
 | `fips_timeline_tracker.py` | Builds `fips-timeline-tracker.html` |
@@ -61,12 +68,23 @@ python3 -m http.server 8000   # then open http://localhost:8000/
 Optional environment variables:
 - `GITHUB_TOKEN`: raises the GitHub API rate limit for PR and review lookups.
 - `FIPS_REPO_DIR`, `CORE_DEVS_REPO_DIR`: paths to existing clones to reuse between runs.
+- `NOTION_TOKEN`: token of a Notion internal integration that the implementers' Meetings database is shared with. `NOTION_MEETINGS_DB` overrides the database ID.
+- `IMPLEMENTERS_MATCH`: which rows count as implementers' calls, matched against the title and type columns (default `implement`; empty keeps every row).
+- `NOTION_READ_BODIES=0`: don't read call pages' bodies. When on (default), bodies are scanned only for FIP and upgrade mentions; their text is never published.
+
+### Implementers' calls setup
+
+1. In Notion, create an internal integration (Settings → Connections → Develop or manage integrations) with read content access, in the workspace that holds the Meetings database.
+2. Open the Meetings database, then ··· → Connections → add the integration.
+3. In this repo: Settings → Secrets and variables → Actions → new secret `NOTION_TOKEN`. Optionally add a variable `NOTION_MEETINGS_DB` if the database ID changes.
+
+Without a token, the scripts read `data/implementers-calls.csv` (Notion: ··· → Export → Markdown & CSV) if it exists, and otherwise the page says the log couldn't be loaded. Columns are detected by type and name, so renaming a column in Notion doesn't break the build. Notion page links on the public site only open for people with access to the workspace, unless the page is published to the web.
 
 If the PR lookup fails (rate limit, network), the dashboard still builds and shows a notice in the PR section instead of claiming there are no PRs.
 
 ## Auto-update
 
-`.github/workflows/update-dashboard.yml` rebuilds all five pages every 6 hours, on manual dispatch, and on pushes to `master` that change the scripts. See [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for hosting options.
+`.github/workflows/update-dashboard.yml` rebuilds all six pages every 6 hours, on manual dispatch, and on pushes to `master` that change the scripts. See [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for hosting options.
 
 ## Notes
 

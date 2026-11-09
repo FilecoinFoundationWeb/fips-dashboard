@@ -319,6 +319,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .kind.meeting { background: var(--active-bg); color: var(--active-fg); }
 .kind.upgrade { background: var(--final-bg); color: var(--final-fg); }
 .kind.discussion { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.kind.impl { background: var(--deferred-bg); color: var(--deferred-fg); }
 .open-list { list-style: none; display: grid; gap: 10px; font-size: .93rem; }
 .open-list li { padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .open-list li:last-child { border-bottom: 0; padding-bottom: 0; }
@@ -338,6 +339,11 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .up-head h3 .nv { color: var(--fil-blue); margin-right: 6px; }
 .up-dates { color: var(--muted); font-size: .86rem; display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 8px; }
 .up-fips { display: grid; gap: 4px; font-size: .9rem; }
+.up-convo { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.up-convo > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .9rem; }
+.convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
+.convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
+.convo-list time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .muted { color: var(--muted); }
 .small { font-size: .84rem; }
 
@@ -346,6 +352,8 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
   .feed li { grid-template-columns: 64px 1fr; }
   .feed li .kind { grid-column: 2; grid-row: 1; }
   .feed li .feed-text { grid-column: 1 / -1; }
+  .convo-list li { grid-template-columns: 1fr auto; }
+  .convo-list li > span:last-child { grid-column: 1 / -1; }
   .stat .value { font-size: 1.6rem; }
   .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
   .corgi-walk { width: 104px; }
@@ -467,6 +475,7 @@ NAV = [
     ('overview', 'Overview', './'),
     ('dashboard', 'FIPs', 'fips-dashboard-static.html'),
     ('coredevs', 'Core Devs', 'core-devs.html'),
+    ('implementers', 'Implementers', 'implementers.html'),
     ('upgrades', 'Upgrades', 'network-upgrades.html'),
     ('timeline', 'Timeline', 'fips-timeline-tracker.html'),
 ]

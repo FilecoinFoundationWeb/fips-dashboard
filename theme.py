@@ -89,6 +89,18 @@ a:hover { color: var(--fil-blue); }
   padding: 28px 0 118px;
 }
 .site-header .wrap { position: relative; z-index: 2; }
+.brand {
+  position: absolute; top: 0; right: 16px; display: inline-flex; align-items: center; gap: 10px;
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em;
+  padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04);
+  transition: border-color .2s, background .2s;
+}
+.brand:hover { color: #fff; border-color: rgba(0,144,255,.6); background: rgba(0,144,255,.14); }
+.brand-mark { width: 34px; height: 34px; flex: none; }
+@media (max-width: 640px) {
+  .brand { top: -6px; font-size: 1rem; padding: 4px 12px 4px 4px; gap: 8px; }
+  .brand-mark { width: 28px; height: 28px; }
+}
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
@@ -471,6 +483,30 @@ CORGI_JS = """
 """
 
 
+# Filecoin mark, unmodified, from filecoin-project/specs (static/filecoin-logo.svg).
+FILECOIN_LOGO = '''<svg aria-hidden="true" focusable="false" class="brand-mark" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 40 40" xml:space="preserve" enable-background="new 0 0 40 40">
+    <style>
+    .st1-logo {
+        fill-rule: evenodd;
+        clip-rule: evenodd;
+        fill: #fff
+    }
+    </style>
+    <defs>
+        <filter id="a-logo" filterUnits="userSpaceOnUse" x="0" y="0" width="40" height="40">
+            <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0" />
+        </filter>
+    </defs>
+    <mask maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="40" id="b-logo_1">
+        <g filter="url(#a-logo)">
+            <path id="a-logo_1" class="st1-logo" d="M0 0h40v40H0V0z" />
+        </g>
+    </mask>
+    <path d="M20 40C9 40 0 31 0 19.9.1 8.9 9-.1 20.1 0 31.1.1 40 9 40 20.2 39.9 31.1 31 40 20 40" mask="url(#b-logo_1)" fill-rule="evenodd" clip-rule="evenodd" fill="#0090ff" />
+    <path class="st1-logo" d="M21.9 17.6l-.6 3.2 5.7.8-.4 1.5-5.6-.8c-.4 1.3-.6 2.7-1.1 3.9-.5 1.4-1 2.8-1.6 4.1-.8 1.7-2.2 2.9-4.1 3.2-1.1.2-2.3.1-3.2-.6-.3-.2-.6-.6-.6-.9 0-.4.2-.9.5-1.1.2-.1.7 0 1 .1.3.3.6.7.8 1.1.6.8 1.4.9 2.2.3.9-.8 1.4-1.9 1.7-3 .6-2.4 1.2-4.7 1.7-7.1v-.4l-5.3-.8.2-1.5 5.5.8.7-3.1-5.7-.9.2-1.6 5.9.8c.2-.6.3-1.1.5-1.6.5-1.8 1-3.6 2.2-5.2 1.2-1.6 2.6-2.6 4.7-2.5.9 0 1.8.3 2.4 1 .1.1.3.3.3.5 0 .4 0 .9-.3 1.2-.4.3-.9.2-1.3-.2-.3-.3-.5-.6-.8-.9-.6-.8-1.5-.9-2.2-.2-.5.5-1 1.2-1.3 1.9-.7 2.1-1.2 4.3-1.9 6.5l5.5.8-.4 1.5-5.3-.8" />
+</svg>'''
+
+
 NAV = [
     ('overview', 'Overview', './'),
     ('dashboard', 'FIPs', 'fips-dashboard-static.html'),
@@ -509,6 +545,7 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
 <body>
 <header class="site-header">
   <div class="wrap">
+    <a class="brand" href="https://filecoin.io" target="_blank" rel="noopener" aria-label="Filecoin website">{FILECOIN_LOGO}<span>Filecoin</span></a>
     <span class="eyebrow">Filecoin governance</span>
     <h1>{html_escape(title)}</h1>
     <p class="sub">{subtitle}</p>

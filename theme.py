@@ -356,6 +356,21 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
 .convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
 .sub-h { font-size: .9rem; margin: 14px 0 6px; }
+.explainer .lead { font-size: 1.02rem; max-width: 900px; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px; margin-top: 14px; }
+.role { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.role strong { display: block; margin-bottom: 4px; }
+.type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+.type-card { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.type-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.type-n { margin-left: auto; font-weight: 800; font-size: 1.2rem; }
+.steps { list-style: none; counter-reset: step; display: grid; gap: 10px; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; font-size: .93rem; }
+.steps li::before { content: counter(step); grid-row: 1 / span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--fil-blue); color: #fff; }
+.steps li strong { display: block; }
+.sections-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 8px 18px; font-size: .9rem; }
+.sections-list li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.sections-list li span:last-child { display: block; color: var(--muted); }
 .flow { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
 .flow .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; }
 .stage { flex: 1 1 0; min-width: 120px; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; text-decoration: none; color: var(--text); border: 1px solid var(--border); background: var(--surface-2); }

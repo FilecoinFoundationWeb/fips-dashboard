@@ -13,6 +13,7 @@ One place to keep up with Filecoin governance. It pulls the public records in [f
 - Most recently active FIP discussions, and links for getting involved.
 
 **Lifecycle** (`index.html`, the home page; `fip-lifecycle.html` redirects here)
+- **Explainers** drawn from the FIPs repo: what a FIP is and who's involved (the FIP editors list is read from FIP-0001 on every build), proposing a FIP step by step, the types of FIP with live counts, and what a FIP must contain.
 - **How a FIP moves**: the FIP-0001 path (Idea → Draft → Last Call → Accepted → Final) with how many FIPs are at each stage and the median time to the next one, plus the side outcomes (Rejected, Withdrawn, Superseded, Active).
 - **Where open FIPs are now**: every Draft, Last Call and Accepted FIP with time in stage, when Core Devs or the implementers last discussed it, and whether it's a candidate for the next upgrade or already shipped.
 - **Live on mainnet, still Accepted**: FIPs shipped in an activated upgrade but not yet marked Final, flagged for editors.
@@ -56,6 +57,7 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 | `fip_utils.py` | Parsing (README table across its historical layouts, FIP front matter), git history, status timeline, Last Call windows, PR matching and review state |
 | `core_devs.py` | Core Devs meetings (README table + notes), recordings, FIP mentions, network upgrades, open agenda issues |
 | `implementers.py` | Implementers' calls from the public Notion meetings database (API token or CSV export as fallbacks) |
+| `lifecycle_explainers.py` | Explainer sections for the lifecycle page, paraphrasing FIP-0001 and proposing.md |
 | `scope_planning.py` | Upgrade scope planning parsed from the core-devs planning discussions |
 | `generate_hub.py` | Builds `index.html` (lifecycle), `overview.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |

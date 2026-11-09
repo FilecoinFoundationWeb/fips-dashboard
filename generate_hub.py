@@ -18,6 +18,7 @@ import fip_utils as u
 import core_devs as cd
 import implementers as impl
 import scope_planning as sp
+import lifecycle_explainers as lx
 from fip_utils import html_escape as esc
 from theme import page
 from generate_fips_dashboard import badge, fip_link, date_str
@@ -726,12 +727,14 @@ def lifecycle_page(ctx):
               '<p class="note">Every change, with dates and commits, is on the <a href="fips-timeline-tracker.html">Timeline</a>.</p></div></section>'
               ) if trows else ''
 
-    body = '\n'.join([flow, board, nudge, timing, guide])
+    repo = ctx['fips_repo']
+    body = '\n'.join([lx.intro(repo, fips), flow, board, nudge, lx.steps_card(),
+                      lx.types_card(repo, files), lx.contents_card(), timing, guide])
     return page(
         title='FIP Lifecycle',
         description='How a Filecoin Improvement Proposal moves from idea to Final, where every open FIP is now and how long each stage takes.',
         current='lifecycle',
-        subtitle='How a FIP moves from idea to Final, where every open FIP is right now, and how long each stage usually takes.',
+        subtitle='What Filecoin Improvement Proposals are, how one moves from idea to Final, and where every open FIP is right now.',
         body_html=body,
     )
 
@@ -869,7 +872,7 @@ def load_context():
     raw_prs = u.fetch_open_prs()
     prs = u.process_prs(raw_prs, with_reviews=False) if raw_prs is not None else None
     return {
-        'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc, 'history': history,
+        'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc, 'history': history, 'fips_repo': fips_repo,
         'meetings': cd.load_meetings(cd_repo), 'upgrades': cd.load_upgrades(cd_repo),
         'prs': prs,
         'prs_by_fip': u.prs_by_fip(prs) if prs else {},

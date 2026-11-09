@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Read-only dashboard of Filecoin Improvement Proposals: status, time in status, Last Call windows, open PRs and review state.">
 <meta name="color-scheme" content="light dark">
-<meta name="generated-at" content="2026-11-09T04:19:53Z">
+<meta name="generated-at" content="2026-11-09T14:00:39Z">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>Filecoin Improvement Proposals</title>
 
@@ -333,6 +333,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .kind.meeting { background: var(--active-bg); color: var(--active-fg); }
 .kind.upgrade { background: var(--final-bg); color: var(--final-fg); }
 .kind.discussion { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.kind.impl { background: var(--deferred-bg); color: var(--deferred-fg); }
 .open-list { list-style: none; display: grid; gap: 10px; font-size: .93rem; }
 .open-list li { padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .open-list li:last-child { border-bottom: 0; padding-bottom: 0; }
@@ -352,6 +353,11 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .up-head h3 .nv { color: var(--fil-blue); margin-right: 6px; }
 .up-dates { color: var(--muted); font-size: .86rem; display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 8px; }
 .up-fips { display: grid; gap: 4px; font-size: .9rem; }
+.up-convo { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.up-convo > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .9rem; }
+.convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
+.convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
+.convo-list time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .muted { color: var(--muted); }
 .small { font-size: .84rem; }
 
@@ -360,6 +366,8 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
   .feed li { grid-template-columns: 64px 1fr; }
   .feed li .kind { grid-column: 2; grid-row: 1; }
   .feed li .feed-text { grid-column: 1 / -1; }
+  .convo-list li { grid-template-columns: 1fr auto; }
+  .convo-list li > span:last-child { grid-column: 1 / -1; }
   .stat .value { font-size: 1.6rem; }
   .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
   .corgi-walk { width: 104px; }
@@ -373,8 +381,8 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
     <h1>Filecoin Improvement Proposals</h1>
     <p class="sub">Where every FIP stands, how long it has been there, and what is waiting on review.</p>
     <div class="header-meta">
-      <nav class="nav" aria-label="Pages"><a href="./">Overview</a><a href="fips-dashboard-static.html" class="current" aria-current="page">FIPs</a><a href="core-devs.html">Core Devs</a><a href="network-upgrades.html">Upgrades</a><a href="fips-timeline-tracker.html">Timeline</a></nav>
-      <span>Updated 2026-11-09 04:19 UTC</span>
+      <nav class="nav" aria-label="Pages"><a href="./">Overview</a><a href="fips-dashboard-static.html" class="current" aria-current="page">FIPs</a><a href="core-devs.html">Core Devs</a><a href="implementers.html">Implementers</a><a href="network-upgrades.html">Upgrades</a><a href="fips-timeline-tracker.html">Timeline</a></nav>
+      <span>Updated 2026-11-09 14:00 UTC</span>
     </div>
   </div>
   <div class="ground" aria-hidden="true"></div>
@@ -434,7 +442,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 </header>
 <main>
   <div class="wrap">
-<section class="stats"><div class="stat"><div class="label">Total FIPs</div><div class="value">99</div></div><div class="stat accent"><div class="label">In Last Call</div><div class="value">1</div></div><div class="stat"><div class="label">Draft</div><div class="value">7</div></div><div class="stat"><div class="label">Accepted</div><div class="value">3</div></div><div class="stat"><div class="label">Final</div><div class="value">73</div></div><div class="stat"><div class="label">Open PRs</div><div class="value">5</div></div></section>
+<section class="stats"><div class="stat"><div class="label">Total FIPs</div><div class="value">99</div></div><div class="stat accent"><div class="label">In Last Call</div><div class="value">1</div></div><div class="stat"><div class="label">Draft</div><div class="value">7</div></div><div class="stat"><div class="label">Accepted</div><div class="value">3</div></div><div class="stat"><div class="label">Final</div><div class="value">73</div></div><div class="stat"><div class="label">Open PRs</div><div class="value">6</div></div></section>
 <section class="card" id="last-call">
 <div class="card-head"><h2>Last Call</h2>
 <span class="hint">The final review window before a FIP moves on. Per FIP-0001, editors set a review end date, normally 14 days out. Dates here are when the README showed the change.</span></div>
@@ -535,7 +543,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 <td></td></tr></tbody></table></div>
 <p class="note">Flagged for FIP editors to look at. The dashboard doesn't decide which one is right.</p></div></section>
 <section class="card" id="prs">
-<div class="card-head"><h2>Open pull requests (5)</h2>
+<div class="card-head"><h2>Open pull requests (6)</h2>
 <span class="hint">Matched to FIPs by the files each PR changes, then by title. Review state is the latest decisive review from each reviewer.</span></div>
 <div class="card-body"><div class="pr-group" id="pr-0086"><h3><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0086.md" target="_blank" rel="noopener">FIP-0086</a> <span class="status-badge status-final">Final</span> <span class="pill">Fast Finality in Filecoin (F3)</span></h3><div class="pr-item">
 <a href="https://github.com/filecoin-project/FIPs/pull/1226" target="_blank" rel="noopener">#1226: update f3 FIP-0086 with deltaBackOffMax</a>
@@ -549,11 +557,15 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 <a href="https://github.com/filecoin-project/FIPs/pull/1269" target="_blank" rel="noopener">#1269: FIP-0117: Repeated SnapDeals with Piece-Level Integrity</a>
 <span class="pr-meta"><span class="pill approved">Approved (1)</span><span>@lucaniz</span>
 <span>opened 2026-06-26</span>
-<span>idle 4 days</span></span></div></div><div class="pr-group" id="pr-0122"><h3><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0122.md" target="_blank" rel="noopener">FIP-0122</a>  <span class="pill">not yet in README</span></h3><div class="pr-item">
+<span>idle 5 days</span></span></div></div><div class="pr-group" id="pr-0122"><h3><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0122.md" target="_blank" rel="noopener">FIP-0122</a>  <span class="pill">not yet in README</span></h3><div class="pr-item">
 <a href="https://github.com/filecoin-project/FIPs/pull/1303" target="_blank" rel="noopener">#1303: Add FIP: Size the miner actor&#x27;s reward-derived charges (faults) by the consensus weight</a>
 <span class="pr-meta"><span class="pill ">Comments only</span><span>@lucaniz</span>
 <span>opened 2026-11-03</span>
-<span>idle 4 days</span></span></div></div><div class="pr-group" id="pr-general"><h3>General FIP-related</h3><div class="pr-item">
+<span>idle 5 days</span></span></div></div><div class="pr-group" id="pr-general"><h3>General FIP-related</h3><div class="pr-item">
+<a href="https://github.com/filecoin-project/FIPs/pull/1306" target="_blank" rel="noopener">#1306: FIP-XXXX: Actor Type Indirection in the State Tree</a>
+<span class="pr-meta"><span class="pill waiting">Awaiting review</span><span>@rvagg</span>
+<span>opened 2026-11-09</span>
+<span>active today</span></span></div><div class="pr-item">
 <a href="https://github.com/filecoin-project/FIPs/pull/1218" target="_blank" rel="noopener">#1218: Add draft FIP for tipset gas reservations</a>
 <span class="pr-meta"><span class="pill ">Draft PR</span><span>@snissn</span>
 <span>opened 2025-11-18</span>
@@ -568,7 +580,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 <footer class="site-footer">
   <div class="wrap">
     <p>Read-only view of public governance records in <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a> and <a href="https://github.com/filecoin-project/core-devs" target="_blank" rel="noopener">filecoin-project/core-devs</a>. Nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors, Core Devs and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
-    <p>Generated 2026-11-09 04:19 UTC. Unofficial community tool.</p>
+    <p>Generated 2026-11-09 14:00 UTC. Unofficial community tool.</p>
   </div>
 </footer>
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="One place to follow Filecoin governance: FIPs, Core Devs meetings and recordings, network upgrades and discussions.">
 <meta name="color-scheme" content="light dark">
-<meta name="generated-at" content="2026-11-09T04:20:00Z">
+<meta name="generated-at" content="2026-11-09T14:00:47Z">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>Filecoin Governance</title>
 
@@ -333,6 +333,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .kind.meeting { background: var(--active-bg); color: var(--active-fg); }
 .kind.upgrade { background: var(--final-bg); color: var(--final-fg); }
 .kind.discussion { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.kind.impl { background: var(--deferred-bg); color: var(--deferred-fg); }
 .open-list { list-style: none; display: grid; gap: 10px; font-size: .93rem; }
 .open-list li { padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .open-list li:last-child { border-bottom: 0; padding-bottom: 0; }
@@ -352,6 +353,11 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .up-head h3 .nv { color: var(--fil-blue); margin-right: 6px; }
 .up-dates { color: var(--muted); font-size: .86rem; display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 8px; }
 .up-fips { display: grid; gap: 4px; font-size: .9rem; }
+.up-convo { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.up-convo > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .9rem; }
+.convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
+.convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
+.convo-list time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .muted { color: var(--muted); }
 .small { font-size: .84rem; }
 
@@ -360,6 +366,8 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
   .feed li { grid-template-columns: 64px 1fr; }
   .feed li .kind { grid-column: 2; grid-row: 1; }
   .feed li .feed-text { grid-column: 1 / -1; }
+  .convo-list li { grid-template-columns: 1fr auto; }
+  .convo-list li > span:last-child { grid-column: 1 / -1; }
   .stat .value { font-size: 1.6rem; }
   .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
   .corgi-walk { width: 104px; }
@@ -373,8 +381,8 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
     <h1>Filecoin Governance</h1>
     <p class="sub">FIPs, Core Devs meetings, recordings and network upgrades in one place, built from the public GitHub records.</p>
     <div class="header-meta">
-      <nav class="nav" aria-label="Pages"><a href="./" class="current" aria-current="page">Overview</a><a href="fips-dashboard-static.html">FIPs</a><a href="core-devs.html">Core Devs</a><a href="network-upgrades.html">Upgrades</a><a href="fips-timeline-tracker.html">Timeline</a></nav>
-      <span>Updated 2026-11-09 04:20 UTC</span>
+      <nav class="nav" aria-label="Pages"><a href="./" class="current" aria-current="page">Overview</a><a href="fips-dashboard-static.html">FIPs</a><a href="core-devs.html">Core Devs</a><a href="implementers.html">Implementers</a><a href="network-upgrades.html">Upgrades</a><a href="fips-timeline-tracker.html">Timeline</a></nav>
+      <span>Updated 2026-11-09 14:00 UTC</span>
     </div>
   </div>
   <div class="ground" aria-hidden="true"></div>
@@ -434,7 +442,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 </header>
 <main>
   <div class="wrap">
-<section class="stats"><a class="stat" href="core-devs.html"><div class="label">Latest Core Devs</div><div class="value">#95</div><div class=sub-value>Oct 28, 2026</div></a><a class="stat accent" href="fips-dashboard-static.html#last-call"><div class="label">In Last Call</div><div class="value">1</div><div class=sub-value>final review windows</div></a><a class="stat" href="network-upgrades.html"><div class="label">Latest upgrade</div><div class="value">NV29</div><div class=sub-value>Solstice · Oct 19, 2026</div></a><a class="stat" href="fips-dashboard-static.html#prs"><div class="label">Open FIP PRs</div><div class="value">5</div><div class=sub-value>on the FIPs repo</div></a><a class="stat" href="#discussions"><div class="label">Active discussions</div><div class="value">5</div><div class=sub-value>updated in 30 days</div></a></section>
+<section class="stats"><a class="stat" href="core-devs.html"><div class="label">Latest Core Devs</div><div class="value">#95</div><div class=sub-value>Oct 28, 2026</div></a><a class="stat accent" href="fips-dashboard-static.html#last-call"><div class="label">In Last Call</div><div class="value">1</div><div class=sub-value>final review windows</div></a><a class="stat" href="network-upgrades.html"><div class="label">Latest upgrade</div><div class="value">NV29</div><div class=sub-value>Solstice · Oct 19, 2026</div></a><a class="stat" href="fips-dashboard-static.html#prs"><div class="label">Open FIP PRs</div><div class="value">6</div><div class=sub-value>on the FIPs repo</div></a><a class="stat" href="#discussions"><div class="label">Active discussions</div><div class="value">6</div><div class=sub-value>updated in 30 days</div></a></section>
 <div class="grid-2"><section class="card"><div class="card-head"><h2>Latest Core Devs meeting</h2>
 <a class="hint" href="core-devs.html">All meetings →</a></div>
 <div class="card-body">
@@ -450,12 +458,14 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 <div class="btn-row" style="margin-top:14px"><a class="btn" href="https://github.com/filecoin-project/FIPs/discussions" target="_blank" rel="noopener">FIP discussions</a><a class="btn" href="https://github.com/filecoin-project/core-devs/issues" target="_blank" rel="noopener">Core Devs agendas</a></div>
 </div></section></div>
 <section class="card"><div class="card-head"><h2>Recent activity</h2>
-<span class="hint">Last 90 days across FIPs, Core Devs and network upgrades.</span></div>
+<span class="hint">Last 90 days across FIPs, Core Devs, implementers' calls and network upgrades.</span></div>
 <div class="card-body"><ul class="feed"><li><time datetime="2026-11-05T04:16:44+00:00">Nov 5</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0121.md" target="_blank" rel="noopener">FIP-0121</a> Remove the Fil+ Actors (f06, f07, f080) listed as <span class="status-badge status-draft">Draft</span></span></li><li><time datetime="2026-11-04T00:48:55+00:00">Nov 4</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0119.md" target="_blank" rel="noopener">FIP-0119</a> Increase maximum sector lifetime to 10 years: <span class="status-badge status-draft">Draft</span> → <span class="status-badge status-last-call">Last Call</span></span></li><li><time datetime="2026-11-03T14:23:13+00:00">Nov 3</time><span class="kind discussion">Discussion</span><span class="feed-text"><a href="https://github.com/filecoin-project/FIPs/discussions/1302" target="_blank" rel="noopener">Fault fees and the other reward-derived charges after Solstice</a> <span class="muted small">by @lucaniz</span></span></li><li><time datetime="2026-10-30T10:26:28+00:00">Oct 30</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0119.md" target="_blank" rel="noopener">FIP-0119</a> Increase maximum sector lifetime to 10 years listed as <span class="status-badge status-draft">Draft</span></span></li><li><time datetime="2026-10-30T09:25:51+00:00">Oct 30</time><span class="kind discussion">Discussion</span><span class="feed-text"><a href="https://github.com/filecoin-project/FIPs/discussions/1300" target="_blank" rel="noopener">Remove the Fil+ actors (f06, f07, f080)</a> <span class="muted small">by @rvagg</span></span></li><li><time datetime="2026-10-28T00:00:00+00:00">Oct 28</time><span class="kind meeting">Meeting</span><span class="feed-text"><a href="https://youtu.be/mS7vNktSWNI?si=93tuMo-DiAhwcWSO" target="_blank" rel="noopener">Core Devs #95</a>: NV29 Solstice completion and transition to NV30 planning; Deferred proposals and implementation scope for NV30; FIP-0119: Increase Maximum Sector Lifetime to 10 Years</span></li><li><time datetime="2026-10-26T20:55:46+00:00">Oct 26</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a> (Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split: <span class="status-badge status-accepted">Accepted</span> → <span class="status-badge status-final">Final</span></span></li><li><time datetime="2026-10-19T12:59:30+00:00">Oct 19</time><span class="kind upgrade">Upgrade</span><span class="feed-text">NV29 Solstice activated on mainnet (FIP-0118)</span></li><li><time datetime="2026-10-07T11:11:25+00:00">Oct 7</time><span class="kind discussion">Discussion</span><span class="feed-text"><a href="https://github.com/filecoin-project/FIPs/discussions/1291" target="_blank" rel="noopener">Change Maximum Sector Lifetime from 5 to 10 years</a> <span class="muted small">by @lucaniz</span></span></li><li><time datetime="2026-09-28T12:59:30+00:00">Sep 28</time><span class="kind upgrade">Upgrade</span><span class="feed-text">NV29 Solstice activated on calibration (FIP-0118)</span></li><li><time datetime="2026-09-16T03:42:20+00:00">Sep 16</time><span class="kind discussion">Discussion</span><span class="feed-text"><a href="https://github.com/filecoin-project/FIPs/discussions/1290" target="_blank" rel="noopener">Remove the payment channel (paych) actor entirely</a> <span class="muted small">by @rvagg</span></span></li><li><time datetime="2026-09-11T23:31:53+00:00">Sep 11</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a> (Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split: <span class="status-badge status-last-call">Last Call</span> → <span class="status-badge status-accepted">Accepted</span></span></li><li><time datetime="2026-09-10T23:02:18+00:00">Sep 10</time><span class="kind discussion">Discussion</span><span class="feed-text"><a href="https://github.com/filecoin-project/FIPs/discussions/1288" target="_blank" rel="noopener">FIP Draft: Stake-Weighted F3 Finality</a> <span class="muted small">by @hannahhoward</span></span></li><li><time datetime="2026-09-04T16:21:46+00:00">Sep 4</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">FIP-0107</a> Implicit Messages in Block Receipts: <span class="status-badge status-last-call">Last Call</span> → <span class="status-badge status-accepted">Accepted</span></span></li><li><time datetime="2026-08-26T00:00:00+00:00">Aug 26</time><span class="kind meeting">Meeting</span><span class="feed-text"><a href="https://youtu.be/it1ft03pI4A?si=60JbSPORPuuDPBRy" target="_blank" rel="noopener">Core Devs #94</a>: FIP-0118: Solstice; FIP-0117: Repeated SnapDeals with Piece-Level Integrity; FRC-0116: JSON-RPC HTTP Conventions</span></li><li><time datetime="2026-08-14T18:48:13+00:00">Aug 14</time><span class="kind fip">FIP status</span><span class="feed-text"><a class="fip-id" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md" target="_blank" rel="noopener">FIP-0118</a> (Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split: <span class="status-badge status-draft">Draft</span> → <span class="status-badge status-last-call">Last Call</span></span></li></ul></div></section>
 <section class="card" id="discussions"><div class="card-head"><h2>FIP discussions</h2>
 <span class="hint">Most recently active threads on the FIPs repo, where proposals start.</span></div>
 <div class="card-body"><div class="table-scroll"><table class="data"><thead><tr><th>Discussion</th><th class="num">Comments</th><th>Last activity</th></tr></thead>
-<tbody><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1300" target="_blank" rel="noopener">Remove the Fil+ actors (f06, f07, f080)</a>
+<tbody><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1090" target="_blank" rel="noopener">State cleanup / efficiency proposal: replace Code CIDs in actors with stable ids</a>
+<div class="muted small">#1090 · Enhancements - Technical · @rvagg</div></td>
+<td class="num">2</td><td class="nowrap">today</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1300" target="_blank" rel="noopener">Remove the Fil+ actors (f06, f07, f080)</a>
 <div class="muted small">#1300 · Enhancements - Technical · @rvagg</div></td>
 <td class="num">1</td><td class="nowrap">3 days ago</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1302" target="_blank" rel="noopener">Fault fees and the other reward-derived charges after Solstice</a>
 <div class="muted small">#1302 · Enhancements - Technical · @lucaniz</div></td>
@@ -467,20 +477,19 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 <div class="muted small">#1253 · Enhancements - Technical · @Kubuxu</div></td>
 <td class="num">7</td><td class="nowrap">25 days ago</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1290" target="_blank" rel="noopener">Remove the payment channel (paych) actor entirely</a>
 <div class="muted small">#1290 · Enhancements - Technical · @rvagg</div></td>
-<td class="num">2</td><td class="nowrap">37 days ago</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1223" target="_blank" rel="noopener">The community is furious! As long as Filecoin lives, reforms will never stop! Reform the Filecoin Foundation (FF), revive Filecoin!</a>
+<td class="num">2</td><td class="nowrap">38 days ago</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1223" target="_blank" rel="noopener">The community is furious! As long as Filecoin lives, reforms will never stop! Reform the Filecoin Foundation (FF), revive Filecoin!</a>
 <div class="muted small">#1223 · General · @Hill168</div></td>
-<td class="num">27</td><td class="nowrap">41 days ago</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1288" target="_blank" rel="noopener">FIP Draft: Stake-Weighted F3 Finality</a>
+<td class="num">27</td><td class="nowrap">42 days ago</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1288" target="_blank" rel="noopener">FIP Draft: Stake-Weighted F3 Finality</a>
 <div class="muted small">#1288 · Enhancements - Technical · @hannahhoward</div></td>
 <td class="num">8</td><td class="nowrap">Sep 21, 2026</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/1266" target="_blank" rel="noopener">Clear state simply</a>
 <div class="muted small">#1266 · Enhancements - Technical · @snadrus</div></td>
-<td class="num">5</td><td class="nowrap">Aug 31, 2026</td></tr><tr><td class="title-cell"><a href="https://github.com/filecoin-project/FIPs/discussions/538" target="_blank" rel="noopener">Repeated SnapDeals</a>
-<div class="muted small">#538 · Enhancements - Technical · @Kubuxu</div></td>
-<td class="num">7</td><td class="nowrap">Jul 1, 2026</td></tr></tbody></table></div></div></section>
+<td class="num">5</td><td class="nowrap">Aug 31, 2026</td></tr></tbody></table></div></div></section>
 <section class="card"><div class="card-head"><h2>Get involved</h2></div><div class="card-body"><div class="links-grid">
 <a class="link-card" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener"><strong>How the FIP process works</strong><span>FIP-0001: types, statuses and how proposals move.</span></a>
 <a class="link-card" href="https://github.com/filecoin-project/FIPs/discussions" target="_blank" rel="noopener"><strong>Start or join a discussion</strong><span>Ideas begin as FIP discussions before a draft.</span></a>
 <a class="link-card" href="fips-dashboard-static.html"><strong>Track every FIP</strong><span>Status, Last Call windows and open PRs.</span></a>
 <a class="link-card" href="core-devs.html"><strong>Core Devs meetings</strong><span>Notes, recordings and agendas back to 2020.</span></a>
+<a class="link-card" href="implementers.html"><strong>Implementers' calls</strong><span>How upgrades get built: calls, recordings and what each one covered.</span></a>
 <a class="link-card" href="network-upgrades.html"><strong>Network upgrades</strong><span>What shipped when, and which FIPs it included.</span></a>
 <a class="link-card" href="mailto:governance@fil.org"><strong>Contact the governance team</strong><span>governance@fil.org</span></a>
 </div></div></section>
@@ -489,7 +498,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 <footer class="site-footer">
   <div class="wrap">
     <p>Read-only view of public governance records in <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a> and <a href="https://github.com/filecoin-project/core-devs" target="_blank" rel="noopener">filecoin-project/core-devs</a>. Nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors, Core Devs and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
-    <p>Generated 2026-11-09 04:20 UTC. Unofficial community tool.</p>
+    <p>Generated 2026-11-09 14:00 UTC. Unofficial community tool.</p>
   </div>
 </footer>
 

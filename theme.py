@@ -356,6 +356,26 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
 .convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
 .sub-h { font-size: .9rem; margin: 14px 0 6px; }
+.flow { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.flow .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; }
+.stage { flex: 1 1 0; min-width: 120px; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; text-decoration: none; color: var(--text); border: 1px solid var(--border); background: var(--surface-2); }
+.stage:hover { border-color: var(--fil-blue); color: var(--text); }
+.stage-name { font-weight: 700; font-size: .9rem; }
+.stage-n { font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
+.stage-sub { font-size: .78rem; color: var(--muted); }
+.stage.draft { background: var(--draft-bg); } .stage.lastcall { background: var(--lastcall-bg); }
+.stage.accepted { background: var(--accepted-bg); } .stage.final { background: var(--final-bg); }
+.side-stages { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 12px; font-size: .88rem; }
+.side-stage { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); }
+.board { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.board-col { border-radius: 12px; padding: 12px; border: 1px solid var(--border); background: var(--surface-2); border-top: 4px solid var(--border); }
+.board-col.draft { border-top-color: var(--draft-fg); } .board-col.lastcall { border-top-color: var(--lastcall-fg); }
+.board-col.accepted { border-top-color: var(--accepted-fg); } .board-col.deferred { border-top-color: var(--deferred-fg); }
+.board-col h3 { font-size: .95rem; margin-bottom: 8px; }
+.board-col ul { list-style: none; display: grid; gap: 8px; }
+.board-col li { padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); font-size: .88rem; }
+.board-col .item-title { font-weight: 600; }
+@media (max-width: 640px) { .flow { flex-direction: column; } .flow .arrow { transform: rotate(90deg); } .stage { min-width: 0; } }
 .milestones { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 6px 14px; font-size: .88rem; }
 .milestones li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
 .milestones strong { white-space: nowrap; }
@@ -514,6 +534,7 @@ FILECOIN_LOGO = '''<svg aria-hidden="true" focusable="false" class="brand-mark" 
 NAV = [
     ('overview', 'Overview', './'),
     ('dashboard', 'FIPs', 'fips-dashboard-static.html'),
+    ('lifecycle', 'Lifecycle', 'fip-lifecycle.html'),
     ('coredevs', 'Core Devs', 'core-devs.html'),
     ('implementers', 'Implementers', 'implementers.html'),
     ('upgrades', 'Upgrades', 'network-upgrades.html'),

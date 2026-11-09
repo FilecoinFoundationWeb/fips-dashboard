@@ -1,6 +1,6 @@
 # Filecoin Governance Hub
 
-🔗 **Live:** [Overview](https://thatguyllc.github.io/fips-dashboard/) · [FIPs](https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html) · [Core Devs](https://thatguyllc.github.io/fips-dashboard/core-devs.html) · [Implementers](https://thatguyllc.github.io/fips-dashboard/implementers.html) · [Upgrades](https://thatguyllc.github.io/fips-dashboard/network-upgrades.html) · [Timeline](https://thatguyllc.github.io/fips-dashboard/fips-timeline-tracker.html)
+🔗 **Live:** [Overview](https://thatguyllc.github.io/fips-dashboard/) · [FIPs](https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html) · [Lifecycle](https://thatguyllc.github.io/fips-dashboard/fip-lifecycle.html) · [Core Devs](https://thatguyllc.github.io/fips-dashboard/core-devs.html) · [Implementers](https://thatguyllc.github.io/fips-dashboard/implementers.html) · [Upgrades](https://thatguyllc.github.io/fips-dashboard/network-upgrades.html) · [Timeline](https://thatguyllc.github.io/fips-dashboard/fips-timeline-tracker.html)
 
 One place to keep up with Filecoin governance. It pulls the public records in [filecoin-project/FIPs](https://github.com/filecoin-project/FIPs) and [filecoin-project/core-devs](https://github.com/filecoin-project/core-devs) into a readable site: proposals and their status, Core Devs meetings with recordings and notes, network upgrades, and open discussions. It's read-only. It never changes a status, assigns a number or decides an outcome; that stays with the process in [FIP-0001](https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md).
 
@@ -11,6 +11,12 @@ One place to keep up with Filecoin governance. It pulls the public records in [f
 - **Open now**: Last Calls in progress, the next meeting's agenda issue and any scheduled upgrade.
 - **Recent activity**: a 90-day feed of FIP status changes, meetings, upgrade activations and new FIP discussions.
 - Most recently active FIP discussions, and links for getting involved.
+
+**Lifecycle** (`fip-lifecycle.html`)
+- **How a FIP moves**: the FIP-0001 path (Idea → Draft → Last Call → Accepted → Final) with how many FIPs are at each stage and the median time to the next one, plus the side outcomes (Deferred, Rejected, Withdrawn, Superseded, Active).
+- **Where open FIPs are now**: every Draft, Last Call, Accepted and Deferred FIP with time in stage, when Core Devs or the implementers last discussed it, and whether it's a candidate for the next upgrade or already shipped.
+- **Live on mainnet, still Accepted**: FIPs shipped in an activated upgrade but not yet marked Final, flagged for editors.
+- **How long stages take** (medians over 2 years) and a **stage guide** paraphrasing FIP-0001.
 
 **Core Devs** (`core-devs.html`)
 - Latest meeting in detail, and **FIPs on the agenda**: every FIP mentioned in the last 6 meetings' notes, how often, when it was last discussed and whether it has shipped. Mentions are shown as discussion, not decisions.
@@ -51,7 +57,7 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 | `core_devs.py` | Core Devs meetings (README table + notes), recordings, FIP mentions, network upgrades, open agenda issues |
 | `implementers.py` | Implementers' calls from the public Notion meetings database (API token or CSV export as fallbacks) |
 | `scope_planning.py` | Upgrade scope planning parsed from the core-devs planning discussions |
-| `generate_hub.py` | Builds `index.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
+| `generate_hub.py` | Builds `index.html`, `fip-lifecycle.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |
 | `fips_timeline_tracker.py` | Builds `fips-timeline-tracker.html` |
@@ -86,7 +92,7 @@ If the PR lookup fails (rate limit, network), the dashboard still builds and sho
 
 ## Auto-update
 
-`.github/workflows/update-dashboard.yml` rebuilds all six pages every 6 hours, on manual dispatch, and on pushes to `master` that change the scripts. See [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for hosting options.
+`.github/workflows/update-dashboard.yml` rebuilds all seven pages every 6 hours, on manual dispatch, and on pushes to `master` that change the scripts. See [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for hosting options.
 
 ## Notes
 

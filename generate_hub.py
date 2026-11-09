@@ -534,6 +534,209 @@ def implementers_card(ctx):
             ' var e = document.getElementById("no-call-match"); if (e) e.hidden = shown !== 0; }</script>')
 
 
+# ---------------------------------------------------------------------------
+# FIP lifecycle
+# ---------------------------------------------------------------------------
+
+# Paraphrased from FIP-0001 ("FIP Work Flow"). Keys are README statuses.
+STAGES = [
+    ('Discussion', 'Idea', 'An idea is raised and debated in FIP Discussions before anyone writes a draft.',
+     'The author opens a draft PR on the FIPs repo when the idea has support.',
+     'FIP Discussions'),
+    ('Draft', 'Draft', 'The FIP editor has merged the draft and assigned a number. Authors keep refining it through follow-up PRs.',
+     'The editor moves it to Last Call when it\'s mature and, for non-core FIPs, implemented.',
+     'FIP Discussions, Core Devs, implementers\' calls'),
+    ('Last Call', 'Last Call', 'A final review window, normally 14 days (the review-period-end date). Material changes send it back to Draft.',
+     'A clean Last Call makes a core FIP Accepted, or any other FIP Final.',
+     'The FIP\'s discussion thread'),
+    ('Accepted', 'Accepted', 'Core FIPs only. The proposal is approved and in implementers\' hands; when it ships is decided in network upgrade planning, outside the FIP process.',
+     'It becomes Final once implemented in at least two clients, the spec is updated and it\'s adopted, normally when its network upgrade activates.',
+     'Upgrade scope planning, implementers\' calls, Core Devs'),
+    ('Final', 'Final', 'The current state of the art. Only errata are fixed from here.',
+     'Can later be Superseded by a newer Final FIP.',
+     '—'),
+]
+SIDE_STAGES = [
+    ('Deferred', 'Core FIPs put off for a future network upgrade. Can return to Draft.'),
+    ('Rejected', 'Fundamentally broken, or a core FIP Core Devs won\'t implement.'),
+    ('Withdrawn', 'The author has withdrawn the proposal.'),
+    ('Superseded', 'Was Final, but another Final FIP has replaced it.'),
+    ('Active', 'Informational or organizational FIPs that are never "done" and may be updated in place, such as FIP-0001.'),
+]
+TIMING_WINDOW_DAYS = 730
+
+
+def _median(xs):
+    xs = sorted(xs)
+    if not xs:
+        return None
+    m = len(xs) // 2
+    return xs[m] if len(xs) % 2 else (xs[m - 1] + xs[m]) / 2
+
+
+def lifecycle_page(ctx):
+    fips, files, history = ctx['fips'], ctx['files'], ctx['history']
+    now = datetime.now(timezone.utc)
+    shipped = cd.fip_upgrades(ctx['upgrades'])
+    md = cd.last_discussed(ctx['meetings'])
+    impl_md = {}
+    for c in ctx['calls']:
+        for f in c['fips']:
+            impl_md.setdefault(f, c)
+
+    # Next upgrade's scope candidates, from the planning discussion
+    live = [x['number'] for x in ctx['upgrades'] if x['mainnet'] and x['mainnet'] <= now and isinstance(x['number'], int)]
+    latest_live = max(live) if live else 0
+    plan = next((p for p in sorted(ctx.get('planning') or [], key=lambda p: p['nv']) if p['nv'] > latest_live), None)
+    candidates = {r['fip']: r for r in (plan['scope'] if plan else []) if r['fip']}
+
+    by_status = {}
+    for n, f in fips.items():
+        by_status.setdefault(f['status'], []).append(n)
+
+    # Typical time in each stage: completed stints that ended in the window
+    cutoff = now - timedelta(days=TIMING_WINDOW_DAYS)
+    stint = {}
+    for n, entries in history.items():
+        for a, b in zip(entries, entries[1:]):
+            if b['since'] >= cutoff and a['status'] != b['status']:
+                stint.setdefault((a['status'], b['status']), []).append((b['since'] - a['since']).days)
+    def typical(frm, *tos):
+        xs = [d for to in tos for d in stint.get((frm, to), [])]
+        med = _median(xs)
+        return (f'{med:.0f} days', len(xs)) if med is not None else ('—', 0)
+
+    discussions = ctx['discussions']
+    counts = {'Discussion': len([d for d in discussions or [] if (now - d['updated']).days <= 30]) if discussions is not None else None}
+    for key, *_ in STAGES[1:]:
+        counts[key] = len(by_status.get(key, []))
+    next_time = {
+        'Draft': typical('Draft', 'Last Call'),
+        'Last Call': typical('Last Call', 'Accepted', 'Final'),
+        'Accepted': typical('Accepted', 'Final'),
+    }
+
+    # Flow strip
+    steps = []
+    for key, label, *_ in STAGES:
+        n = counts.get(key)
+        nt = next_time.get(key)
+        sub = (f'median {nt[0]} to next' if nt and nt[1] else ('active in 30 days' if key == 'Discussion' else 'all time' if key == 'Final' else ''))
+        cls = {'Draft': 'draft', 'Last Call': 'lastcall', 'Accepted': 'accepted', 'Final': 'final'}.get(key, 'idea')
+        steps.append(f'<a class="stage {cls}" href="#stage-{key.lower().replace(" ", "-")}"><span class="stage-name">{label}</span>'
+                     f'<span class="stage-n">{"—" if n is None else n}</span><span class="stage-sub">{sub}</span></a>')
+    side = ''.join(f'<span class="side-stage">{esc(k)} <strong>{len(by_status.get(k, []))}</strong></span>' for k, _ in SIDE_STAGES)
+    flow = (f'<section class="card"><div class="card-head"><h2>How a FIP moves</h2>'
+            '<span class="hint">The path in FIP-0001, with how many FIPs are at each stage today.</span></div><div class="card-body">'
+            f'<div class="flow">{"<span class=arrow aria-hidden=true>→</span>".join(steps)}</div>'
+            f'<div class="side-stages"><span class="muted small">Off the main path:</span>{side}</div>'
+            '<p class="note">Core FIPs go Last Call → Accepted → Final (when shipped in a network upgrade). '
+            'Other FIPs go straight from Last Call to Final. Medians cover stage changes in the last 2 years.</p>'
+            '</div></section>')
+
+    # Board: where the open FIPs are now
+    def since(n):
+        d = u.current_status_since(history, n, fips[n]['status'])
+        return d, (now - d).days if d else None
+
+    def where_discussed(n):
+        bits = []
+        if n in md:
+            m = md[n]
+            bits.append(f'Core Devs #{m["number"]} · {fmt_date(m["date"], False)}')
+        if n in impl_md:
+            bits.append(f'Implementers · {fmt_date(impl_md[n]["date"], False)}')
+        return ' · '.join(bits)
+
+    def item(n, extra=''):
+        d, days = since(n)
+        age = f'{u.humanize_days(days)} in stage' if days is not None else ''
+        disc = where_discussed(n)
+        return (f'<li><div>{fip_a(n)} <span class="item-title">{esc(fips[n]["title"])}</span></div>'
+                f'<div class="muted small">{" · ".join(x for x in (age, extra) if x)}</div>'
+                f'{f"<div class=muted small>Last discussed: {esc(disc)}</div>" if disc else ""}</li>')
+
+    def accepted_note(n):
+        if n in shipped:
+            x = shipped[n]
+            return f'Shipped in NV{x["number"]} {esc(x["name"])}; awaiting Final'
+        if n in candidates:
+            r = candidates[n]
+            return f'NV{plan["nv"]} candidate ({READY_SHORT[r["readiness"]].lower()})'
+        return 'Not in an upgrade yet'
+
+    def draft_note(n):
+        if n in candidates:
+            r = candidates[n]
+            return f'NV{plan["nv"]} candidate ({READY_SHORT[r["readiness"]].lower()})'
+        return ''
+
+    lc_end = {w['number']: w for w in ctx['open_lc']}
+    cols = [
+        ('Draft', 'draft', lambda n: draft_note(n)),
+        ('Last Call', 'lastcall', lambda n: (f'Review ends {fmt_date(lc_end[n]["end"], False)}' + (' (est.)' if lc_end[n]['estimated_end'] else '')) if n in lc_end else ''),
+        ('Accepted', 'accepted', accepted_note),
+        ('Deferred', 'deferred', lambda n: draft_note(n)),
+    ]
+    col_html = []
+    for key, cls, note in cols:
+        nums = sorted(by_status.get(key, []), key=lambda n: since(n)[0] or now)
+        lis = ''.join(item(n, note(n)) for n in nums) or '<li class="muted small">None right now.</li>'
+        col_html.append(f'<div class="board-col {cls}" id="stage-{key.lower().replace(" ", "-")}"><h3>{key} <span class="muted">{len(nums)}</span></h3><ul>{lis}</ul></div>')
+    board = (f'<section class="card"><div class="card-head"><h2>Where open FIPs are now</h2>'
+             '<span class="hint">Every FIP that hasn\'t reached a final outcome, longest in stage first.</span></div>'
+             f'<div class="card-body"><div class="board">{"".join(col_html)}</div>'
+             f'<p class="note">Time in stage is measured from when the FIPs README showed the change, which can lag the decision by a few days.'
+             f'{" Upgrade candidates come from the NV" + str(plan["nv"]) + " planning discussion." if plan else ""}</p></div></section>')
+
+    # Shipped but still Accepted: a nudge for editors
+    waiting_final = [n for n in by_status.get('Accepted', []) if n in shipped and shipped[n]['mainnet'] and shipped[n]['mainnet'] <= now]
+    nudge = ''
+    if waiting_final:
+        rows = ''.join(f'<tr><td>{fip_a(n)}</td><td class="title-cell">{esc(fips[n]["title"])}</td>'
+                       f'<td class="nowrap">NV{shipped[n]["number"]} · {fmt_date(shipped[n]["mainnet"])}</td></tr>' for n in waiting_final)
+        nudge = (f'<section class="card"><div class="card-head"><h2>Live on mainnet, still Accepted ({len(waiting_final)})</h2>'
+                 '<span class="hint">Shipped in an activated upgrade but not yet marked Final. Flagged for editors; it may be intentional.</span></div>'
+                 f'<div class="card-body"><div class="table-scroll"><table class="data"><thead><tr><th>FIP</th><th>Title</th><th>Shipped</th></tr></thead>'
+                 f'<tbody>{rows}</tbody></table></div></div></section>')
+
+    # Stage guide
+    guide_rows = []
+    for key, label, what, nxt, where in STAGES:
+        n = counts.get(key)
+        guide_rows.append(f'<tr><td class="nowrap"><strong>{label}</strong></td><td>{esc(what)}</td><td>{esc(nxt)}</td>'
+                          f'<td class="small">{esc(where)}</td><td class="num">{"—" if n is None else n}</td></tr>')
+    for key, what in SIDE_STAGES:
+        guide_rows.append(f'<tr><td class="nowrap">{key}</td><td colspan="3">{esc(what)}</td><td class="num">{len(by_status.get(key, []))}</td></tr>')
+    guide = (f'<section class="card"><div class="card-head"><h2>Stage guide</h2>'
+             '<span class="hint">Paraphrased from <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>, which is the authority.</span></div>'
+             '<div class="card-body"><div class="table-scroll"><table class="data"><thead><tr><th>Stage</th><th>What it means</th><th>What moves it on</th><th>Where it\'s discussed</th><th class="num">Now</th></tr></thead>'
+             f'<tbody>{"".join(guide_rows)}</tbody></table></div></div></section>')
+
+    # Timing table
+    trans = [('Draft', ('Last Call',), 'Draft → Last Call'), ('Last Call', ('Accepted',), 'Last Call → Accepted'),
+             ('Last Call', ('Final',), 'Last Call → Final (non-core)'), ('Accepted', ('Final',), 'Accepted → Final'),
+             ('Last Call', ('Draft',), 'Last Call → back to Draft'), ('Draft', ('Deferred',), 'Draft → Deferred'),
+             ('Draft', ('Withdrawn',), 'Draft → Withdrawn')]
+    trows = ''.join(f'<tr><td>{esc(lbl)}</td><td class="num">{typical(f, *t)[1]}</td><td class="num">{typical(f, *t)[0]}</td></tr>'
+                    for f, t, lbl in trans if typical(f, *t)[1])
+    timing = (f'<section class="card"><div class="card-head"><h2>How long stages take</h2>'
+              '<span class="hint">Stage changes in the last 2 years, from the FIPs README history.</span></div>'
+              '<div class="card-body"><div class="table-scroll"><table class="data"><thead><tr><th>Change</th><th class="num">FIPs</th><th class="num">Median time</th></tr></thead>'
+              f'<tbody>{trows}</tbody></table></div>'
+              '<p class="note">Every change, with dates and commits, is on the <a href="fips-timeline-tracker.html">Timeline</a>.</p></div></section>'
+              ) if trows else ''
+
+    body = '\n'.join([flow, board, nudge, timing, guide])
+    return page(
+        title='FIP Lifecycle',
+        description='How a Filecoin Improvement Proposal moves from idea to Final, where every open FIP is now and how long each stage takes.',
+        current='lifecycle',
+        subtitle='How a FIP moves from idea to Final, where every open FIP is right now, and how long each stage usually takes.',
+        body_html=body,
+    )
+
+
 READY_PILL = {'ready': 'approved', 'risk': 'waiting', 'deferred-in': 'changes', 'deferred-out': '', 'none': '', 'unknown': ''}
 READY_SHORT = {'ready': 'Ready', 'risk': 'At risk', 'deferred-in': 'Carried over', 'deferred-out': 'Next upgrade',
                'none': 'Not upgrade-bound', 'unknown': '—'}
@@ -658,7 +861,7 @@ def load_context():
     raw_prs = u.fetch_open_prs()
     prs = u.process_prs(raw_prs, with_reviews=False) if raw_prs is not None else None
     return {
-        'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc,
+        'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc, 'history': history,
         'meetings': cd.load_meetings(cd_repo), 'upgrades': cd.load_upgrades(cd_repo),
         'prs': prs,
         'prs_by_fip': u.prs_by_fip(prs) if prs else {},
@@ -691,6 +894,7 @@ def main():
         return 1
     for name, fn in (('index.html', overview), ('core-devs.html', core_devs_page),
                      ('implementers.html', implementers_page),
+                     ('fip-lifecycle.html', lifecycle_page),
                      ('network-upgrades.html', upgrades_page)):
         with open(name, 'w', encoding='utf-8') as f:
             f.write(fn(ctx))

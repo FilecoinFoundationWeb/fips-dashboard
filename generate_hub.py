@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 import fip_utils as u
 import core_devs as cd
 import implementers as impl
+import scope_planning as sp
 from fip_utils import html_escape as esc
 from theme import page
 from generate_fips_dashboard import badge, fip_link, date_str
@@ -533,6 +534,67 @@ def implementers_card(ctx):
             ' var e = document.getElementById("no-call-match"); if (e) e.hidden = shown !== 0; }</script>')
 
 
+READY_PILL = {'ready': 'approved', 'risk': 'waiting', 'deferred-in': 'changes', 'deferred-out': '', 'none': '', 'unknown': ''}
+READY_SHORT = {'ready': 'Ready', 'risk': 'At risk', 'deferred-in': 'Carried over', 'deferred-out': 'Next upgrade',
+               'none': 'Not upgrade-bound', 'unknown': '—'}
+
+
+def scope_planning_card(ctx):
+    """Scope planning for upgrades that haven't shipped yet, from the core-devs planning discussions."""
+    planning = ctx.get('planning')
+    if planning is None:
+        return ('<section class="card" id="scope"><div class="card-head"><h2>Scope planning</h2></div><div class="card-body">'
+                '<p class="empty">The planning discussions couldn\'t be loaded on this run. '
+                '<a href="https://github.com/filecoin-project/core-devs/discussions" target="_blank" rel="noopener">Browse them on GitHub</a>.</p>'
+                '</div></section>')
+    now = datetime.now(timezone.utc)
+    live = [x['number'] for x in ctx['upgrades'] if x['mainnet'] and x['mainnet'] <= now and isinstance(x['number'], int)]
+    latest_live = max(live) if live else 0
+    plans = [p for p in planning if p['nv'] > latest_live]
+    if not plans:
+        return ''
+    sections = []
+    for p in plans:
+        counts = {}
+        for r in p['scope']:
+            counts[r['readiness']] = counts.get(r['readiness'], 0) + 1
+        tally = ' · '.join(f'{n} {READY_SHORT[k].lower()}' for k, n in counts.items() if k != 'unknown')
+        rows = []
+        for r in p['scope']:
+            name = esc(r['name'])
+            if r['fip']:
+                name = re.sub(r'FIP-?\d+', fip_a(r['fip']), name, count=1)
+            elif r['link']:
+                name = f'<a href="{esc(r["link"])}" target="_blank" rel="noopener">{name}</a>'
+            pill = f'<span class="pill {READY_PILL[r["readiness"]]}" title="{esc(r["readiness_label"])}">{READY_SHORT[r["readiness"]]}</span>'
+            summary = f'<div class="muted small">{esc(r["summary"][:220])}</div>' if r['summary'] else ''
+            notes = f'<div class="small" style="margin-top:4px"><strong>Open:</strong> {esc(r["notes"][:200])}</div>' if r['notes'] else ''
+            rows.append(f'<tr><td class="nowrap">{pill}</td><td class="title-cell">{name}{summary}{notes}</td>'
+                        f'<td class="small">{esc(r["status"])}</td><td class="small">{esc(r["timeline"])}</td>'
+                        f'<td class="num">{esc(r["size"]) or "<span class=muted>—</span>"}</td></tr>')
+        table = ('<div class="table-scroll"><table class="data"><thead><tr><th>Readiness</th><th>Candidate</th>'
+                 '<th>Status &amp; progress</th><th>Timeline</th><th class="num">Size</th></tr></thead><tbody>'
+                 + ''.join(rows) + '</tbody></table></div>') if rows else \
+            '<p class="empty">No scope table in the planning discussion yet.</p>'
+        ms = ''.join(f'<li><span>{esc(m["name"])}</span><strong>{esc(m["date"])}</strong></li>' for m in p['milestones'])
+        ms_html = f'<h3 class="sub-h">Milestones</h3><ul class="milestones">{ms}</ul>' if ms else ''
+        naming = f'<p class="small" style="margin-top:10px"><strong>Name:</strong> {esc(p["naming"])}</p>' if p['naming'] else ''
+        hits = ctx['planning_conv'].get(p['nv'], [])
+        convo = upgrade_convo_html(hits, open_=False) if hits else ''
+        sections.append(
+            f'<div class="up-card" id="plan-nv{p["nv"]}"><div class="up-head"><h3><span class="nv">NV{p["nv"]}</span>Scope planning</h3>'
+            f'<span class="pill waiting">Planning</span></div>'
+            f'<div class="up-dates"><span>{len(p["scope"])} candidates{": " + tally if tally else ""}</span>'
+            f'<span>Updated {ago(p["updated"])}</span>'
+            f'<span><a href="{esc(p["url"])}" target="_blank" rel="noopener">Planning discussion →</a></span></div>'
+            f'{table}{ms_html}{naming}{convo}</div>')
+    return (f'<section class="card" id="scope"><div class="card-head"><h2>Scope planning</h2>'
+            '<span class="hint">What\'s being considered for the next upgrade, from the public planning discussions in core-devs. '
+            'Candidates aren\'t commitments; scope is set by Core Devs and the implementers.</span></div>'
+            f'<div class="card-body"><div class="up-list">{"".join(sections)}</div>'
+            '<p class="note">Size: S under 2 engineer-weeks, M 2–4, L over 4.</p></div></section>')
+
+
 def upgrades_page(ctx):
     fips, files, upgrades = ctx['fips'], ctx['files'], ctx['upgrades']
     now = datetime.now(timezone.utc)
@@ -567,6 +629,7 @@ def upgrades_page(ctx):
 <div class="card-body">{f"""<div class="table-scroll"><table class="data"><thead><tr><th>FIP</th><th>Title</th><th>Last discussed</th></tr></thead><tbody>{waiting_rows}</tbody></table></div>""" if waiting_rows else '<p class="empty">Every Accepted FIP is in a network upgrade.</p>'}</div></section>'''
 
     body = '\n'.join([
+        scope_planning_card(ctx),
         waiting_card,
         f'''<section class="card"><div class="card-head"><h2>All network upgrades ({len(upgrades)})</h2>
 <span class="hint">From <a href="https://github.com/filecoin-project/core-devs/blob/master/upgrades.json" target="_blank" rel="noopener">upgrades.json</a> in the core-devs repo.</span></div>
@@ -613,6 +676,10 @@ def add_conversations(ctx):
         c['kind'] = 'implementers'
     ctx['calls'], ctx['calls_source'] = calls, source
     ctx['upgrade_conv'] = cd.upgrade_conversations(ctx['upgrades'], ctx['meetings'] + calls)
+    # Planned upgrades: only calls that name the upgrade count (its FIPs aren't settled yet).
+    ctx['planning'] = sp.fetch_planning()
+    planned = [{'number': p['nv'], 'name': '', 'fips': [], 'mainnet': None} for p in ctx['planning'] or []]
+    ctx['planning_conv'] = cd.upgrade_conversations(planned, ctx['meetings'] + calls)
 
 
 def main():

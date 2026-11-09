@@ -24,6 +24,7 @@ One place to keep up with Filecoin governance. It pulls the public records in [f
 **Upgrades** (`network-upgrades.html`)
 - Every network upgrade from `upgrades.json`: mainnet and calibration dates, epoch, actors version, included FIPs and the upgrade write-up.
 - **Discussed in N calls**: the Core Devs meetings and implementers' calls that discussed each upgrade. A call counts when it names the upgrade (NV27, "network upgrade 27" or its name, e.g. Golden Week) or mentions one of its FIPs in the 400 days before mainnet activation. Each entry says which.
+- **Scope planning**: for upgrades that haven't shipped yet, the candidate FIPs from the public `nvNN Network Upgrade Planning` discussion in core-devs, with readiness (ready, at risk, carried over), status, timeline and T-shirt size; the milestone dates; the naming note; and the Core Devs meetings and implementers' calls that named the upgrade. Rebuilt every run, so edits to the discussion show up within 6 hours.
 - **Accepted, not yet in an upgrade**: Accepted FIPs not listed in any upgrade, with when Core Devs last discussed them.
 
 **FIPs** (`fips-dashboard-static.html`)
@@ -49,6 +50,7 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 | `fip_utils.py` | Parsing (README table across its historical layouts, FIP front matter), git history, status timeline, Last Call windows, PR matching and review state |
 | `core_devs.py` | Core Devs meetings (README table + notes), recordings, FIP mentions, network upgrades, open agenda issues |
 | `implementers.py` | Implementers' calls from the public Notion meetings database (API token or CSV export as fallbacks) |
+| `scope_planning.py` | Upgrade scope planning parsed from the core-devs planning discussions |
 | `generate_hub.py` | Builds `index.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |

@@ -355,6 +355,10 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .up-convo > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .9rem; }
 .convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
 .convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
+.sub-h { font-size: .9rem; margin: 14px 0 6px; }
+.milestones { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 6px 14px; font-size: .88rem; }
+.milestones li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.milestones strong { white-space: nowrap; }
 .convo-list time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .muted { color: var(--muted); }
 .small { font-size: .84rem; }

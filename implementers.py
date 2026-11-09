@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """Read Filecoin implementers' calls from the Notion meetings database.
 
-Two sources, tried in order:
+Sources, tried in order:
 
+  0. The public site (default). The Meetings database is published at
+     filecoindev.notion.site, so it's read there without any sign-in or token,
+     the same way any visitor's browser reads it. Only public data is used, and
+     of that only: each call's title, date, public page link, its agenda lines,
+     recording links, and FIP / upgrade mentions. People (host, attendees,
+     @-mentions) and the async-update tables are never published.
+     NOTION_PUBLIC_SITE overrides the site; set it to "" to skip this source.
   1. The Notion API, when NOTION_TOKEN is set. Create an internal integration
      in Notion, share the Meetings database with it, and add its token as the
      NOTION_TOKEN repository secret. NOTION_MEETINGS_DB overrides the database
@@ -227,10 +234,168 @@ def _parse_csv_date(text):
 
 
 # ---------------------------------------------------------------------------
+# Public Notion site (no token)
+# ---------------------------------------------------------------------------
+
+PUBLIC_SITE = 'https://filecoindev.notion.site'
+AGENDA_HEAD = re.compile(r'agenda', re.I)
+SKIP_HEAD = re.compile(r'async|update|attend|transcript', re.I)
+
+
+def _public_site():
+    v = os.environ.get('NOTION_PUBLIC_SITE')
+    return PUBLIC_SITE if v is None else v.rstrip('/')
+
+
+def _site_post(site, path, body):
+    req = urllib.request.Request(site + '/api/v3/' + path, data=json.dumps(body).encode(), method='POST')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('User-Agent', 'fips-dashboard (public governance tracker)')
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read().decode('utf-8'))
+
+
+def _val(rec):
+    """recordMap entries are {value: X} or {value: {value: X}} depending on API version."""
+    v = (rec or {}).get('value') or {}
+    return v.get('value') if isinstance(v.get('value'), dict) else v
+
+
+def _uuid(hex_id):
+    h = hex_id.replace('-', '')
+    return f'{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}'
+
+
+def _chunk(site, page_id):
+    return _site_post(site, 'loadPageChunk', {'pageId': page_id, 'limit': 500, 'cursor': {'stack': []},
+                                              'chunkNumber': 0, 'verticalColumns': False})
+
+
+def _rich(segments):
+    """(text, hrefs) from Notion's internal rich text. People mentions are dropped."""
+    text, hrefs = [], []
+    for seg in segments or []:
+        s, ann = seg[0], (seg[1] if len(seg) > 1 else [])
+        keep = True
+        for a in ann:
+            if a[0] in ('u', 'p', 'd', 'ui'):  # user, page, date mentions: not published
+                keep = False
+            elif a[0] == 'a' and len(a) > 1:
+                hrefs.append(a[1])
+            elif a[0] == 'lm' and len(a) > 1 and isinstance(a[1], dict):
+                hrefs.append(a[1].get('href'))
+                s = a[1].get('title') or ''
+        if keep and s != '‣':
+            text.append(s)
+    return ''.join(text), [h for h in hrefs if h]
+
+
+def _topic(text):
+    """An agenda line fit to publish: no proposer names, no raw URLs, no legends."""
+    t = re.sub(r'https?://\S+', '', text or '')
+    t = re.sub(r'^\s*\([^)]{1,40}\)\s*', '', t)          # "(Steve) nv29 update" -> "nv29 update"
+    t = re.sub(r'\s+', ' ', cd._clean_md(t)).strip(' :-–;,')
+    if len(t) < 4 or re.match(r'^(XS|S|M|L|XL)\b\s*[:=]', t):
+        return None
+    return t[:120]
+
+
+def _page_content(site, page_id):
+    """(agenda topics, links, all text) for one public call page."""
+    rm = _chunk(site, page_id).get('recordMap', {}).get('block', {})
+    get = lambda i: _val(rm.get(i))
+    topics, links, texts = [], [], []
+    section = None
+
+    def walk(bid, depth):
+        nonlocal section
+        b = get(bid)
+        if not b:
+            return
+        t = b.get('type', '')
+        text, hrefs = _rich((b.get('properties') or {}).get('title'))
+        links.extend(hrefs)
+        src = (b.get('format') or {}).get('display_source') or ((b.get('properties') or {}).get('source') or [[None]])[0][0]
+        if src and t in ('video', 'embed', 'bookmark'):
+            links.append(src)
+        if t in ('header', 'sub_header', 'sub_sub_header') and depth == 0:
+            section = 'agenda' if AGENDA_HEAD.search(text) else ('skip' if SKIP_HEAD.search(text) else 'other')
+        if section != 'skip':
+            texts.append(text)
+            if section == 'agenda' and depth == 0 and t in ('bulleted_list', 'numbered_list', 'to_do'):
+                topic = _topic(text)
+                if topic:
+                    topics.append(topic)
+        # Don't descend into tables (the async-update grid) or into sub-pages.
+        if t not in ('table', 'collection_view', 'collection_view_page', 'page'):
+            for k in b.get('content') or []:
+                walk(k, depth + 1)
+
+    root = get(_uuid(page_id))
+    for k in (root or {}).get('content') or []:
+        walk(k, 0)
+    return topics, links, '\n'.join(texts)
+
+
+def load_from_public_site():
+    site = _public_site()
+    db = (os.environ.get('NOTION_MEETINGS_DB') or DEFAULT_DB).replace('-', '')
+    rm = _chunk(site, _uuid(db)).get('recordMap', {})
+    page = _val(rm.get('block', {}).get(_uuid(db)))
+    if not page:
+        raise RuntimeError('database page is not public')
+    space = page.get('space_id')
+    coll_id = (page.get('collection_id') or next(iter(rm.get('collection', {})), None))
+    view_ids = page.get('view_ids') or list(rm.get('collection_view', {}))
+    if not coll_id or not view_ids:
+        raise RuntimeError('database has no public view')
+    q = _site_post(site, 'queryCollection?src=initial_load', {
+        'source': {'type': 'collection', 'id': coll_id, 'spaceId': space},
+        'collectionView': {'id': view_ids[0], 'spaceId': space},
+        'loader': {'type': 'reducer', 'reducers': {'collection_group_results': {'type': 'results', 'limit': 500}},
+                   'searchQuery': '', 'userTimeZone': 'UTC'}})
+    ids = q['result']['reducerResults']['collection_group_results']['blockIds']
+    blocks = q.get('recordMap', {}).get('block', {})
+    rows = []
+    for bid in ids:
+        b = _val(blocks.get(bid)) or {}
+        title, _ = _rich((b.get('properties') or {}).get('title'))
+        if not _keep(title, []):
+            continue
+        clean = re.sub(r'(\d)\s*-\s*(\d)', r'\1-\2', title)  # "2026-11- 03" -> "2026-11-03"
+        date = cd.parse_date(clean)
+        if not date and b.get('created_time'):
+            date = datetime.fromtimestamp(b['created_time'] / 1000, tz=timezone.utc)
+        rows.append((bid, re.sub(r'\s+', ' ', clean).strip(), date))
+    rows.sort(key=lambda r: r[2] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    calls = []
+    for i, (bid, title, date) in enumerate(rows):
+        topics, links, text = [], [], ''
+        if i < BODY_LIMIT:
+            try:
+                topics, links, text = _page_content(site, bid)
+            except Exception as e:
+                print(f'Warning: could not read public page {bid}: {e}')
+        urls = [(_classify_url('', h), h) for h in links if _classify_url('', h) == 'recording']
+        c = _call(title, date, [], urls, '; '.join(topics[:4]), f'{site}/{bid.replace("-", "")}',
+                  text + '\n' + '\n'.join(links))
+        c['topics'] = topics
+        calls.append(c)
+    return calls
+
+
+# ---------------------------------------------------------------------------
 
 def load_calls():
-    """(calls newest first, source) where source is 'notion', 'csv' or None.
-    Returns ([], None) when neither source is available."""
+    """(calls newest first, source) where source is 'public', 'notion', 'csv' or None.
+    Returns ([], None) when no source is available."""
+    if _public_site():
+        try:
+            calls = load_from_public_site()
+            print(f'Loaded {len(calls)} implementers calls from {_public_site()}')
+            return calls, 'public'
+        except Exception as e:
+            print(f'Warning: could not read the public Notion site ({e}); trying other sources')
     if os.environ.get('NOTION_TOKEN'):
         try:
             calls = load_from_notion()

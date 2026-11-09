@@ -48,7 +48,7 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 |---|---|
 | `fip_utils.py` | Parsing (README table across its historical layouts, FIP front matter), git history, status timeline, Last Call windows, PR matching and review state |
 | `core_devs.py` | Core Devs meetings (README table + notes), recordings, FIP mentions, network upgrades, open agenda issues |
-| `implementers.py` | Implementers' calls from the Notion meetings database (API or CSV export) |
+| `implementers.py` | Implementers' calls from the public Notion meetings database (API token or CSV export as fallbacks) |
 | `generate_hub.py` | Builds `index.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |
@@ -68,17 +68,17 @@ python3 -m http.server 8000   # then open http://localhost:8000/
 Optional environment variables:
 - `GITHUB_TOKEN`: raises the GitHub API rate limit for PR and review lookups.
 - `FIPS_REPO_DIR`, `CORE_DEVS_REPO_DIR`: paths to existing clones to reuse between runs.
-- `NOTION_TOKEN`: token of a Notion internal integration that the implementers' Meetings database is shared with. `NOTION_MEETINGS_DB` overrides the database ID.
+- `NOTION_PUBLIC_SITE`: the public Notion site to read (default `https://filecoindev.notion.site`; empty to skip). `NOTION_MEETINGS_DB` overrides the database ID.
+- `NOTION_TOKEN`: optional fallback, a Notion internal integration token.
 - `IMPLEMENTERS_MATCH`: which rows count as implementers' calls, matched against the title and type columns (default `implement`; empty keeps every row).
-- `NOTION_READ_BODIES=0`: don't read call pages' bodies. When on (default), bodies are scanned only for FIP and upgrade mentions; their text is never published.
+- `NOTION_READ_BODIES=0`: with the token fallback, don't read call pages' bodies (they're only scanned for FIP and upgrade mentions).
 
-### Implementers' calls setup
+### Implementers' calls
 
-1. In Notion, create an internal integration (Settings → Connections → Develop or manage integrations) with read content access, in the workspace that holds the Meetings database.
-2. Open the Meetings database, then ··· → Connections → add the integration.
-3. In this repo: Settings → Secrets and variables → Actions → new secret `NOTION_TOKEN`. Optionally add a variable `NOTION_MEETINGS_DB` if the database ID changes.
+The implementers' Meetings database is published at [filecoindev.notion.site](https://filecoindev.notion.site/6e47427dee6c4095a90fec4bbe89929d), so `implementers.py` reads it from the public site with no token, the same way a visitor's browser does. Only public data is used, and only these parts of it: each call's title and date, its public page link, its agenda lines (with proposer names and raw URLs removed), recording links, and FIP and upgrade mentions. Hosts, attendees, @-mentions and the async-update tables are never published.
 
-Without a token, the scripts read `data/implementers-calls.csv` (Notion: ··· → Export → Markdown & CSV) if it exists, and otherwise the page says the log couldn't be loaded. Columns are detected by type and name, so renaming a column in Notion doesn't break the build. Notion page links on the public site only open for people with access to the workspace, unless the page is published to the web.
+If the public site can't be read, the scripts fall back to the Notion API (`NOTION_TOKEN`, an internal integration the database is shared with) and then to `data/implementers-calls.csv`. If none works, the page says the log couldn't be loaded.
+
 
 If the PR lookup fails (rate limit, network), the dashboard still builds and shows a notice in the PR section instead of claiming there are no PRs.
 

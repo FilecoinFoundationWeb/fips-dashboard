@@ -99,7 +99,7 @@ def call_links(c):
     if c['agenda_url']:
         links.append(f'<a href="{esc(c["agenda_url"])}" target="_blank" rel="noopener">Agenda</a>')
     if c['page_url']:
-        links.append(f'<a href="{esc(c["page_url"])}" target="_blank" rel="noopener">Notion</a>')
+        links.append(f'<a href="{esc(c["page_url"])}" target="_blank" rel="noopener">Notes</a>')
     return ' · '.join(links)
 
 
@@ -518,8 +518,9 @@ def implementers_card(ctx):
                  '<p class="empty" id="no-call-match" hidden>No calls match.</p>')
     else:
         table = "<p class=\"empty\">No implementers' calls logged yet.</p>"
-    src = ("the implementers' meeting log in Notion" if source == 'notion'
-           else "an export of the implementers' meeting log")
+    src = {'public': "the implementers' public meeting notes "
+                     "(<a href=\"https://filecoindev.notion.site/6e47427dee6c4095a90fec4bbe89929d\" target=\"_blank\" rel=\"noopener\">filecoindev.notion.site</a>)",
+           'notion': "the implementers' meeting log in Notion"}.get(source, "an export of the implementers' meeting log")
     more = f' Showing the latest {CALLS_SHOWN} of {len(calls)}.' if len(calls) > CALLS_SHOWN else ''
     return (head + f' ({len(calls)})</h2>'
             '<input class="search" type="search" placeholder="Filter by FIP, NV or topic" '

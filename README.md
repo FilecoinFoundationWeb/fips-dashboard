@@ -27,6 +27,7 @@ One place to keep up with Filecoin governance. It pulls the public records in [f
 - The latest implementers' call: summary, upgrades and FIPs mentioned, recording (playable in the page for YouTube) and notes.
 - **Network upgrade discussions**: for the upcoming and most recent upgrades, the implementers' calls that named each one or discussed its FIPs.
 - The full call log from the implementers' meeting database in Notion, searchable by FIP, NV or topic.
+- **Meeting notes**: each call's public "AI Meeting Notes" (topic headings and points), shown open on the latest call and expandable in the log. Attributions such as "(Name)" and raw URLs are removed; async team updates aren't published.
 
 **Upgrades** (`network-upgrades.html`)
 - Every network upgrade from `upgrades.json`: mainnet and calibration dates, epoch, actors version, included FIPs and the upgrade write-up.

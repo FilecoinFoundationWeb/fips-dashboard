@@ -107,6 +107,24 @@ def call_links(c):
     return ' · '.join(links)
 
 
+def call_notes_html(c, open_=False, compact=False):
+    """A call's public meeting notes as a collapsible outline (empty if it has none)."""
+    notes = c.get('notes') or []
+    if not notes:
+        return ''
+    n = sum(len(g['points']) for g in notes)
+    groups = []
+    for g in notes:
+        pts = ''.join(f'<li>{esc(p["text"])}' + (f'<ul>{"".join(f"<li>{esc(x)}</li>" for x in p["subs"])}</ul>' if p['subs'] else '') + '</li>'
+                      for p in g['points'])
+        head = f'<h4>{esc(g["heading"])}</h4>' if g['heading'] else ''
+        groups.append(f'<div class="note-group">{head}<ul>{pts}</ul></div>')
+    label = 'Meeting notes' if not compact else 'Notes'
+    return (f'<details class="call-notes{" compact" if compact else ""}"{" open" if open_ else ""}>'
+            f'<summary>{label} <span class="muted small">({len(notes)} topic{"s" if len(notes) != 1 else ""}, {n} point{"s" if n != 1 else ""})</span></summary>'
+            f'{"".join(groups)}<p class="note">From the public notes; attributions removed.</p></details>')
+
+
 def convo_label(c):
     """(kind class, kind label, linked title) for a Core Devs meeting or implementers' call."""
     if c.get('kind') == 'implementers':
@@ -437,7 +455,7 @@ def implementers_page(ctx):
                        f'<a class="hint" href="#calls-log">All calls →</a></div><div class="card-body">'
                        f'<div class="meeting-title">{esc(latest["title"])}</div>'
                        f'<div class="meeting-meta">{fmt_date(latest["date"])}{" · " + esc(", ".join(latest["types"])) if latest["types"] else ""}</div>'
-                       f'{summary}{tags}{f"<div class=btn-row>{links}</div>" if links else ""}{vid}</div></section>')
+                       f'{summary}{tags}{call_notes_html(latest, open_=True)}{f"<div class=btn-row>{links}</div>" if links else ""}{vid}</div></section>')
     else:
         latest_card = ('<section class="card" id="latest-call"><div class="card-head"><h2>Latest implementers\' call</h2></div>'
                        '<div class="card-body"><p class="empty">No calls to show yet.</p></div></section>')
@@ -513,7 +531,7 @@ def implementers_card(ctx):
                            ' '.join(f'nv{n}' for n in ups_for)]).lower()
         summary = f'<div class="muted small">{esc(c["summary"][:200])}</div>' if c['summary'] else ''
         rows.append(f'<tr data-search="{esc(search)}"><td class="nowrap">{fmt_date(c["date"])}</td>'
-                    f'<td class="title-cell"><strong>{esc(c["title"])}</strong>{summary}</td>'
+                    f'<td class="title-cell"><strong>{esc(c["title"])}</strong>{summary}{call_notes_html(c, compact=True)}</td>'
                     f'<td><div class="chips">{chips}</div></td>'
                     f'<td class="nowrap">{call_links(c) or "<span class=muted>—</span>"}</td></tr>')
     if rows:

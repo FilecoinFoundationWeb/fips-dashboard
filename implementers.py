@@ -239,7 +239,11 @@ def _parse_csv_date(text):
 
 PUBLIC_SITE = 'https://filecoindev.notion.site'
 AGENDA_HEAD = re.compile(r'agenda', re.I)
-SKIP_HEAD = re.compile(r'async|update|attend|transcript', re.I)
+SKIP_HEAD = re.compile(r'async|aync|update|attend|transcript', re.I)
+NOTES_HEAD = re.compile(r'^\W*(ai\s+)?(meeting\s+)?notes\W*$', re.I)
+# Attributions like "(Hubert)" or "(Steve, Andy)": names aren't published.
+NAME_PAREN = re.compile(r'\s*\((?:[A-Z][a-z]+)(?:\s*(?:,|&|and|/)\s*[A-Z][a-z]+)*\)')
+NOTE_LIMITS = (8, 6, 4)  # groups per call, points per group, sub-points per point
 
 
 def _public_site():
@@ -300,11 +304,23 @@ def _topic(text):
     return t[:120]
 
 
+def _note(text):
+    """A meeting-notes line fit to publish: no attributions, no raw URLs."""
+    t = re.sub(r'https?://\S+', '', text or '')
+    t = re.sub(r'^\s*\([^)]{1,40}\)\s*', '', t)
+    t = NAME_PAREN.sub('', t)
+    t = re.sub(r'\s+', ' ', cd._clean_md(t)).strip(' :-–;,')
+    return t[:220] if len(t) >= 3 else None
+
+
 def _page_content(site, page_id):
-    """(agenda topics, links, all text) for one public call page."""
+    """(agenda topics, notes, links, all text) for one public call page.
+
+    notes: [{'heading', 'points': [{'text', 'subs': [...]}]}] from the call's
+    "AI Meeting Notes" / "Notes" section only."""
     rm = _chunk(site, page_id).get('recordMap', {}).get('block', {})
     get = lambda i: _val(rm.get(i))
-    topics, links, texts = [], [], []
+    topics, links, texts, notes = [], [], [], []
     section = None
 
     def walk(bid, depth):
@@ -318,8 +334,27 @@ def _page_content(site, page_id):
         src = (b.get('format') or {}).get('display_source') or ((b.get('properties') or {}).get('source') or [[None]])[0][0]
         if src and t in ('video', 'embed', 'bookmark'):
             links.append(src)
-        if t in ('header', 'sub_header', 'sub_sub_header') and depth == 0:
+        if t in ('header', 'sub_header') and depth == 0:
+            section = ('agenda' if AGENDA_HEAD.search(text) else 'notes' if NOTES_HEAD.search(text)
+                       else 'skip' if SKIP_HEAD.search(text) else 'other')
+        elif t == 'sub_sub_header' and depth == 0 and section != 'notes':
             section = 'agenda' if AGENDA_HEAD.search(text) else ('skip' if SKIP_HEAD.search(text) else 'other')
+        if section == 'notes':
+            g, p, sp = NOTE_LIMITS
+            if t == 'sub_sub_header' and depth == 0:
+                h = _note(text)
+                if h:
+                    notes.append({'heading': h, 'points': []})
+            elif t in ('bulleted_list', 'numbered_list', 'text', 'to_do') and depth <= 1:
+                line = _note(text)
+                if line:
+                    if not notes:
+                        notes.append({'heading': '', 'points': []})
+                    pts = notes[-1]['points']
+                    if depth == 0 or not pts:
+                        pts.append({'text': line, 'subs': []})
+                    elif len(pts[-1]['subs']) < sp:
+                        pts[-1]['subs'].append(line)
         if section != 'skip':
             texts.append(text)
             if section == 'agenda' and depth == 0 and t in ('bulleted_list', 'numbered_list', 'to_do'):
@@ -334,7 +369,9 @@ def _page_content(site, page_id):
     root = get(_uuid(page_id))
     for k in (root or {}).get('content') or []:
         walk(k, 0)
-    return topics, links, '\n'.join(texts)
+    g, p, _ = NOTE_LIMITS
+    notes = [{'heading': n['heading'], 'points': n['points'][:p]} for n in notes if n['points']][:g]
+    return topics, notes, links, '\n'.join(texts)
 
 
 def load_from_public_site():
@@ -370,16 +407,17 @@ def load_from_public_site():
     rows.sort(key=lambda r: r[2] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
     calls = []
     for i, (bid, title, date) in enumerate(rows):
-        topics, links, text = [], [], ''
+        topics, notes, links, text = [], [], [], ''
         if i < BODY_LIMIT:
             try:
-                topics, links, text = _page_content(site, bid)
+                topics, notes, links, text = _page_content(site, bid)
             except Exception as e:
                 print(f'Warning: could not read public page {bid}: {e}')
         urls = [(_classify_url('', h), h) for h in links if _classify_url('', h) == 'recording']
         c = _call(title, date, [], urls, '; '.join(topics[:4]), f'{site}/{bid.replace("-", "")}',
                   text + '\n' + '\n'.join(links))
         c['topics'] = topics
+        c['notes'] = notes
         calls.append(c)
     return calls
 

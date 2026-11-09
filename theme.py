@@ -356,6 +356,14 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
 .convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
 .sub-h { font-size: .9rem; margin: 14px 0 6px; }
+.call-notes { margin: 12px 0; border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; background: var(--surface-2); }
+.call-notes > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .92rem; }
+.call-notes.compact { margin: 8px 0 0; padding: 6px 10px; border-radius: 8px; }
+.call-notes.compact > summary { font-size: .84rem; }
+.note-group { margin-top: 10px; }
+.note-group h4 { font-size: .9rem; margin-bottom: 4px; }
+.note-group ul { padding-left: 18px; font-size: .88rem; display: grid; gap: 3px; }
+.note-group ul ul { margin-top: 3px; color: var(--muted); }
 .explainer .lead { font-size: 1.02rem; max-width: 900px; }
 .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px; margin-top: 14px; }
 .role { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }

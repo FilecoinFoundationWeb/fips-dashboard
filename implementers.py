@@ -243,6 +243,9 @@ SKIP_HEAD = re.compile(r'async|aync|update|attend|transcript', re.I)
 NOTES_HEAD = re.compile(r'^\W*(ai\s+)?(meeting\s+)?notes\W*$', re.I)
 # Attributions like "(Hubert)" or "(Steve, Andy)": names aren't published.
 NAME_PAREN = re.compile(r'\s*\((?:[A-Z][a-z]+)(?:\s*(?:,|&|and|/)\s*[A-Z][a-z]+)*\)')
+NOT_PEOPLE = {'Filecoin', 'Lotus', 'Forest', 'Venus', 'Curio', 'Solstice', 'Boost', 'Calibnet', 'Mainnet',
+              'Starboard', 'FilOz', 'ChainSafe', 'Spark', 'FilBeam', 'Governance', 'Implementers', 'Core'}
+PERSON_HINTS = re.compile(r"\b[A-Z][a-z]+ \([A-Z]{2,6}\)|\b([A-Z][a-z]+)'s\b")
 NOTE_LIMITS = (8, 6, 4)  # groups per call, points per group, sub-points per point
 
 
@@ -304,6 +307,36 @@ def _topic(text):
     return t[:120]
 
 
+def _names_in(text):
+    """Names used as attributions, e.g. "(Hubert)", "(Steve, Andy)", "(Steve) agenda item"."""
+    out = set()
+    for m in re.finditer(r'\(([A-Z][a-z]+(?:\s*(?:,|&|and|/)\s*[A-Z][a-z]+)*)\)', text or ''):
+        out.update(w for w in re.findall(r'[A-Z][a-z]+', m.group(1)) if w not in NOT_PEOPLE)
+    return out
+
+
+def _mentions_person(line, names):
+    """True if a note line talks about a specific person, so it's left out."""
+    for m in PERSON_HINTS.finditer(line):
+        if (m.group(1) or '') not in NOT_PEOPLE:
+            return True
+    return any(re.search(rf'\b{re.escape(n)}\b', line) for n in names)
+
+
+def filter_notes(notes, names):
+    """Drop note points (and their sub-points) that mention people; drop empty groups."""
+    out = []
+    for g in notes:
+        pts = []
+        for p in g['points']:
+            if _mentions_person(p['text'], names):
+                continue
+            pts.append({'text': p['text'], 'subs': [x for x in p['subs'] if not _mentions_person(x, names)]})
+        if pts and not _mentions_person(g['heading'], names):
+            out.append({'heading': g['heading'], 'points': pts})
+    return out
+
+
 def _note(text):
     """A meeting-notes line fit to publish: no attributions, no raw URLs."""
     t = re.sub(r'https?://\S+', '', text or '')
@@ -322,6 +355,7 @@ def _page_content(site, page_id):
     get = lambda i: _val(rm.get(i))
     topics, links, texts, notes = [], [], [], []
     section = None
+    names = set()
 
     def walk(bid, depth):
         nonlocal section
@@ -355,6 +389,7 @@ def _page_content(site, page_id):
                         pts.append({'text': line, 'subs': []})
                     elif len(pts[-1]['subs']) < sp:
                         pts[-1]['subs'].append(line)
+        names.update(_names_in(text))
         if section != 'skip':
             texts.append(text)
             if section == 'agenda' and depth == 0 and t in ('bulleted_list', 'numbered_list', 'to_do'):
@@ -371,7 +406,7 @@ def _page_content(site, page_id):
         walk(k, 0)
     g, p, _ = NOTE_LIMITS
     notes = [{'heading': n['heading'], 'points': n['points'][:p]} for n in notes if n['points']][:g]
-    return topics, notes, links, '\n'.join(texts)
+    return topics, notes, links, '\n'.join(texts), names
 
 
 def load_from_public_site():
@@ -405,12 +440,13 @@ def load_from_public_site():
             date = datetime.fromtimestamp(b['created_time'] / 1000, tz=timezone.utc)
         rows.append((bid, re.sub(r'\s+', ' ', clean).strip(), date))
     rows.sort(key=lambda r: r[2] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
-    calls = []
+    calls, all_names = [], set()
     for i, (bid, title, date) in enumerate(rows):
-        topics, notes, links, text = [], [], [], ''
+        topics, notes, links, text, names = [], [], [], '', set()
         if i < BODY_LIMIT:
             try:
-                topics, notes, links, text = _page_content(site, bid)
+                topics, notes, links, text, names = _page_content(site, bid)
+                all_names.update(names)
             except Exception as e:
                 print(f'Warning: could not read public page {bid}: {e}')
         urls = [(_classify_url('', h), h) for h in links if _classify_url('', h) == 'recording']
@@ -419,6 +455,9 @@ def load_from_public_site():
         c['topics'] = topics
         c['notes'] = notes
         calls.append(c)
+    # Names collected across every call, so a name attributed in one call is caught in all of them.
+    for c in calls:
+        c['notes'] = filter_notes(c['notes'], all_names)
     return calls
 
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Filecoin implementers&#x27; calls: recordings, notes and which network upgrades and FIPs each call discussed.">
 <meta name="color-scheme" content="light dark">
-<meta name="generated-at" content="2026-11-09T14:59:21Z">
+<meta name="generated-at" content="2026-11-09T15:02:54Z">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>Implementers&#x27; Calls</title>
 
@@ -370,6 +370,21 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
 .convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
 .sub-h { font-size: .9rem; margin: 14px 0 6px; }
+.explainer .lead { font-size: 1.02rem; max-width: 900px; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px; margin-top: 14px; }
+.role { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.role strong { display: block; margin-bottom: 4px; }
+.type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+.type-card { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.type-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.type-n { margin-left: auto; font-weight: 800; font-size: 1.2rem; }
+.steps { list-style: none; counter-reset: step; display: grid; gap: 10px; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; font-size: .93rem; }
+.steps li::before { content: counter(step); grid-row: 1 / span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--fil-blue); color: #fff; }
+.steps li strong { display: block; }
+.sections-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 8px 18px; font-size: .9rem; }
+.sections-list li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.sections-list li span:last-child { display: block; color: var(--muted); }
 .flow { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
 .flow .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; }
 .stage { flex: 1 1 0; min-width: 120px; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; text-decoration: none; color: var(--text); border: 1px solid var(--border); background: var(--surface-2); }
@@ -439,7 +454,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
     <p class="sub">Every implementers' call with its recording and notes, tied to the network upgrades and FIPs it discussed.</p>
     <div class="header-meta">
       <nav class="nav" aria-label="Pages"><a href="./">Lifecycle</a><a href="overview.html">Overview</a><a href="fips-dashboard-static.html">FIPs</a><a href="core-devs.html">Core Devs</a><a href="implementers.html" class="current" aria-current="page">Implementers</a><a href="network-upgrades.html">Upgrades</a><a href="fips-timeline-tracker.html">Timeline</a></nav>
-      <span>Updated 2026-11-09 14:59 UTC</span>
+      <span>Updated 2026-11-09 15:02 UTC</span>
     </div>
   </div>
   <div class="ground" aria-hidden="true"></div>
@@ -508,7 +523,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 <footer class="site-footer">
   <div class="wrap">
     <p>Read-only view of public governance records in <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a> and <a href="https://github.com/filecoin-project/core-devs" target="_blank" rel="noopener">filecoin-project/core-devs</a>. Nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors, Core Devs and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
-    <p>Generated 2026-11-09 14:59 UTC. Unofficial community tool.</p>
+    <p>Generated 2026-11-09 15:02 UTC. Unofficial community tool.</p>
   </div>
 </footer>
 

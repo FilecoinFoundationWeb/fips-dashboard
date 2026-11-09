@@ -718,8 +718,7 @@ def lifecycle_page(ctx):
     # Timing table
     trans = [('Draft', ('Last Call',), 'Draft → Last Call'), ('Last Call', ('Accepted',), 'Last Call → Accepted'),
              ('Last Call', ('Final',), 'Last Call → Final (non-core)'), ('Accepted', ('Final',), 'Accepted → Final'),
-             ('Last Call', ('Draft',), 'Last Call → back to Draft'), ('Draft', ('Deferred',), 'Draft → Deferred'),
-             ('Draft', ('Withdrawn',), 'Draft → Withdrawn')]
+             ('Last Call', ('Draft',), 'Last Call → back to Draft')]
     trows = ''.join(f'<tr><td>{esc(lbl)}</td><td class="num">{typical(f, *t)[1]}</td><td class="num">{typical(f, *t)[0]}</td></tr>'
                     for f, t, lbl in trans if typical(f, *t)[1])
     timing = (f'<section class="card"><div class="card-head"><h2>How long stages take</h2>'

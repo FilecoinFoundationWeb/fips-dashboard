@@ -51,7 +51,7 @@ def discussion_links(urls):
 
 
 PLAN_SHORT = {'ready': 'ready', 'risk': 'candidate', 'deferred-in': 'carry-over',
-              'deferred-out': 'next upgrade', 'none': 'not upgrade-bound', 'unknown': 'mentioned'}
+              'deferred-out': 'next upgrade', 'none': 'not upgrade-bound', 'unknown': 'in planning'}
 PLAN_CLASS = {'ready': 'approved', 'risk': 'waiting', 'deferred-in': 'changes'}
 
 

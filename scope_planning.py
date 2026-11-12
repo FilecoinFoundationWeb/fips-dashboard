@@ -112,13 +112,20 @@ def parse_scope(head, rows):
     size = _col(head, 't-shirt', 'size')
     summary = _col(head, 'summary')
     notes = _col(head, 'notes', 'decision')
+    ready_col = _col(head, 'readiness', 'scope', 'ready')
     if item is None or status is None:
         return []
     out = []
     for r in rows:
         r = r + [''] * (len(head) - len(r))
         name_cell = r[item]
+        # The readiness marker usually leads the name cell, but some tables
+        # put it in its own "Scope"/"Readiness" column; fall back to any cell.
         key, label = _readiness(name_cell)
+        if key == 'unknown' and ready_col is not None:
+            key, label = _readiness(r[ready_col])
+        if key == 'unknown':
+            key, label = _readiness(' '.join(r))
         name = _plain(re.sub('|'.join(READINESS), '', name_cell))
         if not name:
             continue

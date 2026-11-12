@@ -17,7 +17,7 @@ adding columns in the discussion doesn't break the page.
 """
 
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 import fip_utils as u
 
@@ -132,6 +132,7 @@ def parse_scope(head, rows):
             'fip': f'{int(m.group(2)):04d}' if m and m.group(1).upper() == 'FIP' else None,
             'link': links[0][1] if links else None,
             'link_label': links[0][0] if links else None,
+            'links': [url for _, url in links],
             'status': _plain(r[status]),
             'timeline': _plain(r[timeline]) if timeline is not None else '',
             'size': size_txt if size_txt and size_txt.upper() != 'TBD' else '',
@@ -200,3 +201,86 @@ def fetch_planning():
         print(f'Scope planning: NV{nv} ({len(scope)} candidates, {len(milestones)} milestones) from #{d["number"]}')
     out.sort(key=lambda x: x['nv'], reverse=True)
     return out
+
+
+# ---------------------------------------------------------------------------
+# Flagging FIPs that appear in planning
+# ---------------------------------------------------------------------------
+
+FIPS_PR = re.compile(r'github\.com/filecoin-project/FIPs/pull/(\d+)', re.I)
+FIPS_FILE = re.compile(r'github\.com/filecoin-project/FIPs/blob/[^/]+/FIPS/fip-0*(\d+)\.md', re.I)
+
+
+def _norm_url(url):
+    return (url or '').split('#')[0].split('?')[0].rstrip('/').lower()
+
+
+def _norm_title(text):
+    text = re.sub(r'^\s*(FIP|FRC)-?(\d+|X+)\s*[:\-—]\s*', '', text or '', flags=re.I)
+    return re.sub(r'[^a-z0-9]+', ' ', text.lower()).strip()
+
+
+def active(planning, upgrades, now=None):
+    """The active planning cycle: the lowest-numbered upgrade not yet live on
+    mainnet that has a planning discussion. Returns [entry] or [].
+
+    Once that upgrade activates, the next one's planning becomes active, so
+    the FIPs page rolls from NV30 to NV31 without code changes.
+    """
+    plans = upcoming(planning, upgrades, now)
+    return [min(plans, key=lambda p: p['nv'])] if plans else []
+
+
+def upcoming(planning, upgrades, now=None):
+    """Planning entries for upgrades that haven't reached mainnet yet."""
+    now = now or datetime.now(timezone.utc)
+    live = [x['number'] for x in upgrades or []
+            if isinstance(x.get('number'), int) and x.get('mainnet') and x['mainnet'] <= now]
+    latest_live = max(live) if live else 0
+    return [p for p in planning or [] if p['nv'] > latest_live]
+
+
+def fip_flags(plans, titles=None, files=None, prs=None):
+    """Map FIP number -> list of planning mentions, one per upcoming upgrade.
+
+    A planning row is tied to a FIP by, in order: the FIP number in its name;
+    a link to the FIP's file, to an open FIPs PR that touches it, or to its
+    discussions-to thread; or (for "FIP-XXXX" rows not yet renumbered) an
+    exact match on the normalized title.
+    """
+    titles, files, prs = titles or {}, files or {}, prs or []
+    by_disc = {}
+    for num, meta in files.items():
+        for d in meta.get('_discussions', []):
+            by_disc.setdefault(_norm_url(d), set()).add(num)
+    by_pr = {}
+    for pr in prs:
+        for num in pr.get('fip_numbers', []):
+            if num != 'General':
+                by_pr.setdefault(int(pr['number']), set()).add(num)
+    by_title = {}
+    for num, t in titles.items():
+        key = _norm_title(t)
+        if len(key) >= 12:
+            by_title.setdefault(key, set()).add(num)
+
+    flags = {}
+    for p in plans:
+        for row in p['scope']:
+            nums = set()
+            if row.get('fip'):
+                nums.add(row['fip'])
+            for url in row.get('links') or ([row['link']] if row.get('link') else []):
+                if m := FIPS_FILE.search(url):
+                    nums.add(f'{int(m.group(1)):04d}')
+                elif m := FIPS_PR.search(url):
+                    nums |= by_pr.get(int(m.group(1)), set())
+                nums |= by_disc.get(_norm_url(url), set())
+            if not nums:
+                nums |= by_title.get(_norm_title(row['name']), set())
+            for num in nums:
+                entry = {'nv': p['nv'], 'readiness': row['readiness'], 'label': row['readiness_label'],
+                         'name': row['name'], 'url': p['url']}
+                if not any(e['nv'] == p['nv'] for e in flags.get(num, [])):
+                    flags.setdefault(num, []).append(entry)
+    return flags

@@ -50,6 +50,23 @@ def discussion_links(urls):
     return ' · '.join(out)
 
 
+PLAN_SHORT = {'ready': 'ready', 'risk': 'candidate', 'deferred-in': 'carry-over',
+              'deferred-out': 'next upgrade', 'none': 'not upgrade-bound', 'unknown': 'mentioned'}
+PLAN_CLASS = {'ready': 'approved', 'risk': 'waiting', 'deferred-in': 'changes'}
+
+
+def plan_flags(num, flags, compact=False):
+    """Flags for a FIP that appears in the active upgrade's scope planning."""
+    out = []
+    for f in (flags or {}).get(num, []):
+        tip = (f'In the active upgrade planning (NV{f["nv"]})'
+               + (f': {f["label"]}' if f['label'] else '') + f'. Row: {f["name"]}')
+        text = f'NV{f["nv"]}' if compact else f'NV{f["nv"]} {PLAN_SHORT[f["readiness"]]}'
+        out.append(f'<a class="pill nv-flag {PLAN_CLASS.get(f["readiness"], "")}" '
+                   f'href="network-upgrades.html#plan-nv{f["nv"]}" title="{esc(tip)}">{esc(text)}</a>')
+    return (' ' + ' '.join(out)) if out else ''
+
+
 def review_pill(state):
     cls = ('approved' if state.startswith('Approved') else
            'changes' if state == 'Changes requested' else
@@ -61,7 +78,7 @@ def review_pill(state):
 # Sections
 # ---------------------------------------------------------------------------
 
-def stats_html(fips, open_lc, prs, prs_loaded=True):
+def stats_html(fips, open_lc, prs, prs_loaded=True, plans=None, flags=None):
     counts = defaultdict(int)
     for f in fips.values():
         counts[f['status']] += 1
@@ -73,6 +90,10 @@ def stats_html(fips, open_lc, prs, prs_loaded=True):
         ('Final', counts['Final'], False),
         ('Open PRs', len({p['number'] for p in prs}) if prs or prs_loaded else '—', False),
     ]
+    for p in plans or []:
+        n = sum(1 for v in (flags or {}).values() if any(f['nv'] == p['nv'] for f in v))
+        cards.append((f'Active upgrade planning · NV{p["nv"]}',
+                      f'<a href="network-upgrades.html#plan-nv{p["nv"]}">{n}</a>', bool(n)))
     return '<section class="stats">' + ''.join(
         f'<div class="stat{" accent" if accent else ""}"><div class="label">{esc(label)}</div>'
         f'<div class="value">{value}</div></div>'
@@ -80,7 +101,7 @@ def stats_html(fips, open_lc, prs, prs_loaded=True):
     ) + '</section>'
 
 
-def last_call_html(open_lc, past_lc):
+def last_call_html(open_lc, past_lc, flags=None):
     now = datetime.now(timezone.utc)
     if open_lc:
         rows = []
@@ -89,7 +110,7 @@ def last_call_html(open_lc, past_lc):
             left_txt = f'{left} days left' if left > 0 else ('ends today' if left == 0 else f'ended {-left} days ago')
             est = ' <span class="pill est" title="No review-period-end set; FIP-0001 default of 14 days">est.</span>' if w['estimated_end'] else ''
             rows.append(f'''<tr>
-<td>{fip_link(w["number"])}</td><td class="title-cell">{esc(w["title"])}</td>
+<td>{fip_link(w["number"])}</td><td class="title-cell">{esc(w["title"])}{plan_flags(w["number"], flags)}</td>
 <td class="nowrap">{date_str(w["start"])}</td>
 <td class="nowrap">{date_str(w["end"])}{est}</td>
 <td class="nowrap"><strong>{esc(left_txt)}</strong></td>
@@ -120,7 +141,7 @@ def last_call_html(open_lc, past_lc):
 IN_FLIGHT_MAX_DAYS = 365
 
 
-def in_flight_html(fips, history, files, prs_grouped, discussed=None):
+def in_flight_html(fips, history, files, prs_grouped, discussed=None, flags=None):
     """In-flight FIPs that changed status within the last year.
 
     Longer-running FIPs are left out of the table and only counted in a
@@ -134,7 +155,7 @@ def in_flight_html(fips, history, files, prs_grouped, discussed=None):
             continue
         since = u.current_status_since(history, num, f['status'])
         days = u.days_between(since) if since else None
-        if days is None or days > IN_FLIGHT_MAX_DAYS:
+        if (days is None or days > IN_FLIGHT_MAX_DAYS) and num not in (flags or {}):
             older += 1
             continue
         meta = files.get(num, {})
@@ -142,8 +163,8 @@ def in_flight_html(fips, history, files, prs_grouped, discussed=None):
         m = (discussed or {}).get(num)
         cd_cell = (f'<a href="{esc(m["notes_url"] or m["recording_url"] or "core-devs.html")}" target="_blank" rel="noopener">#{m["number"]}</a> · {date_str(m["date"])}'
                    if m else '<span class="muted">—</span>')
-        rows.append((days, f'''<tr>
-<td>{fip_link(num)}</td><td class="title-cell">{esc(f["title"])}</td>
+        rows.append((days if days is not None else 10**6, f'''<tr>
+<td>{fip_link(num)}</td><td class="title-cell">{esc(f["title"])}{plan_flags(num, flags)}</td>
 <td>{badge(f["status"])}</td>
 <td class="nowrap">{date_str(since)}</td><td>{age_cell(days)}</td>
 <td>{discussion_links(meta.get("_discussions", []))}</td>
@@ -161,7 +182,7 @@ def in_flight_html(fips, history, files, prs_grouped, discussed=None):
                  'See <a href="#by-status">All FIPs by status</a>.</p>')
     return f'''<section class="card" id="in-flight">
 <div class="card-head"><h2>In flight</h2>
-<span class="hint">Draft, Last Call, Accepted and Deferred FIPs that changed status in the last year, most recent first.*</span></div>
+<span class="hint">Draft, Last Call, Accepted and Deferred FIPs that changed status in the last year, plus any FIP in the active upgrade planning, most recent first.*</span></div>
 <div class="card-body">{body}</div></section>'''
 
 
@@ -184,7 +205,7 @@ def mismatch_html(mismatches):
 <div class="card-body">{body}</div></section>'''
 
 
-def by_status_html(fips, prs_grouped):
+def by_status_html(fips, prs_grouped, flags=None):
     groups = defaultdict(list)
     for num, f in fips.items():
         groups[f['status']].append(num)
@@ -196,17 +217,18 @@ def by_status_html(fips, prs_grouped):
             n = len(prs_grouped.get(num, []))
             dot = f' <span class="pr-dot" title="{n} open PR{"s" if n != 1 else ""}">{n}</span>' if n else ''
             chips.append(f'<a class="chip" href="{esc(u.fip_url(num))}" target="_blank" rel="noopener" '
-                         f'title="{esc(fips[num]["title"])}">FIP-{num}{dot}</a>')
+                         f'title="{esc(fips[num]["title"])}">FIP-{num}{dot}</a>'
+                         + (plan_flags(num, flags, compact=True) if num in (flags or {}) else ''))
         rows.append(f'<tr><td>{badge(status)}</td><td class="num"><strong>{len(groups[status])}</strong></td>'
                     f'<td><div class="chips">{"".join(chips)}</div></td></tr>')
     return f'''<section class="card" id="by-status">
-<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FRCs are excluded. Blue dots show open PRs.</span></div>
+<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FRCs are excluded. Blue dots show open PRs; NV tags mark FIPs in the active upgrade planning.</span></div>
 <div class="card-body"><div class="table-scroll"><table class="data">
 <thead><tr><th>Status</th><th class="num">Count</th><th>FIPs</th></tr></thead>
 <tbody>{"".join(rows)}</tbody></table></div></div></section>'''
 
 
-def prs_html(prs_grouped, fips, loaded=True):
+def prs_html(prs_grouped, fips, loaded=True, flags=None):
     unique = {pr['number'] for prs in prs_grouped.values() for pr in prs}
     if not loaded:
         body = ('<div class="callout">Couldn\'t load pull requests from the GitHub API on this run '
@@ -226,7 +248,7 @@ def prs_html(prs_grouped, fips, loaded=True):
                 status = fips.get(key, {}).get('status')
                 t = fips.get(key, {}).get("title", "")
                 pill = f'<span class="pill">{esc(t[:80])}</span>' if t else '<span class="pill">not yet in README</span>'
-                head = f'<h3>{fip_link(key)} {badge(status) if status else ""} {pill}</h3>'
+                head = f'<h3>{fip_link(key)} {badge(status) if status else ""} {pill}{plan_flags(key, flags)}</h3>'
                 anchor = f'pr-{key}'
             items = []
             for pr in sorted(prs_grouped[key], key=lambda p: p['updated_at'], reverse=True):
@@ -262,10 +284,12 @@ def main():
     open_lc, past_lc = u.last_call_windows(history, files, fips)
     mismatches = u.status_mismatches(fips, files)
 
-    discussed = {}
+    discussed, upgrades = {}, []
     try:
         import core_devs as cd
-        discussed = cd.last_discussed(cd.load_meetings(cd.get_core_devs_repo()))
+        cd_repo = cd.get_core_devs_repo()
+        discussed = cd.last_discussed(cd.load_meetings(cd_repo))
+        upgrades = cd.load_upgrades(cd_repo)
     except Exception as e:
         print(f'Warning: Core Devs data unavailable: {e}')
 
@@ -275,13 +299,25 @@ def main():
     grouped = u.prs_by_fip(processed)
     print(f'{len(processed)} FIP-related PR(s); {len(open_lc)} in Last Call; {len(mismatches)} mismatch(es)')
 
+    plans, flags = [], {}
+    try:
+        import scope_planning as sp
+        plans = sp.active(sp.fetch_planning(), upgrades)
+        titles = {n: f['title'] for n, f in fips.items()}
+        titles.update({n: m.get('title', '') for n, m in files.items() if n not in titles and m.get('title')})
+        flags = sp.fip_flags(plans, titles, files, processed)
+        print(f'Active planning: {", ".join(f"NV{p['nv']}" for p in plans) or "none"}')
+        print(f'Scope planning flags: {", ".join(f"FIP-{n}" for n in sorted(flags)) or "none"}')
+    except Exception as e:
+        print(f'Warning: scope planning unavailable: {e}')
+
     body = '\n'.join([
-        stats_html(fips, open_lc, processed, prs_loaded=raw_prs is not None),
-        last_call_html(open_lc, past_lc),
-        in_flight_html(fips, history, files, grouped, discussed),
+        stats_html(fips, open_lc, processed, prs_loaded=raw_prs is not None, plans=plans, flags=flags),
+        last_call_html(open_lc, past_lc, flags),
+        in_flight_html(fips, history, files, grouped, discussed, flags),
         mismatch_html(mismatches),
-        prs_html(grouped, fips, loaded=raw_prs is not None),
-        by_status_html(fips, grouped),
+        prs_html(grouped, fips, loaded=raw_prs is not None, flags=flags),
+        by_status_html(fips, grouped, flags),
     ])
 
     html = page(

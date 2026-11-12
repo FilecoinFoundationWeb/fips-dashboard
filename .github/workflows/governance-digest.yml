@@ -1,0 +1,43 @@
+name: Governance Digest Email
+
+on:
+  schedule:
+    # GitHub cron is UTC-only: 13:30 UTC = 5:30 AM PST (6:30 AM during PDT).
+    - cron: '30 13 * * 2,4'  # Tue + Thu
+  workflow_dispatch:
+    inputs:
+      hours:
+        description: 'Look-back window in hours'
+        required: false
+        default: '168'
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Build and send digest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FIPS_REPO_DIR: ${{ runner.temp }}/fips-src
+          CORE_DEVS_REPO_DIR: ${{ runner.temp }}/core-devs-src
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_MEETINGS_DB: ${{ vars.NOTION_MEETINGS_DB }}
+          # Recipients and SMTP credentials live only in Actions secrets.
+          DIGEST_RECIPIENTS: ${{ secrets.DIGEST_RECIPIENTS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
+          DIGEST_HOURS: ${{ github.event.inputs.hours || '168' }}
+        run: python3 governance_digest.py

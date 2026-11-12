@@ -12,3 +12,4 @@ internal/
 
 # Committed export of the implementers meeting log (fallback for Notion)
 !data/*.csv
+digest-preview.html

@@ -31,6 +31,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIPS_REPO_DIR: ${{ runner.temp }}/fips-src
           CORE_DEVS_REPO_DIR: ${{ runner.temp }}/core-devs-src
+          # Implementers' calls: a Notion internal integration token with the
+          # Meetings database shared to it. Without it, data/implementers-calls.csv is used.
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_MEETINGS_DB: ${{ vars.NOTION_MEETINGS_DB }}
         run: |
           # Scripts are stdlib-only; they clone filecoin-project/FIPs and core-devs themselves.
           python3 generate_fips_dashboard.py
@@ -41,7 +45,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add index.html fips-dashboard-static.html fips-timeline-tracker.html core-devs.html network-upgrades.html
+          git add index.html overview.html fips-dashboard-static.html fips-timeline-tracker.html core-devs.html implementers.html fip-lifecycle.html network-upgrades.html
           if ! git diff --staged --quiet; then
             git commit -m "Auto-update dashboard $(date +'%Y-%m-%d %H:%M:%S')"
             git push

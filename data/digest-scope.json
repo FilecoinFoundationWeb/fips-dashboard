@@ -1,0 +1,37 @@
+{
+  "_comment": "What the digest treats as the realistic scope of the active upgrade. Edit this file when scope changes. If 'upgrade' no longer matches the active planning discussion (e.g. NV30 ships and NV31 planning starts), the digest falls back to the planning thread's green rows and says so.",
+  "upgrade": 30,
+  "target": "Q1 2027",
+  "updated": "2026-11-12",
+  "items": [
+    {
+      "name": "Increase maximum sector lifetime to 10 years",
+      "fip": "0119",
+      "prs": [1293],
+      "discussions": ["https://github.com/filecoin-project/FIPs/discussions/1291"]
+    },
+    {
+      "name": "Remove the Fil+ actors (f06, f07, f080)",
+      "fip": "0121",
+      "prs": [1301, 1308],
+      "discussions": ["https://github.com/filecoin-project/FIPs/discussions/1300"]
+    },
+    {
+      "name": "Remove the payment channel (paych) actor",
+      "discussions": ["https://github.com/filecoin-project/FIPs/discussions/1290"]
+    },
+    {
+      "name": "Size the miner actor's reward-derived charges (faults) by consensus weight",
+      "fip": "0122",
+      "prs": [1303]
+    },
+    {
+      "name": "Actor type indirection in the state tree",
+      "prs": [1306]
+    },
+    {
+      "name": "Clear state simply (or a variant)",
+      "discussions": ["https://github.com/filecoin-project/FIPs/discussions/1266"]
+    }
+  ]
+}

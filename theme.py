@@ -89,6 +89,18 @@ a:hover { color: var(--fil-blue); }
   padding: 28px 0 118px;
 }
 .site-header .wrap { position: relative; z-index: 2; }
+.brand {
+  position: absolute; top: 0; right: 16px; display: inline-flex; align-items: center; gap: 10px;
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em;
+  padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04);
+  transition: border-color .2s, background .2s;
+}
+.brand:hover { color: #fff; border-color: rgba(0,144,255,.6); background: rgba(0,144,255,.14); }
+.brand-mark { width: 34px; height: 34px; flex: none; }
+@media (max-width: 640px) {
+  .brand { top: -6px; font-size: 1rem; padding: 4px 12px 4px 4px; gap: 8px; }
+  .brand-mark { width: 28px; height: 28px; }
+}
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
@@ -254,6 +266,10 @@ td.nowrap { white-space: nowrap; }
 .pill.changes { background: var(--rejected-bg); color: var(--rejected-fg); border-color: transparent; }
 .pill.waiting { background: var(--lastcall-bg); color: var(--lastcall-fg); border-color: transparent; }
 .pill.est { background: transparent; }
+a.pill.nv-flag { text-decoration: none; margin-left: 4px; font-size: .7rem; vertical-align: middle; }
+a.pill.nv-flag:not(.approved):not(.waiting):not(.changes) { background: var(--draft-bg); color: var(--draft-fg); border-color: transparent; }
+a.pill.nv-flag:hover { filter: brightness(.95); text-decoration: underline; }
+.chips > a.pill.nv-flag { align-self: center; margin-left: -2px; }
 
 .callout {
   background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 12px;
@@ -319,6 +335,7 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .kind.meeting { background: var(--active-bg); color: var(--active-fg); }
 .kind.upgrade { background: var(--final-bg); color: var(--final-fg); }
 .kind.discussion { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.kind.impl { background: var(--deferred-bg); color: var(--deferred-fg); }
 .open-list { list-style: none; display: grid; gap: 10px; font-size: .93rem; }
 .open-list li { padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .open-list li:last-child { border-bottom: 0; padding-bottom: 0; }
@@ -338,6 +355,58 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .up-head h3 .nv { color: var(--fil-blue); margin-right: 6px; }
 .up-dates { color: var(--muted); font-size: .86rem; display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 8px; }
 .up-fips { display: grid; gap: 4px; font-size: .9rem; }
+.up-convo { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.up-convo > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .9rem; }
+.convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
+.convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
+.sub-h { font-size: .9rem; margin: 14px 0 6px; }
+.call-notes { margin: 12px 0; border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; background: var(--surface-2); }
+.call-notes > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .92rem; }
+.call-notes.compact { margin: 8px 0 0; padding: 6px 10px; border-radius: 8px; }
+.call-notes.compact > summary { font-size: .84rem; }
+.note-group { margin-top: 10px; }
+.note-group h4 { font-size: .9rem; margin-bottom: 4px; }
+.note-group ul { padding-left: 18px; font-size: .88rem; display: grid; gap: 3px; }
+.note-group ul ul { margin-top: 3px; color: var(--muted); }
+.explainer .lead { font-size: 1.02rem; max-width: 900px; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px; margin-top: 14px; }
+.role { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.role strong { display: block; margin-bottom: 4px; }
+.type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+.type-card { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.type-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.type-n { margin-left: auto; font-weight: 800; font-size: 1.2rem; }
+.steps { list-style: none; counter-reset: step; display: grid; gap: 10px; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; font-size: .93rem; }
+.steps li::before { content: counter(step); grid-row: 1 / span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--fil-blue); color: #fff; }
+.steps li strong { display: block; }
+.sections-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 8px 18px; font-size: .9rem; }
+.sections-list li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.sections-list li span:last-child { display: block; color: var(--muted); }
+.flow { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.flow .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; }
+.stage { flex: 1 1 0; min-width: 120px; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; text-decoration: none; color: var(--text); border: 1px solid var(--border); background: var(--surface-2); }
+.stage:hover { border-color: var(--fil-blue); color: var(--text); }
+.stage-name { font-weight: 700; font-size: .9rem; }
+.stage-n { font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
+.stage-sub { font-size: .78rem; color: var(--muted); }
+.stage.draft { background: var(--draft-bg); } .stage.lastcall { background: var(--lastcall-bg); }
+.stage.accepted { background: var(--accepted-bg); } .stage.final { background: var(--final-bg); }
+.side-stages { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 12px; font-size: .88rem; }
+.side-stage { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); }
+.board { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.board-col { border-radius: 12px; padding: 12px; border: 1px solid var(--border); background: var(--surface-2); border-top: 4px solid var(--border); }
+.board-col.draft { border-top-color: var(--draft-fg); } .board-col.lastcall { border-top-color: var(--lastcall-fg); }
+.board-col.accepted { border-top-color: var(--accepted-fg); } .board-col.deferred { border-top-color: var(--deferred-fg); }
+.board-col h3 { font-size: .95rem; margin-bottom: 8px; }
+.board-col ul { list-style: none; display: grid; gap: 8px; }
+.board-col li { padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); font-size: .88rem; }
+.board-col .item-title { font-weight: 600; }
+@media (max-width: 640px) { .flow { flex-direction: column; } .flow .arrow { transform: rotate(90deg); } .stage { min-width: 0; } }
+.milestones { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 6px 14px; font-size: .88rem; }
+.milestones li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.milestones strong { white-space: nowrap; }
+.convo-list time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .muted { color: var(--muted); }
 .small { font-size: .84rem; }
 
@@ -346,6 +415,8 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
   .feed li { grid-template-columns: 64px 1fr; }
   .feed li .kind { grid-column: 2; grid-row: 1; }
   .feed li .feed-text { grid-column: 1 / -1; }
+  .convo-list li { grid-template-columns: 1fr auto; }
+  .convo-list li > span:last-child { grid-column: 1 / -1; }
   .stat .value { font-size: 1.6rem; }
   .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
   .corgi-walk { width: 104px; }
@@ -463,10 +534,36 @@ CORGI_JS = """
 """
 
 
+# Filecoin mark, unmodified, from filecoin-project/specs (static/filecoin-logo.svg).
+FILECOIN_LOGO = '''<svg aria-hidden="true" focusable="false" class="brand-mark" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 40 40" xml:space="preserve" enable-background="new 0 0 40 40">
+    <style>
+    .st1-logo {
+        fill-rule: evenodd;
+        clip-rule: evenodd;
+        fill: #fff
+    }
+    </style>
+    <defs>
+        <filter id="a-logo" filterUnits="userSpaceOnUse" x="0" y="0" width="40" height="40">
+            <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0" />
+        </filter>
+    </defs>
+    <mask maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="40" id="b-logo_1">
+        <g filter="url(#a-logo)">
+            <path id="a-logo_1" class="st1-logo" d="M0 0h40v40H0V0z" />
+        </g>
+    </mask>
+    <path d="M20 40C9 40 0 31 0 19.9.1 8.9 9-.1 20.1 0 31.1.1 40 9 40 20.2 39.9 31.1 31 40 20 40" mask="url(#b-logo_1)" fill-rule="evenodd" clip-rule="evenodd" fill="#0090ff" />
+    <path class="st1-logo" d="M21.9 17.6l-.6 3.2 5.7.8-.4 1.5-5.6-.8c-.4 1.3-.6 2.7-1.1 3.9-.5 1.4-1 2.8-1.6 4.1-.8 1.7-2.2 2.9-4.1 3.2-1.1.2-2.3.1-3.2-.6-.3-.2-.6-.6-.6-.9 0-.4.2-.9.5-1.1.2-.1.7 0 1 .1.3.3.6.7.8 1.1.6.8 1.4.9 2.2.3.9-.8 1.4-1.9 1.7-3 .6-2.4 1.2-4.7 1.7-7.1v-.4l-5.3-.8.2-1.5 5.5.8.7-3.1-5.7-.9.2-1.6 5.9.8c.2-.6.3-1.1.5-1.6.5-1.8 1-3.6 2.2-5.2 1.2-1.6 2.6-2.6 4.7-2.5.9 0 1.8.3 2.4 1 .1.1.3.3.3.5 0 .4 0 .9-.3 1.2-.4.3-.9.2-1.3-.2-.3-.3-.5-.6-.8-.9-.6-.8-1.5-.9-2.2-.2-.5.5-1 1.2-1.3 1.9-.7 2.1-1.2 4.3-1.9 6.5l5.5.8-.4 1.5-5.3-.8" />
+</svg>'''
+
+
 NAV = [
-    ('overview', 'Overview', './'),
+    ('lifecycle', 'Lifecycle', './'),
+    ('overview', 'Overview', 'overview.html'),
     ('dashboard', 'FIPs', 'fips-dashboard-static.html'),
     ('coredevs', 'Core Devs', 'core-devs.html'),
+    ('implementers', 'Implementers', 'implementers.html'),
     ('upgrades', 'Upgrades', 'network-upgrades.html'),
     ('timeline', 'Timeline', 'fips-timeline-tracker.html'),
 ]
@@ -500,6 +597,7 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
 <body>
 <header class="site-header">
   <div class="wrap">
+    <a class="brand" href="https://filecoin.io" target="_blank" rel="noopener" aria-label="Filecoin website">{FILECOIN_LOGO}<span>Filecoin</span></a>
     <span class="eyebrow">Filecoin governance</span>
     <h1>{html_escape(title)}</h1>
     <p class="sub">{subtitle}</p>

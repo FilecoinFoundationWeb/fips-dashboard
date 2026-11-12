@@ -1,23 +1,38 @@
 # Filecoin Governance Hub
 
-🔗 **Live:** [Overview](https://thatguyllc.github.io/fips-dashboard/) · [FIPs](https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html) · [Core Devs](https://thatguyllc.github.io/fips-dashboard/core-devs.html) · [Upgrades](https://thatguyllc.github.io/fips-dashboard/network-upgrades.html) · [Timeline](https://thatguyllc.github.io/fips-dashboard/fips-timeline-tracker.html)
+🔗 **Live:** [Lifecycle (home)](https://thatguyllc.github.io/fips-dashboard/) · [Overview](https://thatguyllc.github.io/fips-dashboard/overview.html) · [FIPs](https://thatguyllc.github.io/fips-dashboard/fips-dashboard-static.html) · [Core Devs](https://thatguyllc.github.io/fips-dashboard/core-devs.html) · [Implementers](https://thatguyllc.github.io/fips-dashboard/implementers.html) · [Upgrades](https://thatguyllc.github.io/fips-dashboard/network-upgrades.html) · [Timeline](https://thatguyllc.github.io/fips-dashboard/fips-timeline-tracker.html)
 
 One place to keep up with Filecoin governance. It pulls the public records in [filecoin-project/FIPs](https://github.com/filecoin-project/FIPs) and [filecoin-project/core-devs](https://github.com/filecoin-project/core-devs) into a readable site: proposals and their status, Core Devs meetings with recordings and notes, network upgrades, and open discussions. It's read-only. It never changes a status, assigns a number or decides an outcome; that stays with the process in [FIP-0001](https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md).
 
 ## What it shows
 
-**Overview** (`index.html`)
+**Overview** (`overview.html`)
 - The latest Core Devs meeting: topics, FIPs mentioned, recording (playable in the page for YouTube), notes and agenda.
 - **Open now**: Last Calls in progress, the next meeting's agenda issue and any scheduled upgrade.
 - **Recent activity**: a 90-day feed of FIP status changes, meetings, upgrade activations and new FIP discussions.
 - Most recently active FIP discussions, and links for getting involved.
 
+**Lifecycle** (`index.html`, the home page; `fip-lifecycle.html` redirects here)
+- **Explainers** drawn from the FIPs repo: what a FIP is and who's involved (the FIP editors list is read from FIP-0001 on every build), proposing a FIP step by step, the types of FIP with live counts, and what a FIP must contain.
+- **How a FIP moves**: the FIP-0001 path (Idea → Draft → Last Call → Accepted → Final) with how many FIPs are at each stage and the median time to the next one, plus the side outcomes (Rejected, Withdrawn, Superseded, Active).
+- **Where open FIPs are now**: every Draft, Last Call and Accepted FIP with time in stage, when Core Devs or the implementers last discussed it, and whether it's a candidate for the next upgrade or already shipped.
+- **Live on mainnet, still Accepted**: FIPs shipped in an activated upgrade but not yet marked Final, flagged for editors.
+- **How long stages take** (medians over 2 years) and a **stage guide** paraphrasing FIP-0001.
+
 **Core Devs** (`core-devs.html`)
 - Latest meeting in detail, and **FIPs on the agenda**: every FIP mentioned in the last 6 meetings' notes, how often, when it was last discussed and whether it has shipped. Mentions are shown as discussion, not decisions.
 - A searchable archive of every meeting (filter by FIP number, meeting number or topic) with recording, notes or slides, and agenda links.
 
+**Implementers** (`implementers.html`)
+- The latest implementers' call: summary, upgrades and FIPs mentioned, recording (playable in the page for YouTube) and notes.
+- **Network upgrade discussions**: for the upcoming and most recent upgrades, the implementers' calls that named each one or discussed its FIPs.
+- The full call log from the implementers' meeting database in Notion, searchable by FIP, NV or topic.
+- **Meeting notes**: each call's public "AI Meeting Notes" (topic headings and points), shown open on the latest call and expandable in the log. Attributions such as "(Name)" and raw URLs are removed; async team updates aren't published.
+
 **Upgrades** (`network-upgrades.html`)
 - Every network upgrade from `upgrades.json`: mainnet and calibration dates, epoch, actors version, included FIPs and the upgrade write-up.
+- **Discussed in N calls**: the Core Devs meetings and implementers' calls that discussed each upgrade. A call counts when it names the upgrade (NV27, "network upgrade 27" or its name, e.g. Golden Week) or mentions one of its FIPs in the 400 days before mainnet activation. Each entry says which.
+- **Scope planning**: for upgrades that haven't shipped yet, the candidate FIPs from the public `nvNN Network Upgrade Planning` discussion in core-devs, with readiness (ready, at risk, carried over), status, timeline and T-shirt size; the milestone dates; the naming note; and the Core Devs meetings and implementers' calls that named the upgrade. Rebuilt every run, so edits to the discussion show up within 6 hours.
 - **Accepted, not yet in an upgrade**: Accepted FIPs not listed in any upgrade, with when Core Devs last discussed them.
 
 **FIPs** (`fips-dashboard-static.html`)
@@ -42,7 +57,10 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 |---|---|
 | `fip_utils.py` | Parsing (README table across its historical layouts, FIP front matter), git history, status timeline, Last Call windows, PR matching and review state |
 | `core_devs.py` | Core Devs meetings (README table + notes), recordings, FIP mentions, network upgrades, open agenda issues |
-| `generate_hub.py` | Builds `index.html`, `core-devs.html` and `network-upgrades.html` |
+| `implementers.py` | Implementers' calls from the public Notion meetings database (API token or CSV export as fallbacks) |
+| `lifecycle_explainers.py` | Explainer sections for the lifecycle page, paraphrasing FIP-0001 and proposing.md |
+| `scope_planning.py` | Upgrade scope planning parsed from the core-devs planning discussions |
+| `generate_hub.py` | Builds `index.html` (lifecycle), `overview.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |
 | `fips_timeline_tracker.py` | Builds `fips-timeline-tracker.html` |
@@ -55,18 +73,29 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 python3 generate_fips_dashboard.py
 python3 fips_timeline_tracker.py
 python3 generate_hub.py
-python3 -m http.server 8000   # then open http://localhost:8000/
+python3 -m http.server 8000   # then open http://localhost:8000/ (the lifecycle page)
 ```
 
 Optional environment variables:
 - `GITHUB_TOKEN`: raises the GitHub API rate limit for PR and review lookups.
 - `FIPS_REPO_DIR`, `CORE_DEVS_REPO_DIR`: paths to existing clones to reuse between runs.
+- `NOTION_PUBLIC_SITE`: the public Notion site to read (default `https://filecoindev.notion.site`; empty to skip). `NOTION_MEETINGS_DB` overrides the database ID.
+- `NOTION_TOKEN`: optional fallback, a Notion internal integration token.
+- `IMPLEMENTERS_MATCH`: which rows count as implementers' calls, matched against the title and type columns (default `implement`; empty keeps every row).
+- `NOTION_READ_BODIES=0`: with the token fallback, don't read call pages' bodies (they're only scanned for FIP and upgrade mentions).
+
+### Implementers' calls
+
+The implementers' Meetings database is published at [filecoindev.notion.site](https://filecoindev.notion.site/6e47427dee6c4095a90fec4bbe89929d), so `implementers.py` reads it from the public site with no token, the same way a visitor's browser does. Only public data is used, and only these parts of it: each call's title and date, its public page link, its agenda lines (with proposer names and raw URLs removed), recording links, and FIP and upgrade mentions. Hosts, attendees, @-mentions and the async-update tables are never published.
+
+If the public site can't be read, the scripts fall back to the Notion API (`NOTION_TOKEN`, an internal integration the database is shared with) and then to `data/implementers-calls.csv`. If none works, the page says the log couldn't be loaded.
+
 
 If the PR lookup fails (rate limit, network), the dashboard still builds and shows a notice in the PR section instead of claiming there are no PRs.
 
 ## Auto-update
 
-`.github/workflows/update-dashboard.yml` rebuilds all five pages every 6 hours, on manual dispatch, and on pushes to `master` that change the scripts. See [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for hosting options.
+`.github/workflows/update-dashboard.yml` rebuilds all the pages every 6 hours, on manual dispatch, and on pushes to `master` that change the scripts. See [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for hosting options.
 
 ## Notes
 

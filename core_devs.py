@@ -179,6 +179,7 @@ def _notes_files(repo):
             'topics': notes_topics(text),
             'fips': fip_mentions(text),
             'facilitator': _facilitator(head),
+            'text': text,
         }
     return out
 
@@ -204,6 +205,7 @@ def load_meetings(repo):
             'topics': n.get('topics', []),
             'fips': sorted(n.get('fips', set())),
             'facilitator': (n.get('facilitator') or '').strip() or None,
+            'match_text': ' '.join([n.get('text', ''), r.get('note') or '']),
         })
     return meetings
 
@@ -283,6 +285,59 @@ def fip_upgrades(upgrades):
     for up in upgrades:
         for f in up['fips']:
             out.setdefault(f, up)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Upgrade conversations: which meetings discussed which upgrade
+# ---------------------------------------------------------------------------
+
+FIP_WINDOW_BEFORE = 400  # days before mainnet that a FIP mention counts toward the upgrade
+FIP_WINDOW_AFTER = 45
+
+
+def _upgrade_patterns(up):
+    n = str(up['number'])
+    pats = [rf'(?<![A-Za-z0-9])nv[\s-]?{re.escape(n)}(?!\d)',
+            rf'network (?:upgrade|version)\s*#?\s*{re.escape(n)}(?!\d)']
+    name = (up.get('name') or '').strip()
+    if len(name) >= 4:
+        words = r'[\s-]?'.join(re.escape(w) for w in name.split())
+        pats.append(rf'(?<![A-Za-z]){words}(?![A-Za-z])')
+    return re.compile('|'.join(pats), re.IGNORECASE)
+
+
+def upgrade_conversations(upgrades, conversations):
+    """{upgrade number: [(conversation, reason), ...]} newest first.
+
+    A conversation is any dict with 'date', 'match_text' and 'fips' (Core Devs
+    meetings and implementers' calls). It counts toward an upgrade when it
+    names the upgrade (NV27, "network version 27" or its name, e.g. Golden
+    Week), or mentions one of the upgrade's FIPs in the run-up to activation.
+    """
+    now = datetime.now(timezone.utc)
+    out = {}
+    for up in upgrades:
+        pat = _upgrade_patterns(up)
+        target = up['mainnet'] or now
+        start = target.timestamp() - FIP_WINDOW_BEFORE * 86400
+        end = target.timestamp() + FIP_WINDOW_AFTER * 86400
+        hits = []
+        for c in conversations:
+            reason = None
+            m = pat.search(c.get('match_text') or '')
+            if m:
+                said = re.sub(r'\s+', ' ', m.group(0)).strip()
+                named = up.get('name') and said.lower().replace('-', ' ') == up['name'].lower()
+                reason = f'names {up["name"]}' if named else f'names NV{up["number"]}'
+            elif c['date'] and start <= c['date'].timestamp() <= end:
+                shared = sorted(set(c['fips']) & set(up['fips']))
+                if shared:
+                    reason = 'mentions ' + ', '.join('FIP-' + f for f in shared[:3])
+            if reason:
+                hits.append((c, reason))
+        hits.sort(key=lambda h: h[0]['date'] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+        out[up['number']] = hits
     return out
 
 

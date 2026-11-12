@@ -1,0 +1,7 @@
+{
+  "_comment": "Who gets the governance digest and which account sends it. This repo is public, so these addresses are public. The SMTP password must still be an Actions secret (SMTP_PASSWORD). Secrets with the same names override these values.",
+  "recipients": ["christian@fil.org", "michael@fil.org"],
+  "smtp_host": "smtp.gmail.com",
+  "smtp_port": 465,
+  "smtp_username": "christian@fil.org"
+}

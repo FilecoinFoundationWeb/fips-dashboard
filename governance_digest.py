@@ -10,16 +10,14 @@ Scope comes from data/digest-scope.json (edit it when scope changes). If
 that file names a different upgrade than the active planning discussion,
 the digest falls back to the planning thread's green rows and says so.
 
-Recipients are never stored in this repo. They come from the
-DIGEST_RECIPIENTS secret (comma- or newline-separated) and are sent as
-Bcc, so no recipient sees another's address and nothing appears in logs.
+Recipients, SMTP host and username come from data/digest-email.json
+(public), or from secrets of the same names if set. Mail is sent Bcc
+(To = sender) in batches. Only SMTP_PASSWORD must be a secret.
 
 Environment (Actions secrets / variables):
-  DIGEST_RECIPIENTS   addresses, comma/newline separated (secret)
-  SMTP_HOST           e.g. smtp.gmail.com
-  SMTP_PORT           465 (SSL) or 587 (STARTTLS); default 465
-  SMTP_USERNAME       login for the sending account (secret)
-  SMTP_PASSWORD       app password / API key (secret)
+  SMTP_PASSWORD       app password / API key (secret, required to send)
+  DIGEST_RECIPIENTS   overrides recipients in data/digest-email.json
+  SMTP_HOST / SMTP_PORT / SMTP_USERNAME   override data/digest-email.json
   DIGEST_FROM         From: address; defaults to SMTP_USERNAME
   DIGEST_HOURS        look-back window; default 168 (one week)
   GITHUB_TOKEN        for discussion and comment data (GraphQL)
@@ -42,6 +40,7 @@ from fip_utils import html_escape as esc
 
 SITE = 'https://thatguyllc.github.io/fips-dashboard/'
 SCOPE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'digest-scope.json')
+EMAIL_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'digest-email.json')
 BATCH = 90          # stay under per-message recipient caps (Gmail SMTP: 100)
 STALE_DAYS = 21     # scoped item with no activity this long is flagged
 
@@ -571,20 +570,33 @@ You're receiving this because you were added to the digest list; reply to the se
 # Send
 # ---------------------------------------------------------------------------
 
-def recipients():
+def email_config():
+    try:
+        with open(EMAIL_FILE, encoding='utf-8') as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def recipients(cfg=None):
     raw = os.environ.get('DIGEST_RECIPIENTS', '')
-    return [r.strip() for r in re.split(r'[,\n;]', raw) if '@' in r]
+    if raw.strip():
+        return [r.strip() for r in re.split(r'[,\n;]', raw) if '@' in r]
+    return [r for r in (cfg or email_config()).get('recipients', []) if '@' in r]
 
 
 def send(subject, html, text):
-    host, user, pw = os.environ.get('SMTP_HOST'), os.environ.get('SMTP_USERNAME'), os.environ.get('SMTP_PASSWORD')
-    port = int(os.environ.get('SMTP_PORT') or 465)
+    cfg = email_config()
+    host = os.environ.get('SMTP_HOST') or cfg.get('smtp_host')
+    user = os.environ.get('SMTP_USERNAME') or cfg.get('smtp_username')
+    pw = os.environ.get('SMTP_PASSWORD')
+    port = int(os.environ.get('SMTP_PORT') or cfg.get('smtp_port') or 465)
     sender = os.environ.get('DIGEST_FROM') or user
-    to = recipients()
+    to = recipients(cfg)
     if not (host and user and pw and to):
         missing = [k for k, v in (('SMTP_HOST', host), ('SMTP_USERNAME', user), ('SMTP_PASSWORD', pw),
                                   ('DIGEST_RECIPIENTS', to)) if not v]
-        print(f'Not sending: missing {", ".join(missing)}. Wrote digest-preview.html instead.')
+        print(f'Not sending: missing {", ".join(missing)} (secrets or data/digest-email.json). Wrote digest-preview.html instead.')
         return False
     ctx = ssl.create_default_context()
     server = smtplib.SMTP_SSL(host, port, context=ctx) if port == 465 else smtplib.SMTP(host, port)

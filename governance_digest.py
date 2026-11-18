@@ -38,7 +38,7 @@ from email.utils import formatdate, make_msgid
 import fip_utils as u
 from fip_utils import html_escape as esc
 
-SITE = 'https://thatguyllc.github.io/fips-dashboard/'
+SITE = 'https://filecoinfoundationweb.github.io/fips-dashboard/'
 SCOPE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'digest-scope.json')
 EMAIL_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'digest-email.json')
 BATCH = 90          # stay under per-message recipient caps (Gmail SMTP: 100)

@@ -224,7 +224,7 @@ def by_status_html(fips, prs_grouped, flags=None):
         rows.append(f'<tr><td><span class="pill">Proposed (open PR)</span></td><td class="num"><strong>{len(proposed)}</strong></td>'
                     f'<td><div class="chips">{chips}</div></td></tr>')
     return f'''<section class="card" id="by-status">
-<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FIPs merged into the FIPs repo, plus proposals that are still an open pull request. FIP numbers run higher than the count because FIPs and FRCs (excluded here) share one numbering sequence, and some numbers went to proposals that were later closed. Blue dots show open PRs; NV tags mark FIPs in the active upgrade planning.</span></div>
+<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FIPs merged into the FIPs repo, plus proposals that are still an open pull request. FIP numbers run higher than the count because FIPs and FRCs (excluded here) share one numbering sequence (<a href="frcs.html">FRCs have their own page</a>), and some numbers went to proposals that were later closed. Blue dots show open PRs; NV tags mark FIPs in the active upgrade planning.</span></div>
 <div class="card-body"><div class="table-scroll"><table class="data">
 <thead><tr><th>Status</th><th class="num">Count</th><th>FIPs</th></tr></thead>
 <tbody>{"".join(rows)}</tbody></table></div></div></section>'''
@@ -283,6 +283,7 @@ def main():
     history, _ = u.build_status_history(repo)
     files = u.load_fip_files(repo)
     u.register_fips(fips, files)
+    u.load_frcs(repo)
     open_lc, past_lc = u.last_call_windows(history, files, fips)
     mismatches = u.status_mismatches(fips, files)
 
@@ -297,8 +298,9 @@ def main():
 
     print('Fetching open PRs and reviews...')
     raw_prs = u.fetch_open_prs()
-    processed = u.process_prs(raw_prs)
-    grouped = u.prs_by_fip(processed)
+    # PRs that only touch FRCs are listed on the FRCs page instead
+    processed = [p for p in u.process_prs(raw_prs) if not all(u.is_frc(n) for n in p['fip_numbers'])]
+    grouped = {k: v for k, v in u.prs_by_fip(processed).items() if not u.is_frc(k)}
     print(f'{len(processed)} FIP-related PR(s); {len(open_lc)} in Last Call; {len(mismatches)} mismatch(es)')
 
     plans, flags = [], {}
@@ -323,9 +325,9 @@ def main():
 
     html = page(
         title='Filecoin Improvement Proposals',
-        description='Read-only dashboard of Filecoin Improvement Proposals: status, time in status, Last Call windows, open PRs and review state.',
+        description='Read-only dashboard of Filecoin Improvement Proposals: status, Last Call windows, open PRs and review state.',
         current='dashboard',
-        subtitle='Where every FIP stands, how long it has been there, and what is waiting on review.',
+        subtitle='Where every FIP stands, which are in Last Call, and which edits are open for review.',
         body_html=body,
     )
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:

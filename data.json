@@ -1,6 +1,6 @@
 {
- "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs. Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-19T15:32:30Z",
+ "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
+ "generated_at": "2026-11-19T16:25:50Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -3987,6 +3987,368 @@
    ],
    "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0122.md",
    "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0122.html"
+  }
+ ],
+ "frcs": [
+  {
+   "number": "0038",
+   "title": "Indexer Protocol for Filecoin Content Discovery",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "willscott, gammazero, honghaoq",
+   "created": "2022-06-24",
+   "discussions": [],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-06-28T05:00:37Z",
+     "commit": "2a3294118ca93968a3e531699820a73ca657bd78"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0038.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0038.html"
+  },
+  {
+   "number": "0040",
+   "title": "Boost - Filecoin Storage Deals Market Protocol",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "dirkmc, nonsense, jacobheun, brendalee",
+   "created": "2022-07-07",
+   "discussions": [],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-07-08T01:50:09Z",
+     "commit": "cb91c0bce833beb667b5955965bdc5d82aeb4c34"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0040.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0040.html"
+  },
+  {
+   "number": "0042",
+   "title": "Calling Convention for Hashed Method Name",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "@anorth, @kubuxu",
+   "created": "2022-07-07",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/382"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-07-26T07:23:45Z",
+     "commit": "a775ca26d9e76adceab801dd29e35a0aa2f844e8"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0042.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0042.html"
+  },
+  {
+   "number": "0046",
+   "title": "Fungible token standard",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Alex North (@anorth), Jeeva Suresh (@jsuresh), Alex Su (@alexytsu)",
+   "created": "2022-08-17",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/277"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-08-31T23:09:46Z",
+     "commit": "126cefcd8feb9a385ab450d4f637247c7c40cdbd"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0046.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0046.html"
+  },
+  {
+   "number": "0051",
+   "title": "Synchronous Consistent Block Broadcast for EC Security",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Guy Goren, Alfonso de la Rocha",
+   "created": "2022-11-07",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/501"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-12-28T01:38:46Z",
+     "commit": "92c721e698dddf47fcef230b2b059b75bff74db0"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0051.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0051.html"
+  },
+  {
+   "number": "0053",
+   "title": "Non-Fungible Token Standard",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Alex Su (@alexytsu), Andrew Bright (@abright), Alex North (@anorth)",
+   "created": "2022-14-11",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/492"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-12-12T04:47:59Z",
+     "commit": "0a30aab3db994f63dcea48f5dd49858c2a992303"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0053.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0053.html"
+  },
+  {
+   "number": "0058",
+   "title": "Verifiable Data Aggregation",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Jakub Sztandera (@Kubuxu), Nicola Greco (@nicola), Peter Rabbitson (@ribasushi)",
+   "created": "2022-12-11",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/512"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-02-27T19:15:21Z",
+     "commit": "2ba23cd8eb66fba42772a2605aef055d481caeff"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0058.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0058.html"
+  },
+  {
+   "number": "0066",
+   "title": "Piece Retrieval Gateway",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Will Scott (@willscott), Dirk McCormick (@dirkmc)",
+   "created": "2023-05-19",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/711"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-07-27T22:32:55Z",
+     "commit": "665e1f148d28dc387c753163994af6d4cbada40b"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0066.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0066.html"
+  },
+  {
+   "number": "0068",
+   "title": "Deal-Making Between SPs and FVM Smart Contracts",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "@aashidham, @raulk, @skottie86, @jennijuju, @nonsense, @shrenujbansal",
+   "created": "2023-04-25",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/721"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-07-28T21:05:12Z",
+     "commit": "496e79c6b50c2a1b369edc8210848b69875cc206"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0068.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0068.html"
+  },
+  {
+   "number": "0069",
+   "title": "Piece Multihash and v2 Piece CID",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Adin Schmahmann (@aschmahmann), Peter Rabbitson (@ribasushi)",
+   "created": "2023-07-26",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/759"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-08-08T23:51:16Z",
+     "commit": "4fab0776a8d657f2833d5f02f19e685ef8853a47"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0069.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0069.html"
+  },
+  {
+   "number": "0087",
+   "title": "FVM-Enabled Deal Aggregation",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "@aashidham, @honghao, @raulk, @nonsense",
+   "created": "2023-10-07",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/866"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-02-12T21:10:30Z",
+     "commit": "7c80fad29cc843cfb82f71fe2f4dfda17d049ac2"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0087.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0087.html"
+  },
+  {
+   "number": "0089",
+   "title": "A Finality Calculator for Filecoin",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Guy Goren (@guy-goren), Jorge M. Soares (@jsoares)",
+   "created": "2024-01-03",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/919"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-02-28T09:17:22Z",
+     "commit": "0fd0ad430143cee5799c8b4422787132f4ee59bd"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0089.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0089.html"
+  },
+  {
+   "number": "0099",
+   "title": "Delegation of Authority for F3 Parameter Setting",
+   "status": "Final",
+   "file_status": "Draft",
+   "authors": "@Kubuxu @BigLep",
+   "created": "2025-01-30",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1102"
+   ],
+   "history": [
+    {
+     "status": "Accepted",
+     "since": "2025-02-26T17:55:15Z",
+     "commit": "32191fb6fbd274096c35f338c6b584262d97fe9e"
+    },
+    {
+     "status": "Final",
+     "since": "2025-09-11T17:16:17Z",
+     "commit": "6bc30b3d62318f7997f748043f08c1d676447a35"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0099.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0099.html"
+  },
+  {
+   "number": "0102",
+   "title": "Wallet-Signing Envelope for Arbitrary Messages",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Hugo Dias (@hugomrdias), Bumblefudge (@bumblefudge)",
+   "created": null,
+   "discussions": [
+    "https://github.com/filecoin-project/lotus/discussions/12761"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-05-12T16:17:41Z",
+     "commit": "c0ca23e9c321376113b61a49131f98bace9f0e7e"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0102.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0102.html"
+  },
+  {
+   "number": "0104",
+   "title": "Common Node API",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "David Ansermino (@ansermino), Aatif Syed (@aatifsyed), Alexey Krasnoperov (@AlexeyKrasnoperov)",
+   "created": "2024-06-25",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1032"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-06-25T03:56:18Z",
+     "commit": "1938a1979a7ce408dbdd450cedab62343635d7e4"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0104.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0104.html"
+  },
+  {
+   "number": "0108",
+   "title": "Filecoin Snapshot Format",
+   "status": "Accepted",
+   "file_status": "Accepted",
+   "authors": "Hailong Mu (@hanabi1224)",
+   "created": "2025-06-25",
+   "discussions": [
+    "https://github.com/filecoin-project/go-f3/issues/480"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-07-03T14:39:21Z",
+     "commit": "f91cbe1dfd98d67ab3d35bf77aadf66df0fce7a0"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-09-11T17:16:17Z",
+     "commit": "6bc30b3d62318f7997f748043f08c1d676447a35"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0108.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0108.html"
+  },
+  {
+   "number": "0116",
+   "title": "JSON-RPC 2.0 HTTP Transport Conventions",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Hubert Bugaj (@LesnyRumcajs)",
+   "created": "2026-03-30",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1247"
+   ],
+   "history": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0116.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0116.html"
+  },
+  {
+   "number": "0120",
+   "title": "Filecoin Encryption Envelope",
+   "status": "Draft",
+   "file_status": "Draft",
+   "authors": "Jakub Sztandera (@Kubuxu), Natalie Bravo (@bravonatalie)",
+   "created": "2026-10-13",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1253"
+   ],
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-11-12T20:09:35Z",
+     "commit": "06441a275c3a56212456b98b537b1d743fba1a47"
+    }
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FRCs/frc-0120.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/frc/0120.html"
   }
  ],
  "network_upgrades": [

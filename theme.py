@@ -480,6 +480,9 @@ abbr.term { text-decoration: underline dotted var(--muted); text-underline-offse
 .days-left.soon { background: var(--rejected-bg); color: var(--rejected-fg); }
 .mentions { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
 .chip.static { cursor: default; font-weight: 600; }
+button.chip { font: inherit; font-size: .86rem; font-weight: 600; cursor: pointer; }
+button.chip[aria-pressed="true"] { border-color: var(--fil-blue); color: var(--fil-blue); background: var(--surface); }
+.frc-filter { margin-bottom: 12px; }
 .chip.static:hover { border-color: var(--border); color: var(--text); }
 .giscus-wrap { min-height: 120px; }
 
@@ -652,8 +655,8 @@ FAVICON_LINK = f'<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
 def search_box(base=''):
     """FIP search in the header: a number, words from a title, or an author."""
     return (f'<div class="fip-search" data-base="{base}" role="search">'
-            '<label class="visually-hidden" for="fip-search-input">Find a FIP</label>'
-            '<input id="fip-search-input" type="search" placeholder="Find a FIP: number, title or author" autocomplete="off" '
+            '<label class="visually-hidden" for="fip-search-input">Find a FIP or FRC</label>'
+            '<input id="fip-search-input" type="search" placeholder="Find a FIP or FRC: number, title or author" autocomplete="off" '
             'aria-controls="fip-search-results" aria-expanded="false">'
             '<ul id="fip-search-results" class="fip-search-results" role="listbox" hidden></ul></div>')
 
@@ -675,7 +678,7 @@ SEARCH_JS = """
   function render() {
     var q = input.value.trim().toLowerCase();
     if (!q || !index) { list.hidden = true; input.setAttribute('aria-expanded', 'false'); return; }
-    var num = q.replace(/^fip[-\\s]*/, '');
+    var num = q.replace(/^f(ip|rc)[-\\s]*/, '');
     var words = q.split(/\\s+/).filter(Boolean);
     var hits = index.filter(function (f) {
       if (/^\\d+$/.test(num) && (f.n === num.padStart(4, '0') || f.n.indexOf(num) === 0 || String(+f.n) === num)) return true;
@@ -683,10 +686,11 @@ SEARCH_JS = """
       return words.every(function (w) { return t.indexOf(w) !== -1; });
     }).slice(0, 8);
     list.innerHTML = hits.length ? hits.map(function (f) {
-      var href = f.u ? esc(f.u) + '" target="_blank" rel="noopener' : base + 'fip/' + f.n + '.html';
-      return '<li role="option"><a href="' + href + '"><strong>FIP-' + f.n + '</strong> ' + esc(f.t) +
+      var k = f.k || 'FIP';
+      var href = f.u ? esc(f.u) + '" target="_blank" rel="noopener' : base + k.toLowerCase() + '/' + f.n + '.html';
+      return '<li role="option"><a href="' + href + '"><strong>' + k + '-' + f.n + '</strong> ' + esc(f.t) +
              ' <span class="s">' + esc(f.s) + '</span></a></li>';
-    }).join('') : '<li class="none">No FIP matches</li>';
+    }).join('') : '<li class="none">No FIP or FRC matches</li>';
     list.hidden = false; input.setAttribute('aria-expanded', 'true');
   }
   input.addEventListener('focus', load);
@@ -715,6 +719,7 @@ NAV = [
     ('lifecycle', 'Lifecycle', './'),
     ('overview', 'Overview', 'overview.html'),
     ('dashboard', 'FIPs', 'fips-dashboard-static.html'),
+    ('frcs', 'FRCs', 'frcs.html'),
     ('coredevs', 'Core Devs', 'core-devs.html'),
     ('implementers', 'Implementers', 'implementers.html'),
     ('upgrades', 'Upgrades', 'network-upgrades.html'),

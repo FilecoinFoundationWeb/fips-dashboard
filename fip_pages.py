@@ -177,9 +177,6 @@ def fip_page_html(n, ctx, prev_n, next_n):
     discuss = discussions[0] if discussions else 'https://github.com/filecoin-project/FIPs/discussions'
     core = _is_core(fip, f)
 
-    since = u.current_status_since(ctx['history'], n, status)
-    in_stage = (now - since).days if since else None
-
     # Upgrade: shipped, or a candidate in the active planning discussion
     up_html = '<span class="muted">Not in a network upgrade</span>'
     for x in ctx['upgrades']:
@@ -211,8 +208,7 @@ def fip_page_html(n, ctx, prev_n, next_n):
                     + (f', {days_word(left)} left' if left else ', today')
                     + '. This is the last chance to raise concerns before the FIP moves on.')
         else:
-            when = (f'The review period was due to end <strong>{fmt(lc["end"])}</strong>{est}. '
-                    'It stays in Last Call until the FIP editors move it on, so comments still count.')
+            when = 'Comments are open in the discussion thread.'
         cta = (f'<div class="cta"><span><strong>In {term("Last Call")}.</strong> {when}</span>'
                f'{ext(discuss, "Comment on the discussion ↗", "btn primary")}</div>')
     elif status == 'Draft':
@@ -236,16 +232,13 @@ def fip_page_html(n, ctx, prev_n, next_n):
     # At a glance
     def listval(v):
         return ', '.join(v) if isinstance(v, list) else (v or '')
-    file_status = f.get('_status')
-    mismatch = (f' <span class="pill waiting" title="The README table and the FIP file disagree; flagged for editors.">'
-                f'file says {esc(file_status)}</span>' if file_status and file_status != status else '')
     requires = [r for r in (f.get('requires') if isinstance(f.get('requires'), list) else
                             re.split(r'[,\s]+', f.get('requires') or '')) if r]
     req_html = ', '.join(u.fip_anchor(m.group(1).zfill(4), base=B) if (m := re.search(r'(\d+)', r)) else esc(r)
                          for r in requires)
     rows = [
-        ('Status', f'{badge(status)}{mismatch}'),
-        ('In this stage', f'{u.humanize_days(in_stage)} (since {fmt(since)})' if since else '—'),
+        ('Status', badge(status) + (f' <span class="muted small">(listed in the FIPs README; the FIP file itself says {esc(f["_status"])})</span>'
+                                     if f.get('_status') and f['_status'] != status else '')),
         ('Type', esc(' · '.join(x for x in (listval(f.get('type')) or fip.get('type', ''), listval(f.get('category'))) if x)) or '—'),
         ('Authors', esc(listval(f.get('author')) or fip.get('authors', '')) or '—'),
         ('Created', esc(listval(f.get('created'))) or '—'),
@@ -255,16 +248,13 @@ def fip_page_html(n, ctx, prev_n, next_n):
                                   for i, d in enumerate(discussions)) or '<span class="muted">None listed</span>'),
     ]
     facts = ''.join(f'<dt>{k}</dt><dd>{v}</dd>' for k, v in rows if v)
-    nxt = extras.what_next(n, ctx, B)
-    nxt_html = (f'<div class="where-at"><h3 class="sub-h">Where it\'s at</h3><ul>{"".join(f"<li>{x}</li>" for x in nxt)}</ul>'
-                '<p class="note" style="margin-top:4px">From the records, not a judgment.</p></div>' if nxt else '')
     groups = extras.affected(ctx.get('fips_repo'), n)
     groups_html = (f'<div class="mentions"><h3 class="sub-h">The FIP\'s text mentions</h3><div class="chips">'
                    + ''.join(f'<span class="chip static">{esc(g)}</span>' for g in groups) +
                    '</div><p class="note" style="margin-top:6px">Found by searching the FIP\'s own wording. Not an official impact assessment; read the FIP.</p></div>'
                    if groups else '')
     glance = (f'<section class="card"><div class="card-head"><h2>At a glance</h2></div><div class="card-body">'
-              f'{status_path(status, history, core)}<dl class="facts">{facts}</dl>{nxt_html}{groups_html}</div></section>')
+              f'{status_path(status, history, core)}<dl class="facts">{facts}</dl>{groups_html}</div></section>')
 
     # History, with Last Call windows
     hist = []
@@ -316,7 +306,7 @@ def fip_page_html(n, ctx, prev_n, next_n):
     if prs:
         pr_items = ''.join(f'<div class="pr-item"><a href="{esc(p["url"])}" target="_blank" rel="noopener">#{p["number"]} {esc(p["title"])}</a>'
                            f'<span class="pr-meta">@{esc(p["author"])} · {"draft · " if p["draft"] else ""}'
-                           f'last activity {days_word(p["idle_days"])} ago</span></div>' for p in prs)
+                           f'updated {esc(p["updated_at"][:10])}</span></div>' for p in prs)
         pr_card = (f'<section class="card"><div class="card-head"><h2>Open pull requests ({len(prs)})</h2>'
                    '<span class="hint">Proposed edits to this FIP waiting on review.</span></div>'
                    f'<div class="card-body">{pr_items}</div></section>')
@@ -369,12 +359,13 @@ def this_week_card(ctx, base=''):
     lc_items = []
     for w in lcs:
         left = (w['end'].date() - now.date()).days
-        label = f'{days_word(left)} left' if left > 0 else 'ends today' if left == 0 else 'review period over'
-        pill = f'<span class="days-left{" soon" if left <= 3 else ""}">{label}</span>'
+        label = f'{days_word(left)} left' if left > 0 else 'ends today' if left == 0 else ''
+        pill = f'<span class="days-left{" soon" if left <= 3 else ""}">{label}</span>' if label else ''
         disc = w['discussions'][0] if w['discussions'] else None
+        when = (f'Review ends {fmt(w["end"], False)}{" (est.)" if w["estimated_end"] else ""}' if left >= 0
+                else 'Comments open')
         lc_items.append(f'<li>{u.fip_anchor(w["number"], base=base)} {esc(w["title"])} {pill}'
-                        f'<div class="muted small">Review ends {fmt(w["end"], False)}{" (est.)" if w["estimated_end"] else ""}'
-                        f'{" · " + ext(disc, "Comment", "") if disc else ""}</div></li>')
+                        f'<div class="muted small">{when}{" · " + ext(disc, "Comment", "") if disc else ""}</div></li>')
     lc_col = (f'<div class="week-col"><h3>{term("Last Call", "In Last Call")}</h3>'
               + (f'<ul>{"".join(lc_items)}</ul>' if lc_items else '<p class="muted small">No Last Calls open right now.</p>') + '</div>')
 
@@ -445,6 +436,12 @@ def search_index(ctx):
         authors = fl.get('author') if isinstance(fl.get('author'), str) else ', '.join(fl.get('author') or [])
         out.append({'n': n, 't': (f.get('title') or fl.get('title') or '').replace('`', ''), 's': f.get('status') or fl.get('_status') or '',
                     'a': authors or f.get('authors') or ''})
+    # Proposals that are still an open PR: searchable, linking to the PR
+    known = set(ctx['fips']) | set(ctx['files'])
+    for n, prs in sorted((ctx.get('prs_by_fip') or {}).items()):
+        if n != 'General' and n.isdigit() and n not in known and prs:
+            title = re.sub(r'^\s*(add\s+)?FIP[-\s]?0*\d+\s*[:\-–]?\s*', '', prs[0]['title'], flags=re.I) or prs[0]['title']
+            out.append({'n': n, 't': title, 's': 'Proposed (open PR)', 'a': prs[0].get('author', ''), 'u': prs[0]['url']})
     return json.dumps(out, ensure_ascii=False, separators=(',', ':'))
 
 

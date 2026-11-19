@@ -26,8 +26,8 @@ def badge(status):
     return f'<span class="status-badge {u.get_status_class(status)}">{esc(status)}</span>'
 
 
-def fip_link(num):
-    return f'<a class="fip-id" href="{esc(u.fip_url(num))}" target="_blank" rel="noopener">FIP-{esc(num)}</a>'
+def fip_link(num, base=''):
+    return u.fip_anchor(num, base=base)
 
 
 def date_str(d):
@@ -216,8 +216,7 @@ def by_status_html(fips, prs_grouped, flags=None):
         for num in sorted(groups[status], key=int):
             n = len(prs_grouped.get(num, []))
             dot = f' <span class="pr-dot" title="{n} open PR{"s" if n != 1 else ""}">{n}</span>' if n else ''
-            chips.append(f'<a class="chip" href="{esc(u.fip_url(num))}" target="_blank" rel="noopener" '
-                         f'title="{esc(fips[num]["title"])}">FIP-{num}{dot}</a>'
+            chips.append(u.fip_anchor(num, 'chip', title=fips[num]['title'], inner=f'FIP-{num}{dot}')
                          + (plan_flags(num, flags, compact=True) if num in (flags or {}) else ''))
         rows.append(f'<tr><td>{badge(status)}</td><td class="num"><strong>{len(groups[status])}</strong></td>'
                     f'<td><div class="chips">{"".join(chips)}</div></td></tr>')
@@ -281,6 +280,7 @@ def main():
     print('Reading README history and FIP files...')
     history, _ = u.build_status_history(repo)
     files = u.load_fip_files(repo)
+    u.register_fips(fips, files)
     open_lc, past_lc = u.last_call_windows(history, files, fips)
     mismatches = u.status_mismatches(fips, files)
 

@@ -1,0 +1,4386 @@
+{
+ "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs. Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
+ "generated_at": "2026-11-19T15:15:01Z",
+ "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
+ "fips": [
+  {
+   "number": "0001",
+   "title": "FIP Purpose and Guidelines",
+   "status": "Active",
+   "file_status": "Active",
+   "type": "Organizational",
+   "category": null,
+   "authors": "Whyrusleeping <whyrusleeping@protocol.ai>",
+   "created": "2019-04-02",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/"
+   ],
+   "status_since": "2020-12-10T22:26:27Z",
+   "history": [
+    {
+     "status": "Active",
+     "since": "2020-12-10T22:26:27Z",
+     "commit": "1dd027472d646dfd8a7bfea1960c320e4eff3c05"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0001.html"
+  },
+  {
+   "number": "0002",
+   "title": "Free Faults on Newly Faulted Sectors of a Missed WindowPoSt",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": null,
+   "authors": "anorth (@anorth), davidad (@davidad), Evan (@miyazono), Irene (@irenegia), Luca (@lucaniz), Nicola (@nicola), ZX (@zixuanzh)",
+   "created": "2020-09-24",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/6"
+   ],
+   "status_since": "2020-12-10T22:26:27Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2020-12-10T22:26:27Z",
+     "commit": "1dd027472d646dfd8a7bfea1960c320e4eff3c05"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0002.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0002.html"
+  },
+  {
+   "number": "0003",
+   "title": "Filecoin Plus Principles",
+   "status": "Active",
+   "file_status": "Active",
+   "type": "Standards",
+   "category": null,
+   "authors": "Alex Feerst (@feerst), jbenet (@jbenet), JV (@jnthnvctr), Tim Boucher (@tim-murmuration), Zargham (@mzargham), ZX (@zixuanzh)",
+   "created": "2020-10-13",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/12"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2020-12-10T22:26:27Z",
+     "commit": "1dd027472d646dfd8a7bfea1960c320e4eff3c05"
+    },
+    {
+     "status": "Active",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0003.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0003.html"
+  },
+  {
+   "number": "0004",
+   "title": "Liquidity Improvement for Storage Miners",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": null,
+   "authors": "davidad (@davidad), jbenet (@jbenet), zenground0 (@zenground0), ZX (@zixuanzh), danilo (@danlessa)",
+   "created": null,
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/14"
+   ],
+   "status_since": "2020-12-10T22:26:27Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2020-12-10T22:26:27Z",
+     "commit": "1dd027472d646dfd8a7bfea1960c320e4eff3c05"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 6,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0004.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0004.html"
+  },
+  {
+   "number": "0005",
+   "title": "Remove ineffective reward vesting",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North (@anorth), @Zenground",
+   "created": "2020-10-22",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/18"
+   ],
+   "status_since": "2020-12-22T06:04:19Z",
+   "history": [
+    {
+     "status": "Accepted",
+     "since": "2020-12-10T22:26:27Z",
+     "commit": "1dd027472d646dfd8a7bfea1960c320e4eff3c05"
+    },
+    {
+     "status": "Final",
+     "since": "2020-12-22T06:04:19Z",
+     "commit": "92868b16199b6481dff11163045e4811930491f8"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 7,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0005.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0005.html"
+  },
+  {
+   "number": "0006",
+   "title": "No repay debt requirement for DeclareFaultsRecovered",
+   "status": "Deferred",
+   "file_status": "Deferred",
+   "type": "Technical",
+   "category": null,
+   "authors": "Nicola (@nicola), Irene (@irenegia)",
+   "created": "2020-10-23",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/21"
+   ],
+   "status_since": "2021-01-16T19:02:00Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2020-12-10T22:26:27Z",
+     "commit": "1dd027472d646dfd8a7bfea1960c320e4eff3c05"
+    },
+    {
+     "status": "Deferred",
+     "since": "2021-01-04T23:35:39Z",
+     "commit": "788939ed558ae54d087e94583b10f5305a534250"
+    },
+    {
+     "status": "Draft",
+     "since": "2021-01-14T07:30:50Z",
+     "commit": "30d10b021844afb390e363889528a7637a5c453f"
+    },
+    {
+     "status": "Deferred",
+     "since": "2021-01-16T19:02:00Z",
+     "commit": "22aba4dc6a70e11cc02edc73b36941c6431be33a"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0006.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0006.html"
+  },
+  {
+   "number": "0007",
+   "title": "h/amt-v3",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg), Steven Allen (@Stebalien), Alex North (@anorth), Zen Ground0 (@Zenground0)",
+   "created": "2020-11-27",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/38"
+   ],
+   "status_since": "2021-03-12T05:47:04Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2020-12-10T22:26:27Z",
+     "commit": "1dd027472d646dfd8a7bfea1960c320e4eff3c05"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-01-19T23:02:01Z",
+     "commit": "6d6528b57129fd78220e2b6119e99d6eba43641b"
+    },
+    {
+     "status": "Final",
+     "since": "2021-03-12T05:47:04Z",
+     "commit": "10748d5be24018f4d73a0f2f679de9c73966587b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0007.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0007.html"
+  },
+  {
+   "number": "0008",
+   "title": "Add miner batched sector pre-commit method",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North (@anorth), @ZenGround0, @nicola",
+   "created": "2020-11-04",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/25"
+   ],
+   "status_since": "2021-07-15T13:46:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2020-12-10T22:27:12Z",
+     "commit": "a62be0fa5381fc24eddb9ee75b6df58a82afc242"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-05-06T16:57:47Z",
+     "commit": "3ced054beae378840ac3d3c35bd064ab976d27ce"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-05-20T04:35:17Z",
+     "commit": "17bc647dd6d5d213c0a0506ef8fd9d6daf16810f"
+    },
+    {
+     "status": "Final",
+     "since": "2021-07-15T13:46:53Z",
+     "commit": "a020c7f1fecf7a34fed1e7df69f24211037ca41b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 13,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0008.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0008.html"
+  },
+  {
+   "number": "0009",
+   "title": "Exempt Window PoSts from BaseFee burn",
+   "status": "Final",
+   "file_status": "Superseded",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Steven Allen (@stebalien), Molly Mackinlay (@momack2), Łukasz Magiera (@magik6k), Zixuan Zhang (@zixuanzh)",
+   "created": "2020-12-15",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/52"
+   ],
+   "status_since": "2021-03-12T05:47:04Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2020-12-16T01:24:48Z",
+     "commit": "29303cdc2c5c1c2556c5a6562d02b458fec21b6f"
+    },
+    {
+     "status": "Accepted",
+     "since": "2020-12-17T04:02:57Z",
+     "commit": "1636f8b6f19079c96071c13e2fdf2657e082b275"
+    },
+    {
+     "status": "Final",
+     "since": "2021-03-12T05:47:04Z",
+     "commit": "10748d5be24018f4d73a0f2f679de9c73966587b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": "9.5",
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0009.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0009.html"
+  },
+  {
+   "number": "0010",
+   "title": "Off-Chain Window PoSt Verification",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Steven (@stebalien), Alex (@anorth), et al.",
+   "created": "2021-01-07",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/42"
+   ],
+   "status_since": "2021-03-12T05:47:04Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-01-14T07:30:50Z",
+     "commit": "30d10b021844afb390e363889528a7637a5c453f"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-01-14T23:33:24Z",
+     "commit": "2b8f4586c115093eee1032ec8e7c99ffdf8e1230"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-01-15T01:40:12Z",
+     "commit": "62e3103228ef23756713d35ba9ac480838177933"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-01-25T20:54:59Z",
+     "commit": "84621733511fa5056ac679596b440768ba72174a"
+    },
+    {
+     "status": "Final",
+     "since": "2021-03-12T05:47:04Z",
+     "commit": "10748d5be24018f4d73a0f2f679de9c73966587b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 10,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0010.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0010.html"
+  },
+  {
+   "number": "0011",
+   "title": "Remove reward auction from reporting consensus faults",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Core",
+   "category": "Core",
+   "authors": "Jakub Sztandera (@Kubuxu)",
+   "created": "2020-01-05",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/61"
+   ],
+   "status_since": "2021-07-15T13:46:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-01-15T01:38:22Z",
+     "commit": "6ee64d1d19741620232af7d51aec6cc28d112d09"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-02-28T21:50:57Z",
+     "commit": "bf5538627afd9fb2d24f755d0d67293efb079f3f"
+    },
+    {
+     "status": "Draft",
+     "since": "2021-02-28T21:51:57Z",
+     "commit": "3074dc66d0676685d15a2e32bcf1118bfacb2388"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-03-03T04:27:32Z",
+     "commit": "5365473496b5d348b41d49b442b999b4a41eb5f9"
+    },
+    {
+     "status": "Draft",
+     "since": "2021-03-09T09:39:10Z",
+     "commit": "f700d10ab6b454d50830528cd6056a0ffaade7cc"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-03-09T09:47:52Z",
+     "commit": "e135583879520b26f9b5ea4a11857180d98de11e"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-05-20T04:35:17Z",
+     "commit": "17bc647dd6d5d213c0a0506ef8fd9d6daf16810f"
+    },
+    {
+     "status": "Final",
+     "since": "2021-07-15T13:46:53Z",
+     "commit": "a020c7f1fecf7a34fed1e7df69f24211037ca41b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 13,
+   "mentions": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0011.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0011.html"
+  },
+  {
+   "number": "0012",
+   "title": "DataCap Top up for FIL+ Client Addresses",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "DS (@dshoy), JV (@jnthnvctr), ZX (@zx)",
+   "created": "2021-01-29",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/70"
+   ],
+   "status_since": "2021-07-15T13:46:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-02-11T05:46:45Z",
+     "commit": "ce20b0b1eaa974bf02aca6b4a1c8ddd3ccaad8cf"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-02-28T21:51:57Z",
+     "commit": "3074dc66d0676685d15a2e32bcf1118bfacb2388"
+    },
+    {
+     "status": "Draft",
+     "since": "2021-03-09T09:39:10Z",
+     "commit": "f700d10ab6b454d50830528cd6056a0ffaade7cc"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-03-09T09:47:52Z",
+     "commit": "e135583879520b26f9b5ea4a11857180d98de11e"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-03-24T03:17:59Z",
+     "commit": "9ca83a0e4a0080cbf2e1a78e51ae92b6ce12858a"
+    },
+    {
+     "status": "Final",
+     "since": "2021-07-15T13:46:53Z",
+     "commit": "a020c7f1fecf7a34fed1e7df69f24211037ca41b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 13,
+   "mentions": [
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0012.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0012.html"
+  },
+  {
+   "number": "0013",
+   "title": "Add ProveCommitSectorAggregated method to reduce on-chain congestion",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Anca (@ninitrava), Nicola (@nicola), Zenground0, nemo (@cryptonemo), nikkolasg, jbenet, zixuanzh",
+   "created": "2021-02-17",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/50"
+   ],
+   "status_since": "2021-07-15T13:46:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-02-23T17:17:39Z",
+     "commit": "78581dd4a5b96d432c5eba710ecd9df812a1ca8c"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-05-06T16:59:34Z",
+     "commit": "d6cab188dab7c6763eaf7018747ca1a6e99f078b"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-05-20T04:35:17Z",
+     "commit": "17bc647dd6d5d213c0a0506ef8fd9d6daf16810f"
+    },
+    {
+     "status": "Final",
+     "since": "2021-07-15T13:46:53Z",
+     "commit": "a020c7f1fecf7a34fed1e7df69f24211037ca41b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 13,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0013.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0013.html"
+  },
+  {
+   "number": "0014",
+   "title": "Allow V1 proof sectors to be extended up to a maximum of 540 days",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "deltazxm (@deltazxm), Neo Ge(@neogeweb3), Fatman13(@Fatman13 )",
+   "created": "2021-26-02",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/56"
+   ],
+   "status_since": "2021-07-15T13:46:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-03-09T09:39:10Z",
+     "commit": "f700d10ab6b454d50830528cd6056a0ffaade7cc"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-03-29T22:22:17Z",
+     "commit": "cb89e9affe338a86e3932e39fc548250a36e3b3c"
+    },
+    {
+     "status": "Final",
+     "since": "2021-07-15T13:46:53Z",
+     "commit": "a020c7f1fecf7a34fed1e7df69f24211037ca41b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 11,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0014.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0014.html"
+  },
+  {
+   "number": "0015",
+   "title": "Revert FIP-0009(Exempt Window PoSts from BaseFee burn)",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "jennijuju (@jennijuju), arajasek (@arajasek)",
+   "created": "2021-05-20",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/86"
+   ],
+   "status_since": "2021-07-15T13:46:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-05-20T15:05:26Z",
+     "commit": "a6addd4f1ab4157aac12206e9afa2c02018c8861"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-05-28T23:40:44Z",
+     "commit": "85a085c60ab715c8695da3e29681dd52c599f918"
+    },
+    {
+     "status": "Accepted",
+     "since": "2021-05-31T16:25:23Z",
+     "commit": "1f200a373cc64c0d1562288cc83e334384dc95b3"
+    },
+    {
+     "status": "Final",
+     "since": "2021-07-15T13:46:53Z",
+     "commit": "a020c7f1fecf7a34fed1e7df69f24211037ca41b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 13,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0015.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0015.html"
+  },
+  {
+   "number": "0016",
+   "title": "Pack arbitrary data in CC sectors",
+   "status": "Deferred",
+   "file_status": "Rejected",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "donghengzhao (@1475)",
+   "created": "2021-30-03",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/57"
+   ],
+   "status_since": "2022-03-12T05:27:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-06-09T09:36:02Z",
+     "commit": "fb6818d41b253cca7b28f99e1591093843b15446"
+    },
+    {
+     "status": "Deferred",
+     "since": "2022-03-12T05:27:34Z",
+     "commit": "fe91cdfca9812c99954f7b96fbd015f19cf29e64"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0016.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0016.html"
+  },
+  {
+   "number": "0017",
+   "title": "Three-messages lightweight sector updates",
+   "status": "Deferred",
+   "file_status": "Deferred",
+   "type": "Core",
+   "category": null,
+   "authors": "nicola (@nicola), lucaniz (@lucaniz), irenegia (@irenegia)",
+   "created": "2021-07-27",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/131"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Deferred",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0017.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0017.html"
+  },
+  {
+   "number": "0018",
+   "title": "New miner terminology proposal",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Organizational",
+   "category": null,
+   "authors": "Stefaan-V (@Stefaan-V)",
+   "created": "2021-07-26",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/127"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2021-08-04T23:35:33Z",
+     "commit": "fcc4f8bfff91a3e053ac0e0fbf282f0c6406e131"
+    },
+    {
+     "status": "Last Call",
+     "since": "2021-08-05T00:02:53Z",
+     "commit": "c2e2adc0d9b19cdf067a6db8402f93efb3ca1cb4"
+    },
+    {
+     "status": "Final",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0018.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0018.html"
+  },
+  {
+   "number": "0019",
+   "title": "Snap Deals",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Core",
+   "category": null,
+   "authors": "@Kubuxu, @lucaniz, @nicola, @rosariogennaro, @irenegia",
+   "created": "2021-08-24",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/145"
+   ],
+   "status_since": "2022-03-12T05:07:12Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    },
+    {
+     "status": "Final",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 15,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0019.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0019.html"
+  },
+  {
+   "number": "0020",
+   "title": "Add return value to WithdrawBalance",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": "Core",
+   "authors": "Steven Li (@steven004), Zenground0 (@Zenground0)",
+   "created": "2021-06-06",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/26"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 14,
+   "mentions": [
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0020.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0020.html"
+  },
+  {
+   "number": "0021",
+   "title": "Correct quality calculation on expiration",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "@Stebalien, @ZX, @Zenground0",
+   "created": "2021-09-20",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/184"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 14,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0021.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0021.html"
+  },
+  {
+   "number": "0022",
+   "title": "Bad deals don't fail PublishStorageDeals",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Core",
+   "category": null,
+   "authors": "ZenGround0 (@ZenGround0)",
+   "created": "2021-09-06",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/142"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 14,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0022.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0022.html"
+  },
+  {
+   "number": "0023",
+   "title": "Break ties between tipsets of equal weights",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": null,
+   "authors": "Sarah Azouvi (@sa8), Aayush Rajasekaran (@arajasek)",
+   "created": "2021-09-07",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/22"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 14,
+   "mentions": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0023.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0023.html"
+  },
+  {
+   "number": "0024",
+   "title": "BatchBalancer & BatchDiscount Post -Hyperdrive adjustment",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "zx, jbenet, zenground0, momack2",
+   "created": "2021-09-21",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/173"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 14,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0024.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0024.html"
+  },
+  {
+   "number": "0025",
+   "title": "Handle expired deals in ProveCommit",
+   "status": "Deferred",
+   "file_status": "Deferred",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "ZenGround0 (@ZenGround0)",
+   "created": "2021-09-06",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/152"
+   ],
+   "status_since": "2022-03-12T05:07:12Z",
+   "history": [
+    {
+     "status": "Deferred",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0025.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0025.html"
+  },
+  {
+   "number": "0026",
+   "title": "Extend sector fault cutoff period from 2 weeks to 6 weeks",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": null,
+   "authors": "IPFSUnion(@IPFSUnion)",
+   "created": "2021-10-01",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/189"
+   ],
+   "status_since": "2022-01-05T16:20:58Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2022-01-05T16:20:58Z",
+     "commit": "782a312732a69bc45437caafd9d85bf665dca58e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0026.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0026.html"
+  },
+  {
+   "number": "0027",
+   "title": "Change type of DealProposal Label field from a (Golang) String to a Union",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Laudiacay (@laudiacay), Steven Allen (@Stebalien), Aayush Rajasekaran (@arajasek)",
+   "created": "2021-09-29",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/187"
+   ],
+   "status_since": "2023-01-09T19:33:45Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-03-26T00:10:58Z",
+     "commit": "dd70d83b4605277d6b9cfdbde319c99580ed825d"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-04-15T18:51:05Z",
+     "commit": "889ff629d4027b8123e118178d4dc1454a707d29"
+    },
+    {
+     "status": "Final",
+     "since": "2023-01-09T19:33:45Z",
+     "commit": "980602cf3f6c8fb9c3a90e3f908a0968309333be"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 16,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0027.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0027.html"
+  },
+  {
+   "number": "0028",
+   "title": "Remove DataCap and verified client status from client address",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": null,
+   "authors": "Jiaying Wang (@jennijuju), Deep (@dkkapur), Fil+ Governance Community",
+   "created": "2021-12-13",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/204"
+   ],
+   "status_since": "2022-03-12T05:07:12Z",
+   "history": [
+    {
+     "status": "Final",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 15,
+   "mentions": [
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0028.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0028.html"
+  },
+  {
+   "number": "0029",
+   "title": "Beneficiary address for storage providers",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Steven Li(@steven004)",
+   "created": "2021-12-09",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/issues/213"
+   ],
+   "status_since": "2023-02-24T00:39:40Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-04-15T18:51:05Z",
+     "commit": "889ff629d4027b8123e118178d4dc1454a707d29"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-05-09T18:58:13Z",
+     "commit": "3131d81a88f2471f3a65a4bee1098af52d133396"
+    },
+    {
+     "status": "Final",
+     "since": "2023-02-24T00:39:40Z",
+     "commit": "c694636b7be6e5fa51de32458c78309325c415ce"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 17,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0029.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0029.html"
+  },
+  {
+   "number": "0030",
+   "title": "Introducing the Filecoin Virtual Machine (FVM)",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": "Core",
+   "authors": "@raulk, @stebalien",
+   "created": "2022-01-26",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/287"
+   ],
+   "status_since": "2022-07-29T05:28:04Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-05-09T18:58:13Z",
+     "commit": "3131d81a88f2471f3a65a4bee1098af52d133396"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-05-25T15:39:28Z",
+     "commit": "adc6612943ebb08ca4693c0d59c2ca3ab05c9a41"
+    },
+    {
+     "status": "Final",
+     "since": "2022-07-29T05:28:04Z",
+     "commit": "184d8a87858f0f85aa8236443e93e97144ae8a48"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 16,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "Wallets and exchanges",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0030.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0030.html"
+  },
+  {
+   "number": "0031",
+   "title": "Atomic switch to non-programmable FVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": "Core",
+   "authors": "@raulk, @stebalien",
+   "created": "2022-02-03",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/296"
+   ],
+   "status_since": "2022-07-29T05:28:04Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-05-09T18:58:13Z",
+     "commit": "3131d81a88f2471f3a65a4bee1098af52d133396"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-05-25T15:39:28Z",
+     "commit": "adc6612943ebb08ca4693c0d59c2ca3ab05c9a41"
+    },
+    {
+     "status": "Final",
+     "since": "2022-07-29T05:28:04Z",
+     "commit": "184d8a87858f0f85aa8236443e93e97144ae8a48"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 16,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0031.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0031.html"
+  },
+  {
+   "number": "0032",
+   "title": "Gas model adjustment for non-programmable FVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Raúl Kripalani (@raulkr), Steven Allen (@stebalien), Jakub Sztandera (@Kubuxu)",
+   "created": "2022-03-08",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/316"
+   ],
+   "status_since": "2022-07-29T05:28:04Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-03-12T05:21:17Z",
+     "commit": "8382bba663f170a975cec212cdccb7fef9939e39"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-05-09T18:58:13Z",
+     "commit": "3131d81a88f2471f3a65a4bee1098af52d133396"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-05-25T15:39:28Z",
+     "commit": "adc6612943ebb08ca4693c0d59c2ca3ab05c9a41"
+    },
+    {
+     "status": "Final",
+     "since": "2022-07-29T05:28:04Z",
+     "commit": "184d8a87858f0f85aa8236443e93e97144ae8a48"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 16,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0032.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0032.html"
+  },
+  {
+   "number": "0033",
+   "title": "Explicit premium for FIL+ verified deals",
+   "status": "Deferred",
+   "file_status": "Deferred",
+   "type": "Technical (Core)",
+   "category": null,
+   "authors": "Alex North (@anorth)",
+   "created": "2022-01-12",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/243"
+   ],
+   "status_since": "2022-06-01T23:08:51Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-03-12T05:07:12Z",
+     "commit": "c3febbed2e3cce2dd0d409db1cd922511be08d1b"
+    },
+    {
+     "status": "Deferred",
+     "since": "2022-06-01T23:08:51Z",
+     "commit": "5e0f1c504e10eb3746c8fed321ec9b25e7c8b09f"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0033.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0033.html"
+  },
+  {
+   "number": "0034",
+   "title": "Fix pre-commit deposit independent of sector content",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North (@anorth), Jakub Sztandera (@Kubuxu)",
+   "created": "2022-0218",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/290"
+   ],
+   "status_since": "2023-01-09T19:33:45Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-05-25T15:39:28Z",
+     "commit": "adc6612943ebb08ca4693c0d59c2ca3ab05c9a41"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-07-13T04:55:10Z",
+     "commit": "52e25c8520ff8927c78db6440bba00a8fdeabb11"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-07-29T05:27:00Z",
+     "commit": "a1ecc1172ed6fbe25a24848ff800abae62e919dc"
+    },
+    {
+     "status": "Final",
+     "since": "2023-01-09T19:33:45Z",
+     "commit": "980602cf3f6c8fb9c3a90e3f908a0968309333be"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 17,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0034.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0034.html"
+  },
+  {
+   "number": "0035",
+   "title": "Support actors as built-in storage market clients",
+   "status": "Withdrawn",
+   "file_status": "Withdrawn",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North (@anorth)",
+   "created": "2022-02-17",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/271"
+   ],
+   "status_since": "2022-08-08T18:52:25Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-06-09T00:03:30Z",
+     "commit": "ff4f448e132d8b7a95bc636fe5199f976b757f32"
+    },
+    {
+     "status": "Withdrawn",
+     "since": "2022-08-08T18:52:25Z",
+     "commit": "3d5d052839f324369b758566a782b9b5d833a1d9"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0035.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0035.html"
+  },
+  {
+   "number": "0036",
+   "title": "Introducing a Sector Duration Multiple for Longer Term Sector Commitment",
+   "status": "Rejected",
+   "file_status": "Rejected",
+   "type": "Technical",
+   "category": null,
+   "authors": "Axel C (@AxCortesCubero), Juan B (@jbenet), Maria S (@misilva73), Molly M (@momack2), Tom M (@tmellan), Vik K (@vkalghatgi), ZX @zixuanzh)",
+   "created": "2022-07-29",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/453 (previously https://github.com/filecoin-project/FIPs/discussions/421 and https://github.com/filecoin-project/FIPs/discussions/386)"
+   ],
+   "status_since": "2022-10-05T17:38:39Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-07-29T21:00:00Z",
+     "commit": "0f10bd93734b16255f57010bf65436493c1cabf7"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-09-15T00:59:31Z",
+     "commit": "9a7ced49e359a703fddcf4bfa56b6f6029c9eeb4"
+    },
+    {
+     "status": "Rejected",
+     "since": "2022-10-05T17:38:39Z",
+     "commit": "122d35a36321f8e14e1a80931e8f77d52179bf83"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0036.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0036.html"
+  },
+  {
+   "number": "0037",
+   "title": "Gas model adjustment for user programmability",
+   "status": "Withdrawn",
+   "file_status": "Withdrawn",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Raúl Kripalani (@raulk), Steven Allen (@stebalien)",
+   "created": "2022-03-09",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/316"
+   ],
+   "status_since": "2024-09-18T08:43:50Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-07-08T02:05:40Z",
+     "commit": "1d1d49059def2242b06df4994533f99609bee8be"
+    },
+    {
+     "status": "Withdrawn",
+     "since": "2024-09-18T08:43:50Z",
+     "commit": "56863b13e62685f8e8e6b2b2f5048ba142263031"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0037.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0037.html"
+  },
+  {
+   "number": "0039",
+   "title": "Filecoin Message Replay Protection",
+   "status": "Draft",
+   "file_status": "Rejected",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Afri Schoedon (@q9f)",
+   "created": "2022-02-16",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/301"
+   ],
+   "status_since": "2022-07-08T01:45:29Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-07-08T01:45:29Z",
+     "commit": "4015319721a7def0d802e89e0ef95c99d1a19689"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0039.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0039.html"
+  },
+  {
+   "number": "0041",
+   "title": "Forward Compatibility for PreCommit and ReplicaUpdate",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Jakub Sztandera (@Kubuxu)",
+   "created": "2022-06-29",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/380"
+   ],
+   "status_since": "2023-01-09T19:33:45Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-07-14T15:32:50Z",
+     "commit": "303641c6ddcbe5e6ae1796127d807088f6d40159"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-09-08T16:12:22Z",
+     "commit": "0f948c7819dc78ed7193de793457951753cc942e"
+    },
+    {
+     "status": "Final",
+     "since": "2023-01-09T19:33:45Z",
+     "commit": "980602cf3f6c8fb9c3a90e3f908a0968309333be"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 17,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0041.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0041.html"
+  },
+  {
+   "number": "0044",
+   "title": "Standard Authentication Method for Actors",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Interface)",
+   "category": null,
+   "authors": "Aayush Rajasekaran (@arajasek), Alex North (@anorth)",
+   "created": "2022-08-02",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/413"
+   ],
+   "status_since": "2023-01-09T19:33:45Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-08-31T23:21:03Z",
+     "commit": "dc8ddbd11f95c393fbaa9eb0fcc76355f1b79329"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-09-10T00:45:49Z",
+     "commit": "6f7b14b1355aa98060515f89bf2d42f23e084eb0"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-09-30T17:08:04Z",
+     "commit": "24db4daf2786615b5ce8c81a34cc5065e5dbb328"
+    },
+    {
+     "status": "Final",
+     "since": "2023-01-09T19:33:45Z",
+     "commit": "980602cf3f6c8fb9c3a90e3f908a0968309333be"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 17,
+   "mentions": [
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0044.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0044.html"
+  },
+  {
+   "number": "0045",
+   "title": "De-couple verified registry from markets",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": null,
+   "authors": "Alex North (@anorth), Zenground0 (@zenground0)",
+   "created": "2022-08-12",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/313"
+   ],
+   "status_since": "2023-01-09T19:33:45Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-08-31T22:44:22Z",
+     "commit": "f9150ead5d1e741c70dd3b610d838a918abb0523"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-09-10T00:45:49Z",
+     "commit": "6f7b14b1355aa98060515f89bf2d42f23e084eb0"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-09-30T17:08:04Z",
+     "commit": "24db4daf2786615b5ce8c81a34cc5065e5dbb328"
+    },
+    {
+     "status": "Final",
+     "since": "2023-01-09T19:33:45Z",
+     "commit": "980602cf3f6c8fb9c3a90e3f908a0968309333be"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 17,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0045.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0045.html"
+  },
+  {
+   "number": "0047",
+   "title": "Proof Expiration & PoRep Security Policy",
+   "status": "Superseded",
+   "file_status": "Superseded",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Jakub Sztandera (@Kubuxu), Irene Giacomelli (@irenegia), Alex North (@anorth), Luca Nizzardo (@lucaniz)",
+   "created": "2022-08-31",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/415"
+   ],
+   "status_since": "2023-08-08T23:54:38Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-09-14T19:46:51Z",
+     "commit": "c99abaa22cab98eeb770178fabb332253f947931"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-09-15T00:59:31Z",
+     "commit": "9a7ced49e359a703fddcf4bfa56b6f6029c9eeb4"
+    },
+    {
+     "status": "Accepted",
+     "since": "2022-10-05T17:38:39Z",
+     "commit": "122d35a36321f8e14e1a80931e8f77d52179bf83"
+    },
+    {
+     "status": "Superseded",
+     "since": "2023-08-08T23:54:38Z",
+     "commit": "957fc9ee833d4b11f40f999d4484d5896d077c99"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0047.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0047.html"
+  },
+  {
+   "number": "0048",
+   "title": "f4 Address Class",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Steven Allen <stebalien@protocol.ai>, Melanie Riise <me@mriise.net>, Rául Kripalani <raul@protocol.ai>",
+   "created": "2022-10-02",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/473"
+   ],
+   "status_since": "2023-03-20T23:42:20Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-10-07T00:36:59Z",
+     "commit": "10c7a8f6a56fff0bc5b071db5dbb0f5780bebdb2"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-01-09T19:59:15Z",
+     "commit": "63a3d1bd00d5314c8404c9421f7aa920aa2157c4"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-01-24T02:22:31Z",
+     "commit": "9f3da36cacc2bd46f95d969c9821782f4a8d8e94"
+    },
+    {
+     "status": "Final",
+     "since": "2023-03-20T23:42:20Z",
+     "commit": "34f0c8376846a3c8786beb80955294431a716816"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 18,
+   "mentions": [
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "Wallets and exchanges",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0048.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0048.html"
+  },
+  {
+   "number": "0049",
+   "title": "Actor Events",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": "Core",
+   "authors": "Raúl Kripalani (@raulk), Steven Allen (@stebalien)",
+   "created": "2022-10-12",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/484"
+   ],
+   "status_since": "2023-03-20T23:42:20Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-12-05T19:36:20Z",
+     "commit": "4d00ef115e8783d2caace5143c2ac6be2d7ac933"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-01-26T20:33:20Z",
+     "commit": "e971f387f0322ce34d69b267fe4044de4c5c4336"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-02-10T21:50:17Z",
+     "commit": "221101ce96c26d9a37ad86a5a94b050ec9bf7e1d"
+    },
+    {
+     "status": "Final",
+     "since": "2023-03-20T23:42:20Z",
+     "commit": "34f0c8376846a3c8786beb80955294431a716816"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 18,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0049.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0049.html"
+  },
+  {
+   "number": "0050",
+   "title": "API Between User-Programmed Actors and Built-In Actors",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "<Technical (Core)>",
+   "category": null,
+   "authors": "Alex North (@anorth), Aayush Rajasekaran (@arajasek)",
+   "created": "<2022-12-05>",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/401"
+   ],
+   "status_since": "2023-03-20T23:42:20Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-12-05T22:26:03Z",
+     "commit": "4960d2337f7530537f585521dc1fbe468096b91e"
+    },
+    {
+     "status": "Last Call",
+     "since": "2022-12-20T00:55:08Z",
+     "commit": "7ed35547e88eee36a4107bbf40a168104c239d83"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-01-05T00:39:06Z",
+     "commit": "43ea80d098029d5301116521cbe771a251691a8b"
+    },
+    {
+     "status": "Final",
+     "since": "2023-03-20T23:42:20Z",
+     "commit": "34f0c8376846a3c8786beb80955294431a716816"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 18,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0050.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0050.html"
+  },
+  {
+   "number": "0052",
+   "title": "Increase max sector commitment to 3.5 years",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "@anorth",
+   "created": "2022-12-06",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/475"
+   ],
+   "status_since": "2024-01-12T20:24:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2022-12-09T19:22:25Z",
+     "commit": "718a91ce073cd3ec5edb57056ed63ecc440a8d04"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-01-09T19:59:15Z",
+     "commit": "63a3d1bd00d5314c8404c9421f7aa920aa2157c4"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-01-24T02:21:04Z",
+     "commit": "47d57932a543213630675a47ce08f454c6189df9"
+    },
+    {
+     "status": "Final",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 21,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0052.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0052.html"
+  },
+  {
+   "number": "0054",
+   "title": "Filecoin EVM Runtime (FEVM)",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": "Core",
+   "authors": "Raúl Kripalani (@raulk), Steven Allen (@stebalien)",
+   "created": "2022-12-02",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/592"
+   ],
+   "status_since": "2023-03-20T23:42:20Z",
+   "history": [
+    {
+     "status": "Last Call",
+     "since": "2023-01-21T07:08:30Z",
+     "commit": "dd377907db8cf96a35d45cd7d319c55d465ae963"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-02-10T21:50:17Z",
+     "commit": "221101ce96c26d9a37ad86a5a94b050ec9bf7e1d"
+    },
+    {
+     "status": "Final",
+     "since": "2023-03-20T23:42:20Z",
+     "commit": "34f0c8376846a3c8786beb80955294431a716816"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 18,
+   "mentions": [
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "Wallets and exchanges",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0054.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0054.html"
+  },
+  {
+   "number": "0055",
+   "title": "Supporting Ethereum Accounts, Addresses, and Transactions",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": "Core",
+   "authors": "Raúl Kripalani (@raulk), Steven Allen (@stebalien)",
+   "created": "2022-12-02",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/388 https://github.com/filecoin-project/FIPs/discussions/490 https://github.com/filecoin-project/FIPs/discussions/287"
+   ],
+   "status_since": "2023-03-20T23:42:20Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-01-13T00:21:59Z",
+     "commit": "d7f6f49be8a9dfae369df7520527f6d0cdd89b33"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-01-24T02:21:04Z",
+     "commit": "47d57932a543213630675a47ce08f454c6189df9"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-02-10T21:50:17Z",
+     "commit": "221101ce96c26d9a37ad86a5a94b050ec9bf7e1d"
+    },
+    {
+     "status": "Final",
+     "since": "2023-03-20T23:42:20Z",
+     "commit": "34f0c8376846a3c8786beb80955294431a716816"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 18,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "Wallets and exchanges",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0055.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0055.html"
+  },
+  {
+   "number": "0056",
+   "title": "Sector Duration Multiplier",
+   "status": "Rejected",
+   "file_status": "Rejected",
+   "type": "Technical",
+   "category": null,
+   "authors": "Axel C (@AxCortesCubero), Juan B (@jbenet), Maria S (@misilva73), Molly M (@momack2), Tom M (@tmellan), Vik K (@vkalghatgi), ZX @zixuanzh)",
+   "created": "2022-12-14",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/554"
+   ],
+   "status_since": "2023-04-06T17:34:20Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-01-24T02:21:04Z",
+     "commit": "47d57932a543213630675a47ce08f454c6189df9"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-03-07T00:17:24Z",
+     "commit": "1657820bb3f6edfaaa1bdffa7a1ab2f33ecf12d3"
+    },
+    {
+     "status": "Draft",
+     "since": "2023-03-07T01:55:11Z",
+     "commit": "669d86b563921e2bcc20aac27dc76f4e9ad430de"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-03-10T23:02:48Z",
+     "commit": "e55d09675e327aa4c39d29fbee34eb9a5cc281e2"
+    },
+    {
+     "status": "Rejected",
+     "since": "2023-04-06T17:34:20Z",
+     "commit": "03e2f5c56b66cff3d6ace7452c71ca59dd86896b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0056.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0056.html"
+  },
+  {
+   "number": "0057",
+   "title": "Update Gas Charging Schedule and System Limits for FEVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": null,
+   "authors": "Steven Allen (@stebalien), Raúl Kripalani (@raulk), Akosh Farkash (@aakoshh), Jakub Sztandera  (@Kubuxu)",
+   "created": "2022-12-12",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/588"
+   ],
+   "status_since": "2023-03-20T23:42:20Z",
+   "history": [
+    {
+     "status": "Last Call",
+     "since": "2023-01-24T02:21:04Z",
+     "commit": "47d57932a543213630675a47ce08f454c6189df9"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-02-10T21:50:17Z",
+     "commit": "221101ce96c26d9a37ad86a5a94b050ec9bf7e1d"
+    },
+    {
+     "status": "Final",
+     "since": "2023-03-20T23:42:20Z",
+     "commit": "34f0c8376846a3c8786beb80955294431a716816"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 18,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0057.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0057.html"
+  },
+  {
+   "number": "0059",
+   "title": "Synthetic PoRep",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "@Kubuxu @Luca @Rosario Gennaro @Nicola @Irene @nemo",
+   "created": "10 feb 2023",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/649"
+   ],
+   "status_since": "2024-01-12T20:24:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-03-14T22:13:03Z",
+     "commit": "3f0de3e7af8a613580ffa90fca1abe90d93b24de"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-06-07T19:56:56Z",
+     "commit": "fc1f064f594b3b007af6b503f5302ab06a35be72"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-08-22T02:20:58Z",
+     "commit": "3efa8ce7a175a0c5251750eddf701a2094402efb"
+    },
+    {
+     "status": "Final",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 21,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0059.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0059.html"
+  },
+  {
+   "number": "0060",
+   "title": "Set market deal maintenance interval to 30 days",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": null,
+   "authors": "Jakub Sztandera (@Kubuxu), @Zenground0, Alex North (@anorth)",
+   "created": "2023-03-06",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/638"
+   ],
+   "status_since": "2023-05-15T23:59:14Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-03-21T05:13:55Z",
+     "commit": "9b5f9ec65a1b96d1a90c1a851eea5939caac1c67"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-03-23T20:23:40Z",
+     "commit": "6499f9ef4522e8bbdf718d96070a60e920c89f01"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-04-06T22:42:01Z",
+     "commit": "dec95e331d567a7b805f3717dfec7ff38d4af808"
+    },
+    {
+     "status": "Final",
+     "since": "2023-05-15T23:59:14Z",
+     "commit": "109836051fe2432d2f16b4ed26641c828d00a3a5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 19,
+   "mentions": [
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0060.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0060.html"
+  },
+  {
+   "number": "0061",
+   "title": "WindowPoSt Grindability Fix",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "@cryptonemo @Kubuxu  @DrPeterVanNostrand @Nicola @porcuquine @vmx @arajasek",
+   "created": "2023-03-09",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/656"
+   ],
+   "status_since": "2023-05-15T23:59:14Z",
+   "history": [
+    {
+     "status": "Last Call",
+     "since": "2023-03-23T20:23:40Z",
+     "commit": "6499f9ef4522e8bbdf718d96070a60e920c89f01"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-04-06T22:42:01Z",
+     "commit": "dec95e331d567a7b805f3717dfec7ff38d4af808"
+    },
+    {
+     "status": "Final",
+     "since": "2023-05-15T23:59:14Z",
+     "commit": "109836051fe2432d2f16b4ed26641c828d00a3a5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 19,
+   "mentions": [
+    "Storage providers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0061.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0061.html"
+  },
+  {
+   "number": "0062",
+   "title": "Fallback Method Handler for the Multisig Actor",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": null,
+   "authors": "Dimitris Vyzovitis (@vyzo), Raúl Kripalani (@raulk)",
+   "created": "2023-03-20",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/671"
+   ],
+   "status_since": "2023-05-15T23:59:14Z",
+   "history": [
+    {
+     "status": "Last Call",
+     "since": "2023-03-23T20:23:40Z",
+     "commit": "6499f9ef4522e8bbdf718d96070a60e920c89f01"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-04-06T22:42:01Z",
+     "commit": "dec95e331d567a7b805f3717dfec7ff38d4af808"
+    },
+    {
+     "status": "Final",
+     "since": "2023-05-15T23:59:14Z",
+     "commit": "109836051fe2432d2f16b4ed26641c828d00a3a5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 19,
+   "mentions": [
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0062.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0062.html"
+  },
+  {
+   "number": "0063",
+   "title": "Switching to new Drand mainnet network",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Core, Networking",
+   "category": "Core",
+   "authors": "@yiannisbot, @CluEleSsUK, @AnomalRoil, @nikkolasg, @willscott",
+   "created": "2023-02-24",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/567"
+   ],
+   "status_since": "2024-04-25T19:30:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-07-21T01:47:21Z",
+     "commit": "421e9eacd8d21f8d09f392e90e04f27ad4da663d"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-01-30T19:14:36Z",
+     "commit": "723c6f417268fdbd32b59e419da4206deb0c3a6a"
+    },
+    {
+     "status": "Final",
+     "since": "2024-04-25T19:30:53Z",
+     "commit": "ffd0a487686801c230862afe94f305642a0fe0fa"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 22,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0063.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0063.html"
+  },
+  {
+   "number": "0064",
+   "title": "Add Parameters to Base Fee Mechanism",
+   "status": "Withdrawn",
+   "file_status": "Withdrawn",
+   "type": "Technical (Core)",
+   "category": null,
+   "authors": "Guy Goren (@guy.goren)",
+   "created": "2023-06-05",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/686"
+   ],
+   "status_since": "2026-01-23T21:37:59Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-08-12T03:50:06Z",
+     "commit": "779b31240fb0fa6472d3ed8460fe2eda2166bf15"
+    },
+    {
+     "status": "Withdrawn",
+     "since": "2026-01-23T21:37:59Z",
+     "commit": "add980f22dff01d5948f59dcfacba50b5161edcd"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0064.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0064.html"
+  },
+  {
+   "number": "0065",
+   "title": "Ignore built-in market locked balance in circulating supply calculation",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North <@anorth>",
+   "created": "2023-06-16",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/719"
+   ],
+   "status_since": "2024-08-08T19:26:47Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-07-21T01:47:21Z",
+     "commit": "421e9eacd8d21f8d09f392e90e04f27ad4da663d"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-08-28T15:40:27Z",
+     "commit": "7b38d298f6f9d3f6bdf307a0074155c5acc8b425"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-09-13T09:52:38Z",
+     "commit": "91691ed237ff32e9426a1b0c427dd99cf06640d3"
+    },
+    {
+     "status": "Final",
+     "since": "2024-08-08T19:26:47Z",
+     "commit": "b30ab3dbf1c23b8c37805b164edaa1d7ef6b1ea7"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 23,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0065.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0065.html"
+  },
+  {
+   "number": "0067",
+   "title": "PoRep Security Policy & Replacement Sealing Enforcement",
+   "status": "Accepted",
+   "file_status": "Accepted",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Jakub Sztandera (@Kubuxu), Alex North (@anorth), Irene Giacomelli (@irenegia), Luca Nizzardo (@lucaniz)",
+   "created": "2023-06-16",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/727"
+   ],
+   "status_since": "2023-08-28T15:40:27Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-07-31T00:13:42Z",
+     "commit": "74ba5e5659d7cef40fbe37fb1a272ae50e63af1b"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-08-16T19:56:11Z",
+     "commit": "9f10a7d59d3a98c0e6820b168486832295110fe7"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-08-28T15:40:27Z",
+     "commit": "7b38d298f6f9d3f6bdf307a0074155c5acc8b425"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0067.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0067.html"
+  },
+  {
+   "number": "0070",
+   "title": "Allow SPs to move partitions between deadlines",
+   "status": "Rejected",
+   "file_status": "Rejected",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Steven Li (@steven004), Alan Xu (@zhiqiangxu), Mike Li (@hunjixin), Alex North (@anorth), Nicola (@nicola)",
+   "created": "2023-06-25",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/735"
+   ],
+   "status_since": "2024-01-23T20:15:37Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-08-14T22:04:35Z",
+     "commit": "3718aabb0eb847c38f122e76e8575a92143272a5"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-09-13T09:52:38Z",
+     "commit": "91691ed237ff32e9426a1b0c427dd99cf06640d3"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-10-02T18:36:14Z",
+     "commit": "ba190e62bda9713170e89b0e0c0a8011d4ed1f7e"
+    },
+    {
+     "status": "Rejected",
+     "since": "2024-01-23T20:15:37Z",
+     "commit": "284ca3b674576c62558796d2328a23f7a3157c7e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0070.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0070.html"
+  },
+  {
+   "number": "0071",
+   "title": "Deterministic State Access (IPLD Reachability)",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": null,
+   "authors": "Steven (@stebalien)",
+   "created": "2023-07-25",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/764"
+   ],
+   "status_since": "2024-01-12T20:24:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-08-23T00:38:00Z",
+     "commit": "fad2ce255e9d8b385127873e1e07cd4647e4309a"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-09-13T09:52:38Z",
+     "commit": "91691ed237ff32e9426a1b0c427dd99cf06640d3"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-10-02T18:36:14Z",
+     "commit": "ba190e62bda9713170e89b0e0c0a8011d4ed1f7e"
+    },
+    {
+     "status": "Final",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 21,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0071.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0071.html"
+  },
+  {
+   "number": "0072",
+   "title": "Improved event syscall API",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": null,
+   "authors": "Fridrik Asmundsson (@fridrik01), Steven Allen (@stebalien)",
+   "created": "2023-08-10",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/775"
+   ],
+   "status_since": "2024-01-12T20:24:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-08-28T14:47:04Z",
+     "commit": "ad0ba5a1b4a7245859216cbd5fb2a405a0db385c"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-10-02T18:36:14Z",
+     "commit": "ba190e62bda9713170e89b0e0c0a8011d4ed1f7e"
+    },
+    {
+     "status": "Final",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 21,
+   "mentions": [
+    "Clients and data onboarding",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0072.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0072.html"
+  },
+  {
+   "number": "0073",
+   "title": "Remove beneficiary from the self_destruct syscall",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": null,
+   "authors": "Steven Allen (@stebalien)",
+   "created": "2023-08-29",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/524"
+   ],
+   "status_since": "2024-01-12T20:24:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-09-01T19:04:43Z",
+     "commit": "f0f9b3873cb4ea4047c47f551b9d9beac274d4fb"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-09-13T09:52:38Z",
+     "commit": "91691ed237ff32e9426a1b0c427dd99cf06640d3"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-10-02T18:36:14Z",
+     "commit": "ba190e62bda9713170e89b0e0c0a8011d4ed1f7e"
+    },
+    {
+     "status": "Final",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 21,
+   "mentions": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0073.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0073.html"
+  },
+  {
+   "number": "0074",
+   "title": "Remove cron-based automatic deal settlement",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North (@anorth), Alex Su (@alexytsu)",
+   "created": "2023-08-24",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/800"
+   ],
+   "status_since": "2024-04-25T19:30:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-09-11T20:10:30Z",
+     "commit": "5b8073fddf9d88d9140de15ddc45f4faacc43547"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-11-06T22:29:20Z",
+     "commit": "788680609f82becc99b7ccb0f5de34c7c7fb5046"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-11-28T20:04:59Z",
+     "commit": "f6f86bd885cd420c425457bec6dd3c3b4281a64f"
+    },
+    {
+     "status": "Final",
+     "since": "2024-04-25T19:30:53Z",
+     "commit": "ffd0a487686801c230862afe94f305642a0fe0fa"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 22,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0074.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0074.html"
+  },
+  {
+   "number": "0075",
+   "title": "Improvements to the FVM randomness syscalls",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Aayush Rajasekaran (@arajasek), Steven Allen (@stebalien)",
+   "created": "2023-08-28",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/790, https://github.com/filecoin-project/FIPs/discussions/791"
+   ],
+   "status_since": "2024-01-12T20:24:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-09-07T13:12:29Z",
+     "commit": "3412bed734f447fe9a0b1a22bcd01f6c9f77c13b"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-09-13T09:52:38Z",
+     "commit": "91691ed237ff32e9426a1b0c427dd99cf06640d3"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-10-02T18:36:14Z",
+     "commit": "ba190e62bda9713170e89b0e0c0a8011d4ed1f7e"
+    },
+    {
+     "status": "Final",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 21,
+   "mentions": [
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0075.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0075.html"
+  },
+  {
+   "number": "0076",
+   "title": "Direct data onboarding",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North (@anorth), @zenground0",
+   "created": "2023-08-24",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/730"
+   ],
+   "status_since": "2024-04-25T19:30:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-10-11T19:56:58Z",
+     "commit": "b19e1e6518c687ed75ddec488669996d66fa322d"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-12-11T22:56:08Z",
+     "commit": "b6dcc2bc41734055f65c4d0c1c6717583e7d3a31"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-12-26T10:15:34Z",
+     "commit": "3f6ed3eb5e6e6c2d67a87a1eb14825799232ca15"
+    },
+    {
+     "status": "Final",
+     "since": "2024-04-25T19:30:53Z",
+     "commit": "ffd0a487686801c230862afe94f305642a0fe0fa"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 22,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0076.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0076.html"
+  },
+  {
+   "number": "0077",
+   "title": "Add Cost Opportunity For New Miner Creation",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Zac <@remakeZK>",
+   "created": "2023-08-21",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/780"
+   ],
+   "status_since": "2025-10-06T09:49:06Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-09-21T05:28:56Z",
+     "commit": "0f13b43de863d6a7f0c61211e493bf0ff4ebc258"
+    },
+    {
+     "status": "Last Call",
+     "since": "2025-05-29T09:10:02Z",
+     "commit": "630c0792f77b0cac8df896a6a22e7067ea3c4a4d"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-09-11T17:16:17Z",
+     "commit": "6bc30b3d62318f7997f748043f08c1d676447a35"
+    },
+    {
+     "status": "Final",
+     "since": "2025-10-06T09:49:06Z",
+     "commit": "79ca2a6305a4fa3a1e82c9a5c0c4698c85d4417d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 27,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0077.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0077.html"
+  },
+  {
+   "number": "0078",
+   "title": "Remove Restrictions on the Minting of Datacap",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Fatman13 (@Fatman13), flyworker (@flyworker), stuberman (@stuberman), Eliovp (@Eliovp), dcasem (@dcasem), and The-Wayvy (@The-Wayvy)",
+   "created": "2023-08-22",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/844"
+   ],
+   "status_since": "2023-10-11T01:42:01Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-10-11T01:42:01Z",
+     "commit": "18a81996c6a11f66441bf710ea5e34e99952997c"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0078.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0078.html"
+  },
+  {
+   "number": "0079",
+   "title": "Add BLS Aggregate Signatures to FVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Jake (@drpetervannostrand)",
+   "created": "2023-09-27",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/840"
+   ],
+   "status_since": "2024-08-08T19:26:47Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-10-19T21:20:31Z",
+     "commit": "6b54250c54fbd0b38510b476f5093c03e0d659fd"
+    },
+    {
+     "status": "Last Call",
+     "since": "2023-11-06T22:29:20Z",
+     "commit": "788680609f82becc99b7ccb0f5de34c7c7fb5046"
+    },
+    {
+     "status": "Accepted",
+     "since": "2023-11-28T20:04:59Z",
+     "commit": "f6f86bd885cd420c425457bec6dd3c3b4281a64f"
+    },
+    {
+     "status": "Final",
+     "since": "2024-08-08T19:26:47Z",
+     "commit": "b30ab3dbf1c23b8c37805b164edaa1d7ef6b1ea7"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 23,
+   "mentions": [
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0079.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0079.html"
+  },
+  {
+   "number": "0080",
+   "title": "Phasing Out Fil+ and Restoring Deal Quality Multiplier to 1x",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "@Fatman13, @ArthurWang1255, @stuberman, @Eliovp, @dcasem, @The-Wayvy",
+   "created": "2023-08-03",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/774"
+   ],
+   "status_since": "2023-11-07T01:27:01Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-11-07T01:27:01Z",
+     "commit": "6e801d88c1ad8bbfac480028585b07a186648875"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0080.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0080.html"
+  },
+  {
+   "number": "0081",
+   "title": "Introduce lower bound for sector initial pledge",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Alex North (@anorth), Vik Kalghatgi (@vkalghatgi), Kiran Karra (@kkarrancsu), @lemmih",
+   "created": "2023-10-31",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/847"
+   ],
+   "status_since": "2024-11-27T18:11:03Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-11-28T21:05:38Z",
+     "commit": "1bd887028ac1b50b6f2f94913e07ede73583da5b"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-08-26T23:34:53Z",
+     "commit": "7ef7e2af065dd26369550b1fcca40cbb9a2ed43a"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-09-23T16:38:10Z",
+     "commit": "58da734e97b58f6c1195c66b811f446d186b8df8"
+    },
+    {
+     "status": "Final",
+     "since": "2024-11-27T18:11:03Z",
+     "commit": "12453c5e1ca9933f197fdc7b3da22ba7ee25ce8d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 24,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Wallets and exchanges"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0081.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0081.html"
+  },
+  {
+   "number": "0082",
+   "title": "Add support for aggregated replica update proofs",
+   "status": "Accepted",
+   "file_status": "Accepted",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "nemo (@cryptonemo), Jake (@DrPeterVanNostrand), @anorth",
+   "created": "2023-09-26",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/752"
+   ],
+   "status_since": "2024-09-18T08:44:19Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2023-12-13T21:37:49Z",
+     "commit": "1b176baa8f3aad68c4e08a8c818b7d5470777956"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-01-12T20:24:34Z",
+     "commit": "db22522d1facdc6b81f80578d8815d62c39b84c5"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-01-30T19:14:36Z",
+     "commit": "723c6f417268fdbd32b59e419da4206deb0c3a6a"
+    },
+    {
+     "status": "Final",
+     "since": "2024-08-08T19:26:47Z",
+     "commit": "b30ab3dbf1c23b8c37805b164edaa1d7ef6b1ea7"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-09-18T08:44:19Z",
+     "commit": "674759e8eae864eb2f5c493b9812e2541abc1aa7"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0082.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0082.html"
+  },
+  {
+   "number": "0083",
+   "title": "Add built-in Actor events in the Verified Registry, Miner and Market Actors",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Aarsh Shah (@aarshkshah1992)",
+   "created": "2023-11-27",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/754"
+   ],
+   "status_since": "2024-04-25T19:30:53Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-01-04T11:12:05Z",
+     "commit": "4b3a44919c2369e6004b97ca0bd0fbfe62979f56"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-01-23T20:15:37Z",
+     "commit": "284ca3b674576c62558796d2328a23f7a3157c7e"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-01-30T19:14:36Z",
+     "commit": "723c6f417268fdbd32b59e419da4206deb0c3a6a"
+    },
+    {
+     "status": "Final",
+     "since": "2024-04-25T19:30:53Z",
+     "commit": "ffd0a487686801c230862afe94f305642a0fe0fa"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 22,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0083.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0083.html"
+  },
+  {
+   "number": "0084",
+   "title": "Remove Storage Miner Actor Method `ProveCommitSectors`",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Jennifer Wang (@jennijuju)",
+   "created": "2023-09-03",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/899"
+   ],
+   "status_since": "2024-08-08T19:26:47Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-01-04T21:43:48Z",
+     "commit": "e22c254fdabe1d8b7954fdf20bf4aa52af07b6b3"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-01-23T20:15:37Z",
+     "commit": "284ca3b674576c62558796d2328a23f7a3157c7e"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-02-23T10:04:02Z",
+     "commit": "8e90723081451fec534f7375973d335b64450f6e"
+    },
+    {
+     "status": "Final",
+     "since": "2024-08-08T19:26:47Z",
+     "commit": "b30ab3dbf1c23b8c37805b164edaa1d7ef6b1ea7"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 23,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0084.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0084.html"
+  },
+  {
+   "number": "0085",
+   "title": "Convert f090 Mining Reserve actor to a keyless account actor",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Jennifer Wang (@jennijuju), Jon Victor (@jnthnvctr)",
+   "created": "2024-01-04",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/901"
+   ],
+   "status_since": "2024-08-08T19:26:47Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-01-22T21:08:04Z",
+     "commit": "142a0a50f49b753a7f3b65100cc19f09f4bf342e"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-02-23T10:04:02Z",
+     "commit": "8e90723081451fec534f7375973d335b64450f6e"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-03-15T10:46:40Z",
+     "commit": "8118ceecf469a56cabad6f2bd7f6eba2d9012999"
+    },
+    {
+     "status": "Final",
+     "since": "2024-08-08T19:26:47Z",
+     "commit": "b30ab3dbf1c23b8c37805b164edaa1d7ef6b1ea7"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 23,
+   "mentions": [
+    "Wallets and exchanges"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0085.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0085.html"
+  },
+  {
+   "number": "0086",
+   "title": "Fast Finality in Filecoin (F3)",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Steven Allen (@stebalien), Masih H. Derkani (@masih), Jie Hou (@mb1896), Henrique Moniz (@hmoniz), Alex North (@anorth), Matej Pavlovic (@matejpavlovic), Aayush Rajasekaran (@arajasek), Alejandro Ranchal-Pedrosa (@ranchalp), Jorge M. Soares (@jsoares), Jakub Sztandera (@Kubuxu), Marko Vukolic (@vukolic), Jennifer Wang (@jennijuju)",
+   "created": "2023-12-18",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/809"
+   ],
+   "status_since": "2025-05-23T14:01:50Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-02-21T21:58:00Z",
+     "commit": "9400c2f671887446c329ae0d25f4302177d08b72"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-07-19T22:17:07Z",
+     "commit": "07848cd14a1b16b6d7ce25c6a6660c994994b8c3"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-08-07T15:53:03Z",
+     "commit": "1e07baf0804df20042e345f19ec7dfa74d9da197"
+    },
+    {
+     "status": "Final",
+     "since": "2025-05-23T14:01:50Z",
+     "commit": "f74e0203adf362da63f7cfc98e46d25a5e6aa226"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 24,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "Wallets and exchanges"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0086.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0086.html"
+  },
+  {
+   "number": "0090",
+   "title": "Non-Interactive PoRep",
+   "status": "Superseded",
+   "file_status": "Superseded",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "luca (@lucaniz), kuba (@Kubuxu), nicola (@nicola), nemo (@cryptonemo), volker (@vmx), irene (@irenegia)",
+   "created": "2023-12-18",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/854"
+   ],
+   "status_since": "2024-06-27T19:08:59Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-03-16T07:19:25Z",
+     "commit": "e719f22dfe2229689f8bebf94811d7e58951c598"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-04-25T19:30:53Z",
+     "commit": "ffd0a487686801c230862afe94f305642a0fe0fa"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-05-07T16:41:02Z",
+     "commit": "98134ecd9da74ff41ef5fe53275c827b638079cb"
+    },
+    {
+     "status": "Superseded",
+     "since": "2024-06-27T19:08:59Z",
+     "commit": "020bcb412ee20a2879b4a710337959c51b938d3b"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0090.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0090.html"
+  },
+  {
+   "number": "0091",
+   "title": "Add support for Homestead and EIP-155 Ethereum Transactions (\"legacy\" Ethereum Transactions)",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Aarsh (@aarshkshah1992)",
+   "created": "2024-04-17",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/962"
+   ],
+   "status_since": "2025-01-08T15:29:34Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-04-27T18:42:43Z",
+     "commit": "047b8df0ef5b845325c463c603792103d5f61379"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-05-14T21:32:04Z",
+     "commit": "3c6e993b39ffaaa92da7e9294a704864edeeb825"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-05-31T14:27:38Z",
+     "commit": "8133634f6d59c3c460b16aa2288af22bcdee3f95"
+    },
+    {
+     "status": "Final",
+     "since": "2025-01-08T15:29:34Z",
+     "commit": "58148efbc24c6a99292321212c5a35ad42fca97f"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 23,
+   "mentions": [
+    "Smart contract developers",
+    "Wallets and exchanges",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0091.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0091.html"
+  },
+  {
+   "number": "0092",
+   "title": "Non-Interactive PoRep",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "luca (@lucaniz), kuba (@Kubuxu), nicola (@nicola), nemo (@cryptonemo), volker (@vmx), irene (@irenegia), Alex North (@anorth), orjan (@Phi-rjan)",
+   "created": "2024-06-04",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/854 and https://github.com/filecoin-project/FIPs/discussions/1007"
+   ],
+   "status_since": "2024-08-08T19:26:47Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-05-16T22:44:34Z",
+     "commit": "e04778851c114381a7fd29ddc7d703e607e95fcc"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-06-12T15:31:28Z",
+     "commit": "dd50c3fa6dd1fb4c44d2668cad727b4ff733d264"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-06-27T19:08:59Z",
+     "commit": "020bcb412ee20a2879b4a710337959c51b938d3b"
+    },
+    {
+     "status": "Final",
+     "since": "2024-08-08T19:26:47Z",
+     "commit": "b30ab3dbf1c23b8c37805b164edaa1d7ef6b1ea7"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 23,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0092.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0092.html"
+  },
+  {
+   "number": "0094",
+   "title": "Add Support for EIP-5656 (MCOPY Opcode) in the FEVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Michael Seiler (@snissn), Raúl Kripalani (@raulk), Steven Allen (@stebalien)",
+   "created": "2024-08-22",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1025"
+   ],
+   "status_since": "2024-11-27T18:11:03Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-09-10T13:01:46Z",
+     "commit": "de4536608ba36f2fab8679beb53acecb9d7adb89"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-09-12T17:57:11Z",
+     "commit": "a38b5f5a09d53b0702ddded9cbc192d6751fec22"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-10-07T17:31:22Z",
+     "commit": "8012def4e989473e46e1740410afd1ee5d368661"
+    },
+    {
+     "status": "Final",
+     "since": "2024-11-27T18:11:03Z",
+     "commit": "12453c5e1ca9933f197fdc7b3da22ba7ee25ce8d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 24,
+   "mentions": [
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0094.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0094.html"
+  },
+  {
+   "number": "0095",
+   "title": "Add FEVM precompile to fetch beacon digest from chain history",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": null,
+   "authors": "@ZenGround0, @anorth",
+   "created": "2024-08-26",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1051"
+   ],
+   "status_since": "2024-11-27T18:11:03Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-09-03T21:01:12Z",
+     "commit": "83d2a92a35ff30de4ec642c87245a8476861fdc7"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-09-10T00:22:14Z",
+     "commit": "ac4b9739b9752e070e8fec4db2e205f8277f2f0c"
+    },
+    {
+     "status": "Accepted",
+     "since": "2024-10-07T17:31:22Z",
+     "commit": "8012def4e989473e46e1740410afd1ee5d368661"
+    },
+    {
+     "status": "Final",
+     "since": "2024-11-27T18:11:03Z",
+     "commit": "12453c5e1ca9933f197fdc7b3da22ba7ee25ce8d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 24,
+   "mentions": [
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0095.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0095.html"
+  },
+  {
+   "number": "0096",
+   "title": "Convert fundraising remainder address(es) to keyless account actor(s)",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Fatman13 (@fatman13)",
+   "created": "2024-07-10",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1033"
+   ],
+   "status_since": "2024-12-12T21:30:14Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-12-12T21:30:14Z",
+     "commit": "502b5c69a84cdc6b70bdff115e23560b21db159e"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0096.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0096.html"
+  },
+  {
+   "number": "0097",
+   "title": "Add Support for EIP-1153 (Transient Storage) in the FEVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Michael Seiler (@snissn), Steven Allen (@stebalien)",
+   "created": "2024-11-19",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/855"
+   ],
+   "status_since": "2025-05-23T14:01:50Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-12-11T22:20:54Z",
+     "commit": "a61623981a4245e0ffd4f45cb0ad9d9d4bae294c"
+    },
+    {
+     "status": "Last Call",
+     "since": "2024-12-20T22:20:21Z",
+     "commit": "36ccc39e49b365f565fcc4ba9f153dc5208b42fa"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-01-08T13:23:57Z",
+     "commit": "2944d4adeb3936276a40d0b8b17a83fc8475bc97"
+    },
+    {
+     "status": "Final",
+     "since": "2025-05-23T14:01:50Z",
+     "commit": "f74e0203adf362da63f7cfc98e46d25a5e6aa226"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 25,
+   "mentions": [
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0097.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0097.html"
+  },
+  {
+   "number": "0098",
+   "title": "Simplify termination fee calculation to a fixed percentage of initial pledge",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Jonathan Schwartz (@Schwartz10), Alex North (@anorth), Jim Pick (@jimpick)",
+   "created": "2024-09-26",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1036"
+   ],
+   "status_since": "2025-05-23T14:01:50Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2024-12-13T14:44:15Z",
+     "commit": "ed13e3c8271c319828b3df302312383625f801ea"
+    },
+    {
+     "status": "Last Call",
+     "since": "2025-01-28T15:13:29Z",
+     "commit": "b258e36e5e085afd48525cb6442f2301553df528"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-02-24T20:40:38Z",
+     "commit": "6217fce2c9d07839d7682f37e93e400f1e215f12"
+    },
+    {
+     "status": "Final",
+     "since": "2025-05-23T14:01:50Z",
+     "commit": "f74e0203adf362da63f7cfc98e46d25a5e6aa226"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 25,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0098.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0098.html"
+  },
+  {
+   "number": "0100",
+   "title": "Removing Batch Balancer, Replacing It With a Per-sector Fee and Removing Gas-limited Constraints",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "irene (@irenegia), AX (@AxCortesCubero), rvagg (@rvagg), molly (@momack2), kiran (@kkarrancsu)",
+   "created": "2025-02-04",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1092",
+    "https://github.com/filecoin-project/FIPs/discussions/1105"
+   ],
+   "status_since": "2025-05-23T14:01:50Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-02-13T18:55:20Z",
+     "commit": "e97fb3e251575737cbbef9e86785c3cb51676a5f"
+    },
+    {
+     "status": "Last Call",
+     "since": "2025-02-24T20:40:38Z",
+     "commit": "6217fce2c9d07839d7682f37e93e400f1e215f12"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-03-14T18:39:53Z",
+     "commit": "43243b3e4f6c12c3829227e172df32e8b8967106"
+    },
+    {
+     "status": "Final",
+     "since": "2025-05-23T14:01:50Z",
+     "commit": "f74e0203adf362da63f7cfc98e46d25a5e6aa226"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 25,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0100.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0100.html"
+  },
+  {
+   "number": "0101",
+   "title": "Removal of the ProveCommitAggregate method from the miner actor",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg)",
+   "created": "2025-02-05",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1116"
+   ],
+   "status_since": "2025-10-06T09:49:06Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-02-18T00:19:04Z",
+     "commit": "5361386b0e59b86cf334285ede1ec14efa2a1fb6"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-03-14T18:39:53Z",
+     "commit": "43243b3e4f6c12c3829227e172df32e8b8967106"
+    },
+    {
+     "status": "Final",
+     "since": "2025-10-06T09:49:06Z",
+     "commit": "79ca2a6305a4fa3a1e82c9a5c0c4698c85d4417d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 27,
+   "mentions": [
+    "Storage providers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0101.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0101.html"
+  },
+  {
+   "number": "0103",
+   "title": "Removal of the ExtendSectorExpiration method from the miner actor",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg)",
+   "created": "2025-03-14",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1116"
+   ],
+   "status_since": "2025-10-06T09:49:06Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-05-12T16:17:41Z",
+     "commit": "c0ca23e9c321376113b61a49131f98bace9f0e7e"
+    },
+    {
+     "status": "Last Call",
+     "since": "2025-06-30T02:49:32Z",
+     "commit": "406c52bab29869428777f72ad18b019e961f03aa"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-09-11T17:16:17Z",
+     "commit": "6bc30b3d62318f7997f748043f08c1d676447a35"
+    },
+    {
+     "status": "Final",
+     "since": "2025-10-06T09:49:06Z",
+     "commit": "79ca2a6305a4fa3a1e82c9a5c0c4698c85d4417d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 27,
+   "mentions": [
+    "Storage providers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0103.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0103.html"
+  },
+  {
+   "number": "0105",
+   "title": "Add Support for EIP-2537 (BLS12-381 Precompiles) in the FEVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Aarav Mehta (@aaravm), Michael Seiler (@snissn)",
+   "created": "2025-04-11",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1135"
+   ],
+   "status_since": "2025-10-06T09:49:06Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-07-01T06:38:05Z",
+     "commit": "2fe1575b690e556480ade8d396709e5f2f7a1271"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-09-11T17:16:17Z",
+     "commit": "6bc30b3d62318f7997f748043f08c1d676447a35"
+    },
+    {
+     "status": "Final",
+     "since": "2025-10-06T09:49:06Z",
+     "commit": "79ca2a6305a4fa3a1e82c9a5c0c4698c85d4417d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 27,
+   "mentions": [
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0105.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0105.html"
+  },
+  {
+   "number": "0106",
+   "title": "Removal of the ProveReplicaUpdates method from the miner actor",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg)",
+   "created": "2025-05-20",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1151"
+   ],
+   "status_since": "2025-10-06T09:49:06Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-05-26T02:32:16Z",
+     "commit": "6c880fa95e485fc5d3333347dde451aec43dfbb8"
+    },
+    {
+     "status": "Last Call",
+     "since": "2025-06-30T02:49:32Z",
+     "commit": "406c52bab29869428777f72ad18b019e961f03aa"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-09-11T17:16:17Z",
+     "commit": "6bc30b3d62318f7997f748043f08c1d676447a35"
+    },
+    {
+     "status": "Final",
+     "since": "2025-10-06T09:49:06Z",
+     "commit": "79ca2a6305a4fa3a1e82c9a5c0c4698c85d4417d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 27,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0106.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0106.html"
+  },
+  {
+   "number": "0107",
+   "title": "Implicit Messages in Block Receipts",
+   "status": "Accepted",
+   "file_status": "Accepted",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg)",
+   "created": "2025-05-14",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1149"
+   ],
+   "status_since": "2026-09-04T16:21:46Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-06-17T05:25:10Z",
+     "commit": "2c4e07a4c89cb6b04ce4815f46e4400fa273166a"
+    },
+    {
+     "status": "Last Call",
+     "since": "2025-06-30T02:49:32Z",
+     "commit": "406c52bab29869428777f72ad18b019e961f03aa"
+    },
+    {
+     "status": "Accepted",
+     "since": "2026-09-04T16:21:46Z",
+     "commit": "3d3dfcab887ea8b637cc0f9c22428e674cee0266"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0107.html"
+  },
+  {
+   "number": "0109",
+   "title": "Enable smart contract notifications for Direct Data Onboarding (DDO)",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg)",
+   "created": "2025-02-05",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1181"
+   ],
+   "status_since": "2025-10-06T09:49:06Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-08-15T16:23:31Z",
+     "commit": "892b4ed7246c641a5ca360306245530da9be5aa6"
+    },
+    {
+     "status": "Last Call",
+     "since": "2025-08-18T15:11:30Z",
+     "commit": "42237583f43977eb8f88549b4582a5a94f8a05a6"
+    },
+    {
+     "status": "Accepted",
+     "since": "2025-09-11T17:16:17Z",
+     "commit": "6bc30b3d62318f7997f748043f08c1d676447a35"
+    },
+    {
+     "status": "Final",
+     "since": "2025-10-06T09:49:06Z",
+     "commit": "79ca2a6305a4fa3a1e82c9a5c0c4698c85d4417d"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 27,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0109.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0109.html"
+  },
+  {
+   "number": "0110",
+   "title": "Allow Shorter Deal Durations",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Will Scott (@willscott)",
+   "created": "2025-10-09",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1205"
+   ],
+   "status_since": "2025-11-14T14:50:45Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2025-11-14T14:50:45Z",
+     "commit": "b65d2e6f167141082c68edb3a444c13cc2b9bb1f"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0110.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0110.html"
+  },
+  {
+   "number": "0111",
+   "title": "Add Support for EIP-7702 (Set Code for EOAs) in the FEVM",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Michael Seiler (@snissn), Aarav Mehta (@aaravm)",
+   "created": "2025-10-30",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1143"
+   ],
+   "status_since": "2026-01-20T09:05:44Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-01-20T09:05:44Z",
+     "commit": "6bb18a838d5d7d6fcd8bc886d275f278bbaf8d9a"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "Wallets and exchanges",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0111.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0111.html"
+  },
+  {
+   "number": "0112",
+   "title": "Export Sector Liveness Check to FEVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "@Kubuxu, @lordshashank, @ZenGround0",
+   "created": "2025-11-26",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1108"
+   ],
+   "status_since": "2026-06-01T09:03:37Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-03-06T08:02:40Z",
+     "commit": "2ac747dc870cd09fdcfa5d372f448bc920e1fe08"
+    },
+    {
+     "status": "Last Call",
+     "since": "2026-03-23T07:33:36Z",
+     "commit": "2f2a44ade7755424af9325eb8ad4136431836edb"
+    },
+    {
+     "status": "Approved",
+     "since": "2026-04-14T15:16:22Z",
+     "commit": "709f1b442d8b69dc5ce0d78cb6f601ccbf494444"
+    },
+    {
+     "status": "Accepted",
+     "since": "2026-04-14T15:16:22Z",
+     "commit": "b3a2c047c559669b953cb53c422e9e253bac11e9"
+    },
+    {
+     "status": "Final",
+     "since": "2026-06-01T09:03:37Z",
+     "commit": "61db9642979458b1106a168737d1084de618e730"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 28,
+   "mentions": [
+    "Storage providers",
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0112.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0112.html"
+  },
+  {
+   "number": "0113",
+   "title": "secp256r1 (P-256) P256VERIFY Precompile for FEVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Aarav Mehta (@aaravm), Michael Seiler (@snissn)",
+   "created": "2026-01-20",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1227"
+   ],
+   "status_since": "2026-06-01T09:03:37Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-03-06T07:52:53Z",
+     "commit": "81274a51e49b8397276122d31a7ac1304df36ec9"
+    },
+    {
+     "status": "Approved",
+     "since": "2026-04-14T15:16:22Z",
+     "commit": "709f1b442d8b69dc5ce0d78cb6f601ccbf494444"
+    },
+    {
+     "status": "Accepted",
+     "since": "2026-04-14T15:16:22Z",
+     "commit": "b3a2c047c559669b953cb53c422e9e253bac11e9"
+    },
+    {
+     "status": "Final",
+     "since": "2026-06-01T09:03:37Z",
+     "commit": "61db9642979458b1106a168737d1084de618e730"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 28,
+   "mentions": [
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0113.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0113.html"
+  },
+  {
+   "number": "0114",
+   "title": "Add Support for EIP-7939 (CLZ Opcode) in the FEVM",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Aarav Mehta (@aaravm), Michael Seiler (@snissn)",
+   "created": "2026-01-21",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1229"
+   ],
+   "status_since": "2026-06-01T09:03:37Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-03-06T07:55:01Z",
+     "commit": "6471a691f89178d74b35d6720162fa9001b90685"
+    },
+    {
+     "status": "Approved",
+     "since": "2026-04-14T15:16:22Z",
+     "commit": "709f1b442d8b69dc5ce0d78cb6f601ccbf494444"
+    },
+    {
+     "status": "Accepted",
+     "since": "2026-04-14T15:16:22Z",
+     "commit": "b3a2c047c559669b953cb53c422e9e253bac11e9"
+    },
+    {
+     "status": "Final",
+     "since": "2026-06-01T09:03:37Z",
+     "commit": "61db9642979458b1106a168737d1084de618e730"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 28,
+   "mentions": [
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0114.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0114.html"
+  },
+  {
+   "number": "0115",
+   "title": "Premium Percentile Base Fee Target",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical Core",
+   "category": "Core",
+   "authors": "William Morriss (@wjmelements), Lin Zexiao (@LinZexiao)",
+   "created": "2026-02-13",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1236"
+   ],
+   "status_since": "2026-06-01T09:03:37Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-03-17T22:19:27Z",
+     "commit": "409c17d20528ef8eef777d0de031765933e33236"
+    },
+    {
+     "status": "Last Call",
+     "since": "2026-04-14T15:16:22Z",
+     "commit": "709f1b442d8b69dc5ce0d78cb6f601ccbf494444"
+    },
+    {
+     "status": "Accepted",
+     "since": "2026-04-21T21:35:07Z",
+     "commit": "bdd5283279fd115c87c9bbf71d2e40c9d075f5aa"
+    },
+    {
+     "status": "Final",
+     "since": "2026-06-01T09:03:37Z",
+     "commit": "61db9642979458b1106a168737d1084de618e730"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 28,
+   "mentions": [
+    "Clients and data onboarding"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0115.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0115.html"
+  },
+  {
+   "number": "0118",
+   "title": "(Solstice) Deprecate FIL+ and Fund Services via Block-Reward Split",
+   "status": "Final",
+   "file_status": "Final",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Irene Giacomelli (@irenegia), Axel Cortes Cubero (@AxCortesCubero), Michael Madoff (@decentramike), Molly Mackinlay (@momack2), Rod Vagg (@rvagg), William Morriss (@wjmelements)",
+   "created": "2026-07-14",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1249"
+   ],
+   "status_since": "2026-10-26T20:55:46Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-08-05T14:17:09Z",
+     "commit": "dd5075fe097672b2af4e72d16507efdc7f03f1c7"
+    },
+    {
+     "status": "Last Call",
+     "since": "2026-08-14T18:48:13Z",
+     "commit": "2e257ba4929415d4b6b6c93da633a4bb10e78ea2"
+    },
+    {
+     "status": "Accepted",
+     "since": "2026-09-11T23:31:53Z",
+     "commit": "fb0b58e47b14c8babb7709fd3897d71734eda9a5"
+    },
+    {
+     "status": "Final",
+     "since": "2026-10-26T20:55:46Z",
+     "commit": "c92ec604a44c81038f254948bc288ebe5f1a97cb"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": 29,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "Wallets and exchanges",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0118.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0118.html"
+  },
+  {
+   "number": "0119",
+   "title": "Increase maximum sector lifetime to 10 years",
+   "status": "Last Call",
+   "file_status": "Last Call",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Luca Nizzardo (@lucaniz)",
+   "created": "2026-10-09",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1291"
+   ],
+   "status_since": "2026-11-04T00:48:55Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-10-30T10:26:28Z",
+     "commit": "29b6a33b6fbf6fec9f1eafee71458d162ce5b209"
+    },
+    {
+     "status": "Last Call",
+     "since": "2026-11-04T00:48:55Z",
+     "commit": "191324e6b2e4bd4ea6ea46bab4191c4ec063aaff"
+    }
+   ],
+   "last_call": {
+    "start": "2026-11-04T00:48:55Z",
+    "end": "2026-11-18T00:48:55Z",
+    "estimated_end": true
+   },
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0119.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0119.html"
+  },
+  {
+   "number": "0121",
+   "title": "Remove the Fil+ Actors (f06, f07, f080)",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg)",
+   "created": "2026-10-30",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1300"
+   ],
+   "status_since": "2026-11-05T04:16:44Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-11-05T04:16:44Z",
+     "commit": "d9f473c4d8a7c23ea76ea06705e33e720a1b7372"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0121.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0121.html"
+  },
+  {
+   "number": "0122",
+   "title": "Size the miner actor's reward-derived charges (faults) by the consensus weight",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical (Core)",
+   "category": "Core",
+   "authors": "Luca Nizzardo (@lucaniz), Irene Giacomelli (@irenegia)",
+   "created": "2026-11-03",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1302"
+   ],
+   "status_since": "2026-11-17T14:47:56Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-11-17T14:47:56Z",
+     "commit": "c8b6fffc647cd0d73b19be712e955ff1287c5c1a"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0122.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0122.html"
+  }
+ ],
+ "network_upgrades": [
+  {
+   "number": 29,
+   "name": "Solstice",
+   "actors": "v19.0.1",
+   "fips": [
+    "0118"
+   ],
+   "mainnet": "2026-10-19T12:59:30Z",
+   "mainnet_epoch": 6470279,
+   "calibration": "2026-09-28T12:59:30Z",
+   "releases": [
+    {
+     "client": "Lotus",
+     "version": "v1.37.0",
+     "url": "https://github.com/filecoin-project/lotus/releases/tag/v1.37.0"
+    }
+   ],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v29.md"
+  },
+  {
+   "number": 28,
+   "name": "Fire Horse",
+   "actors": "v18.0.0",
+   "fips": [
+    "0112",
+    "0113",
+    "0114",
+    "0115"
+   ],
+   "mainnet": "2026-05-27T14:00:00Z",
+   "mainnet_epoch": 6052800,
+   "calibration": "2026-05-07T14:00:00Z",
+   "releases": [
+    {
+     "client": "Lotus",
+     "version": "v1.36.0",
+     "url": "https://github.com/filecoin-project/lotus/releases/tag/v1.36.0"
+    },
+    {
+     "client": "Venus",
+     "version": "v1.20.0",
+     "url": "https://github.com/filecoin-project/venus/releases/tag/v1.20.0"
+    },
+    {
+     "client": "Forest",
+     "version": "v0.33.4",
+     "url": "https://github.com/ChainSafe/forest/releases/tag/v0.33.4"
+    },
+    {
+     "client": "Curio",
+     "version": "v1.28.1",
+     "url": "https://github.com/filecoin-project/curio/releases/tag/v1.28.1"
+    }
+   ],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v28.md"
+  },
+  {
+   "number": 27,
+   "name": "Golden Week",
+   "actors": "v17.0.0",
+   "fips": [
+    "0105",
+    "0109",
+    "0077",
+    "0103",
+    "0106",
+    "0101"
+   ],
+   "mainnet": "2025-09-24T23:00:00Z",
+   "mainnet_epoch": 5348280,
+   "calibration": "2025-09-10T23:00:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v27.md"
+  },
+  {
+   "number": 26,
+   "name": "Tock",
+   "actors": "v16.0.0",
+   "fips": [],
+   "mainnet": "2025-07-09T23:00:00Z",
+   "mainnet_epoch": 5126520,
+   "calibration": "2025-04-02T23:00:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v26.md"
+  },
+  {
+   "number": 25,
+   "name": "Teep",
+   "actors": "v16.0.0",
+   "fips": [
+    "0097",
+    "0098",
+    "0100"
+   ],
+   "mainnet": "2025-04-10T23:00:00Z",
+   "mainnet_epoch": 4867320,
+   "calibration": "2025-03-26T23:00:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v25.md"
+  },
+  {
+   "number": 24,
+   "name": "Tuk Tuk",
+   "actors": "v15.0.0",
+   "fips": [
+    "0081",
+    "0086",
+    "0094",
+    "0095"
+   ],
+   "mainnet": "2024-11-20T23:00:00Z",
+   "mainnet_epoch": 4461240,
+   "calibration": "2024-10-23T13:30:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v24.md"
+  },
+  {
+   "number": 23,
+   "name": "Waffle",
+   "actors": "v14.0.0",
+   "fips": [
+    "0065",
+    "0079",
+    "0084",
+    "0085",
+    "0091",
+    "0092",
+    "['0086', 'F3 Soft Launch']"
+   ],
+   "mainnet": "2024-08-06T12:00:00Z",
+   "mainnet_epoch": 4154640,
+   "calibration": "2024-07-11T12:00:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v23.md"
+  },
+  {
+   "number": 22,
+   "name": "Dragon",
+   "actors": "v13.0.0",
+   "fips": [
+    "0063",
+    "0074",
+    "0076",
+    "0083"
+   ],
+   "mainnet": "2024-04-24T14:00:00Z",
+   "mainnet_epoch": 3817920,
+   "calibration": "2024-03-11T14:00:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v22.md"
+  },
+  {
+   "number": 21,
+   "name": "Watermelon",
+   "actors": "v12.0.0",
+   "fips": [
+    "0052",
+    "0059",
+    "0071",
+    "0072",
+    "0073",
+    "0075"
+   ],
+   "mainnet": "2023-12-12T13:30:00Z",
+   "mainnet_epoch": 3469380,
+   "calibration": "2023-10-19T13:00:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v21.md"
+  },
+  {
+   "number": 20,
+   "name": "Thunder",
+   "actors": "v11.0.0",
+   "fips": [],
+   "mainnet": "2023-05-18T13:00:00Z",
+   "mainnet_epoch": 2870280,
+   "calibration": "2023-04-21T16:00:00Z",
+   "releases": [],
+   "notes_url": null
+  },
+  {
+   "number": 19,
+   "name": "Lightning",
+   "actors": "v11.0.0",
+   "fips": [
+    "0060",
+    "0061",
+    "0062"
+   ],
+   "mainnet": "2023-04-27T13:00:00Z",
+   "mainnet_epoch": 2809800,
+   "calibration": "2023-04-20T14:00:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v19.md"
+  },
+  {
+   "number": 18,
+   "name": "Hygge",
+   "actors": "v10.0.0",
+   "fips": [
+    "0048",
+    "0049",
+    "0050",
+    "0054",
+    "0055",
+    "0057"
+   ],
+   "mainnet": "2023-03-14T15:14:00Z",
+   "mainnet_epoch": 2683348,
+   "calibration": "2023-02-21T16:30:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v18.md"
+  },
+  {
+   "number": 17,
+   "name": "Shark",
+   "actors": "v9.0.0",
+   "fips": [
+    "0029",
+    "0034",
+    "0041",
+    "0044",
+    "0045"
+   ],
+   "mainnet": "2022-11-30T14:00:00Z",
+   "mainnet_epoch": 2383680,
+   "calibration": "2022-11-07T14:13:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v17.md"
+  },
+  {
+   "number": 16,
+   "name": "Skyr",
+   "actors": "v8.0.0",
+   "fips": [
+    "0027",
+    "0030",
+    "0031",
+    "0032"
+   ],
+   "mainnet": "2022-07-06T14:00:00Z",
+   "mainnet_epoch": 1960320,
+   "calibration": "2022-11-01T22:28:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v16.md"
+  },
+  {
+   "number": 15,
+   "name": "OhSnap",
+   "actors": "v7.0.0",
+   "fips": [
+    "0019",
+    "0028"
+   ],
+   "mainnet": "2022-03-01T15:00:00Z",
+   "mainnet_epoch": 1594680,
+   "calibration": "2022-11-01T22:13:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v15.md"
+  },
+  {
+   "number": 14,
+   "name": "Chocolate",
+   "actors": "v6.0.0",
+   "fips": [
+    "0020",
+    "0021",
+    "0022",
+    "0023",
+    "0024"
+   ],
+   "mainnet": "2021-10-26T13:30:00Z",
+   "mainnet_epoch": 1231620,
+   "calibration": "2022-11-01T21:58:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v14.md"
+  },
+  {
+   "number": 13,
+   "name": "HyperDrive",
+   "actors": "v5.0.0",
+   "fips": [
+    "0008",
+    "0011",
+    "0012",
+    "0013",
+    "0015"
+   ],
+   "mainnet": "2021-06-30T22:00:00Z",
+   "mainnet_epoch": 892800,
+   "calibration": "2022-11-01T21:43:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v13.md"
+  },
+  {
+   "number": 12,
+   "name": "Turbo",
+   "actors": "v4.0.0",
+   "fips": [],
+   "mainnet": "2021-04-29T06:00:00Z",
+   "mainnet_epoch": 712320,
+   "calibration": "2022-11-01T21:28:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v12.md"
+  },
+  {
+   "number": 11,
+   "name": "Norwegian",
+   "actors": "v3.1.0",
+   "fips": [
+    "0014"
+   ],
+   "mainnet": "2021-04-12T22:00:00Z",
+   "mainnet_epoch": 665280,
+   "calibration": "2022-11-01T21:13:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v11.md"
+  },
+  {
+   "number": 10,
+   "name": "Trust",
+   "actors": "v3.0.3",
+   "fips": [
+    "0010"
+   ],
+   "mainnet": "2021-03-04T00:00:30Z",
+   "mainnet_epoch": 550321,
+   "calibration": "2022-11-01T20:58:00Z",
+   "releases": [],
+   "notes_url": "https://github.com/filecoin-project/core-devs/blob/master/Network%20Upgrades/v10.md"
+  },
+  {
+   "number": "9.5",
+   "name": "Claus",
+   "actors": "v2.3.3",
+   "fips": [
+    "0009"
+   ],
+   "mainnet": "2020-12-22T02:00:00Z",
+   "mainnet_epoch": 343200,
+   "calibration": "2022-11-01T20:28:00Z",
+   "releases": [],
+   "notes_url": null
+  },
+  {
+   "number": 9,
+   "name": "Orange",
+   "actors": "v2.3.3",
+   "fips": [],
+   "mainnet": "2020-12-19T17:49:00Z",
+   "mainnet_epoch": 336458,
+   "calibration": "2022-11-01T20:43:00Z",
+   "releases": [],
+   "notes_url": null
+  },
+  {
+   "number": 8,
+   "name": "Persian",
+   "actors": "v2.3.2",
+   "fips": [],
+   "mainnet": "2020-11-27T12:00:00Z",
+   "mainnet_epoch": 272400,
+   "calibration": "2022-11-01T20:13:00Z",
+   "releases": [],
+   "notes_url": null
+  },
+  {
+   "number": 7,
+   "name": "Calico",
+   "actors": "v2.3.2",
+   "fips": [
+    "0005"
+   ],
+   "mainnet": "2020-11-25T00:00:00Z",
+   "mainnet_epoch": 265200,
+   "calibration": "2022-11-01T19:13:00Z",
+   "releases": [],
+   "notes_url": null
+  },
+  {
+   "number": 6,
+   "name": "Kumquat",
+   "actors": "v2.2.0",
+   "fips": [
+    "0004"
+   ],
+   "mainnet": "2020-10-22T22:40:00Z",
+   "mainnet_epoch": 170000,
+   "calibration": "2022-11-01T18:58:00Z",
+   "releases": [],
+   "notes_url": null
+  }
+ ]
+}

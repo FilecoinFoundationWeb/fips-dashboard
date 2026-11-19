@@ -95,18 +95,18 @@ AUDIENCES = [
 ]
 
 
-def fip_body(repo, num):
+def fip_body(repo, num, folder='FIPS'):
     try:
-        with open(os.path.join(repo or '', 'FIPS', f'fip-{num}.md'), encoding='utf-8', errors='replace') as f:
+        with open(os.path.join(repo or '', folder, f'{folder[:3].lower()}-{num}.md'), encoding='utf-8', errors='replace') as f:
             text = f.read()
     except OSError:
         return ''
     return re.sub(r'^---\n.*?\n---\n', '', text, count=1, flags=re.S)
 
 
-def affected(repo, num):
+def affected(repo, num, folder='FIPS'):
     """Groups the FIP's own text mentions at least twice. Not an impact assessment."""
-    body = fip_body(repo, num)
+    body = fip_body(repo, num, folder)
     return [name for name, pat in AUDIENCES if len(re.findall(pat, body, re.I)) >= 2]
 
 
@@ -178,6 +178,7 @@ def _iso(d):
 
 
 def data_json(ctx):
+    import frc_pages  # imported here to avoid a cycle
     now = datetime.now(timezone.utc)
     shipped = {}
     for x in ctx['upgrades']:
@@ -212,7 +213,8 @@ def data_json(ctx):
             'notes_url': x.get('doc_url')} for x in ctx['upgrades']]
     return json.dumps({
         'about': 'Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and '
-                 'filecoin-project/core-devs. Unofficial; the repos are the authority. "mentions" lists groups '
+                 'filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. "mentions" lists groups '
                  'the FIP text mentions, not an impact assessment.',
-        'generated_at': _iso(now), 'site': u.SITE_URL, 'fips': out, 'network_upgrades': ups,
+        'generated_at': _iso(now), 'site': u.SITE_URL, 'fips': out, 'frcs': frc_pages.data_entries(ctx),
+        'network_upgrades': ups,
     }, ensure_ascii=False, indent=1)

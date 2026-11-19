@@ -6,6 +6,8 @@
   fip-lifecycle.html     Redirect to the home page, for old links
   core-devs.html         Core Devs meetings, recordings, FIPs on the agenda
   network-upgrades.html  Network upgrades and the FIPs they shipped
+  fip/NNNN.html          One page per FIP, plus fips-index.json, feed.xml and
+                         calendar.ics (see fip_pages.py)
 
 Reads public data only (FIPs and core-devs repos, plus optional GitHub API
 calls for discussions and open agenda issues).
@@ -19,6 +21,7 @@ import core_devs as cd
 import implementers as impl
 import scope_planning as sp
 import lifecycle_explainers as lx
+import fip_pages
 from fip_utils import html_escape as esc
 from theme import page
 from generate_fips_dashboard import badge, fip_link, date_str
@@ -69,8 +72,10 @@ def fip_info(num):
     return title, f'https://github.com/filecoin-project/FIPs/pulls?q=is%3Apr+FIP-{num}', False
 
 
-def fip_a(num, cls='fip-id'):
+def fip_a(num, cls='fip-id', base=''):
     title, url, _ = fip_info(num)
+    if u.fip_page(num):
+        return u.fip_anchor(num, cls, base=base, title=title)
     return f'<a class="{cls}" href="{esc(url)}" target="_blank" rel="noopener" title="{esc(title)}">FIP-{num}</a>'
 
 
@@ -746,7 +751,7 @@ def lifecycle_page(ctx):
               ) if trows else ''
 
     repo = ctx['fips_repo']
-    body = '\n'.join([lx.intro(repo, fips), flow, board, nudge, lx.steps_card(),
+    body = '\n'.join([fip_pages.this_week_card(ctx), lx.intro(repo, fips), flow, board, nudge, lx.steps_card(),
                       lx.types_card(repo, files), lx.contents_card(), timing, guide])
     return page(
         title='FIP Lifecycle',
@@ -885,12 +890,14 @@ def load_context():
     fips = {f['number']: f for f in u.parse_fip_table(u.read_readme(fips_repo))}
     history, events = u.build_status_history(fips_repo)
     files = u.load_fip_files(fips_repo)
-    open_lc, _ = u.last_call_windows(history, files, fips)
+    u.register_fips(fips, files)
+    open_lc, past_lc = u.last_call_windows(history, files, fips)
     print('Fetching PRs, discussions and agenda issues (optional)...')
     raw_prs = u.fetch_open_prs()
     prs = u.process_prs(raw_prs, with_reviews=False) if raw_prs is not None else None
     return {
-        'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc, 'history': history, 'fips_repo': fips_repo,
+        'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc, 'past_lc': past_lc,
+        'history': history, 'fips_repo': fips_repo,
         'meetings': cd.load_meetings(cd_repo), 'upgrades': cd.load_upgrades(cd_repo),
         'prs': prs,
         'prs_by_fip': u.prs_by_fip(prs) if prs else {},
@@ -928,6 +935,7 @@ def main():
         with open(name, 'w', encoding='utf-8') as f:
             f.write(fn(ctx))
         print(f'Generated {name}')
+    fip_pages.write_all(ctx)
     return 0
 
 

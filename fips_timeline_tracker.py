@@ -56,6 +56,7 @@ def main():
         print('ERROR: No FIPs parsed. Aborting to avoid overwriting existing tracker.')
         return 1
     u.register_fips(current, u.load_fip_files(repo))
+    u.load_frcs(repo)
 
     print('Walking README history...')
     _, events = u.build_status_history(repo)

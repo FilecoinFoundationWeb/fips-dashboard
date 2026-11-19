@@ -229,6 +229,7 @@ def collect(hours):
     history, events = u.build_status_history(repo)
     files = u.load_fip_files(repo)
     u.register_fips(fips, files)
+    u.load_frcs(repo)
     open_lc, _ = u.last_call_windows(history, files, fips)
     d.update(fips=fips, files=files, last_call=open_lc,
              status_changes=sorted((e for e in events if e['date'] >= since and e['from'] != e['to']),

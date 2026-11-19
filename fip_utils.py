@@ -82,7 +82,13 @@ def get_status_class(status):
 
 
 def fip_url(number):
+    if number in KNOWN_FRCS and number not in KNOWN_FIPS:
+        return frc_url(number)
     return f'{FIPS_BASE_URL}FIPS/fip-{number}.md'
+
+
+def frc_url(number):
+    return f'{FIPS_BASE_URL}FRCs/frc-{number}.md'
 
 
 # Public address of the published site, for feeds and emails (absolute links).
@@ -91,6 +97,8 @@ SITE_URL = 'https://filecoinfoundationweb.github.io/fips-dashboard/'
 # FIP numbers that get their own page (fip/NNNN.html). Each generator registers
 # the FIPs it loaded, so links point at the dashboard page only when one exists.
 KNOWN_FIPS = set()
+# FRCs share the FIP numbering and get their own pages (frc/NNNN.html).
+KNOWN_FRCS = set()
 
 
 def register_fips(*sources):
@@ -98,9 +106,25 @@ def register_fips(*sources):
         KNOWN_FIPS.update(src or ())
 
 
+def register_frcs(*sources):
+    for src in sources:
+        KNOWN_FRCS.update(src or ())
+
+
+def is_frc(number):
+    return number in KNOWN_FRCS and number not in KNOWN_FIPS
+
+
+def label(number):
+    """'FRC-0108' or 'FIP-0100'."""
+    return f'{"FRC" if is_frc(number) else "FIP"}-{number}'
+
+
 def fip_page(number, base=''):
-    """Relative link to a FIP's dashboard page, or None if it has none."""
-    return f'{base}fip/{number}.html' if number in KNOWN_FIPS else None
+    """Relative link to a FIP's (or FRC's) dashboard page, or None if it has none."""
+    if number in KNOWN_FIPS:
+        return f'{base}fip/{number}.html'
+    return f'{base}frc/{number}.html' if number in KNOWN_FRCS else None
 
 
 def fip_href(number, base=''):
@@ -114,7 +138,7 @@ def fip_anchor(number, cls='fip-id', base='', title='', inner=None):
     href, external = fip_href(number, base)
     target = ' target="_blank" rel="noopener"' if external else ''
     tip = f' title="{html_escape(title)}"' if title else ''
-    return f'<a class="{cls}" href="{html_escape(href)}"{target}{tip}>{inner or "FIP-" + html_escape(number)}</a>'
+    return f'<a class="{cls}" href="{html_escape(href)}"{target}{tip}>{inner or html_escape(label(number))}</a>'
 
 
 def days_between(start, end=None):
@@ -148,13 +172,13 @@ def _split_row(line):
     return [c.strip() for c in cells]
 
 
-def parse_fip_table(text):
+def parse_fip_table(text, kind='fip'):
     """Parse FIPs from the README markdown table.
 
     Column positions are read from the header row, so this works across the
     README's historical layouts (with or without a Type column, with or
     without padding). Returns a list of dicts with keys: number, title, type,
-    authors, status. FRCs are excluded.
+    authors, status. kind='fip' skips FRCs, 'frc' keeps only FRCs, 'all' keeps both.
     """
     fips = []
     cols = None
@@ -191,8 +215,8 @@ def parse_fip_table(text):
             return default
 
         fip_type = col('type', '')
-        is_frc = '/frcs/' in link.lower() or fip_type.strip().upper() == 'FRC'
-        if is_frc:
+        frc = '/frcs/' in link.lower() or fip_type.strip().upper() == 'FRC'
+        if (kind == 'fip' and frc) or (kind == 'frc' and not frc):
             continue
 
         fips.append({
@@ -261,7 +285,7 @@ def readme_commits(repo_dir):
     return commits
 
 
-def build_status_history(repo_dir):
+def build_status_history(repo_dir, kind='fip'):
     """Walk every README commit and record each FIP's status transitions.
 
     Returns (history, events):
@@ -276,7 +300,7 @@ def build_status_history(repo_dir):
     prev = {}
     for sha, date in readme_commits(repo_dir):
         try:
-            fips = {f['number']: f for f in parse_fip_table(read_readme(repo_dir, sha))}
+            fips = {f['number']: f for f in parse_fip_table(read_readme(repo_dir, sha), kind)}
         except subprocess.CalledProcessError:
             continue
         if not fips:
@@ -331,14 +355,14 @@ def parse_front_matter(text):
     return meta
 
 
-def load_fip_files(repo_dir):
+def load_fip_files(repo_dir, folder='FIPS', prefix='fip'):
     """{fip_number: front-matter dict} for every FIPS/fip-XXXX.md file."""
     result = {}
-    fips_dir = os.path.join(repo_dir, 'FIPS')
+    fips_dir = os.path.join(repo_dir, folder)
     if not os.path.isdir(fips_dir):
         return result
     for name in sorted(os.listdir(fips_dir)):
-        m = re.match(r'fip-(\d+)\.md$', name, re.IGNORECASE)
+        m = re.match(rf'{prefix}-(\d+)\.md$', name, re.IGNORECASE)
         if not m:
             continue
         with open(os.path.join(fips_dir, name), encoding='utf-8', errors='replace') as f:
@@ -348,6 +372,19 @@ def load_fip_files(repo_dir):
         meta['_discussions'] = [d for d in (disc if isinstance(disc, list) else [disc]) if d.startswith('http')]
         result[m.group(1).zfill(4)] = meta
     return result
+
+
+def load_frc_files(repo_dir):
+    """{number: front-matter dict} for every FRCs/frc-XXXX.md file."""
+    return load_fip_files(repo_dir, 'FRCs', 'frc')
+
+
+def load_frcs(repo_dir):
+    """(README FRC rows by number, FRC file front matter by number), registered for linking."""
+    frcs = {f['number']: f for f in parse_fip_table(read_readme(repo_dir), 'frc')}
+    files = load_frc_files(repo_dir)
+    register_frcs(frcs, files)
+    return frcs, files
 
 
 def parse_date(value):
@@ -458,9 +495,9 @@ def fetch_open_prs():
 
 def extract_fip_from_title(title):
     """Subject FIP numbers from a PR title (placeholders like FIPXXXX skipped)."""
-    if not title or re.search(r'FIP[-\s]?[Xx]{2,}', title, re.IGNORECASE):
+    if not title or re.search(r'F(?:IP|RC)[-\s]?[Xx]{2,}', title, re.IGNORECASE):
         return []
-    return sorted({m.zfill(4) for m in re.findall(r'FIP[-\s]?(\d{1,4})', title, re.IGNORECASE)})
+    return sorted({m.zfill(4) for m in re.findall(r'F(?:IP|RC)[-\s]?(\d{1,4})', title, re.IGNORECASE)})
 
 
 def extract_fip_from_files(pr_number):
@@ -472,7 +509,7 @@ def extract_fip_from_files(pr_number):
         return []
     nums = set()
     for f in files:
-        m = re.search(r'FIPS/fip-(\d+)\.md', f.get('filename', ''), re.IGNORECASE)
+        m = re.search(r'(?:FIPS/fip|FRCs/frc)-(\d+)\.md', f.get('filename', ''), re.IGNORECASE)
         if m:
             nums.add(m.group(1).zfill(4))
     return sorted(nums)
@@ -536,7 +573,7 @@ def process_prs(prs, with_reviews=True):
         title = pr.get('title') or ''
         fips = extract_fip_from_files(number) or extract_fip_from_title(title)
         if not fips:
-            if 'fip' in title.lower():
+            if 'fip' in title.lower() or 'frc' in title.lower():
                 fips = ['General']
             else:
                 continue

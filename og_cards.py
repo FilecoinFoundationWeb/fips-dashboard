@@ -96,9 +96,9 @@ def _mix(a, b, t):
     return tuple(round(x + (y - x) * t) for x, y in zip(a, b))
 
 
-def fip_card(path, number, title, status):
+def fip_card(path, number, title, status, kind='FIP'):
     img, d = _base()
-    d.text((72, 140), f'FIP-{number}', font=_font(96, 800), fill=WHITE)
+    d.text((72, 140), f'{kind}-{number}', font=_font(96, 800), fill=WHITE)
     y = 270
     for line in _wrap(d, title, _font(52, 700), W - 144, 3):
         d.text((72, y), line, font=_font(52, 700), fill=WHITE)

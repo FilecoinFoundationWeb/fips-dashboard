@@ -1,0 +1,6 @@
+{
+  "_comment": "Optional features, all off until filled in. analytics: provider 'plausible' (set domain, e.g. filecoinfoundationweb.github.io) or 'goatcounter' (set goatcounter_code, the part before .goatcounter.com). giscus: embeds each FIP's GitHub discussion on its page; needs the giscus app (https://github.com/apps/giscus) installed on the repo below and the IDs from https://giscus.app. digest_signup_url: a sign-up page for the email digest (e.g. a Google Group or Buttondown form); shown in the footer and the This week card when set.",
+  "analytics": {"provider": "", "domain": "", "goatcounter_code": ""},
+  "giscus": {"repo": "filecoin-project/FIPs", "repo_id": "", "category_id": ""},
+  "digest_signup_url": ""
+}

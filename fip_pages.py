@@ -7,6 +7,8 @@
   fips-index.json    number / title / status for the header search box
   feed.xml           RSS: status changes, Last Calls, upgrades and meetings
   calendar.ics       meetings, Last Call review deadlines and upgrade dates
+  data.json          every FIP and upgrade as JSON (see extras.py)
+  og/*.png           link-preview images, when Pillow is available (og_cards.py)
 
 Also provides this_week_card() for the home page. Called from generate_hub.py
 with the context it has already loaded, so nothing is fetched twice.
@@ -21,7 +23,9 @@ import zlib
 from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime
 
+import extras
 import fip_utils as u
+import og_cards
 from fip_utils import html_escape as esc
 from theme import page
 
@@ -251,8 +255,16 @@ def fip_page_html(n, ctx, prev_n, next_n):
                                   for i, d in enumerate(discussions)) or '<span class="muted">None listed</span>'),
     ]
     facts = ''.join(f'<dt>{k}</dt><dd>{v}</dd>' for k, v in rows if v)
+    nxt = extras.what_next(n, ctx, B)
+    nxt_html = (f'<div class="where-at"><h3 class="sub-h">Where it\'s at</h3><ul>{"".join(f"<li>{x}</li>" for x in nxt)}</ul>'
+                '<p class="note" style="margin-top:4px">From the records, not a judgment.</p></div>' if nxt else '')
+    groups = extras.affected(ctx.get('fips_repo'), n)
+    groups_html = (f'<div class="mentions"><h3 class="sub-h">The FIP\'s text mentions</h3><div class="chips">'
+                   + ''.join(f'<span class="chip static">{esc(g)}</span>' for g in groups) +
+                   '</div><p class="note" style="margin-top:6px">Found by searching the FIP\'s own wording. Not an official impact assessment; read the FIP.</p></div>'
+                   if groups else '')
     glance = (f'<section class="card"><div class="card-head"><h2>At a glance</h2></div><div class="card-body">'
-              f'{status_path(status, history, core)}<dl class="facts">{facts}</dl></div></section>')
+              f'{status_path(status, history, core)}<dl class="facts">{facts}</dl>{nxt_html}{groups_html}</div></section>')
 
     # History, with Last Call windows
     hist = []
@@ -291,6 +303,13 @@ def fip_page_html(n, ctx, prev_n, next_n):
                   f'<div class="card-body">{"<ul class=convo-list>" + "".join(items) + "</ul>" + more if items else "<p class=empty>Not mentioned in any call notes yet.</p>"}'
                   '</div></section>')
 
+    # The discussion itself, embedded when giscus is set up in data/site.json
+    embed = extras.giscus_embed(discussions)
+    disc_card = (f'<section class="card" id="discussion"><div class="card-head"><h2>Discussion</h2>'
+                 f'<span class="hint">The FIP\'s GitHub discussion. Replies post from your own GitHub account. '
+                 f'{ext(discuss, "Open on GitHub ↗", "")}</span></div><div class="card-body">{embed}</div></section>'
+                 if embed else '')
+
     # Open PRs
     prs = (ctx.get('prs_by_fip') or {}).get(n) or []
     pr_card = ''
@@ -320,19 +339,22 @@ def fip_page_html(n, ctx, prev_n, next_n):
         return f'<a class="{cls}" href="{num}.html"><span>{label}</span>FIP-{num} {esc(short(t, 60))}</a>'
     prevnext = f'<nav class="prev-next" aria-label="Other FIPs">{pn(prev_n, "prev", "← Previous")}{pn(next_n, "next", "Next →")}</nav>'
 
+    report = extras.report_url(f'FIP-{n}', f'{u.SITE_URL}fip/{n}.html')
     crumbs = (f'<div class="crumbs"><span><a href="{B}fips-dashboard-static.html#by-status">← All FIPs</a> · '
-              f'<a href="{B}">How FIPs move</a></span>{ext(u.fip_url(n), "View on GitHub ↗", "")}</div>')
+              f'<a href="{B}">How FIPs move</a></span><span>{ext(report, "Report a data problem", "")} · '
+              f'{ext(u.fip_url(n), "View on GitHub ↗", "")}</span></div>')
 
     body = '\n'.join(x for x in [
         crumbs, cta,
         f'<div class="grid-2"><div>{summary_card}{calls_card}</div><div>{glance}{hist_card}</div></div>',
-        pr_card, involve, prevnext,
+        disc_card, pr_card, involve, prevnext,
     ] if x)
     sub = f'{esc(listval(f.get("type")) or fip.get("type") or "FIP")} · {badge(status)}'
     return page(
         title=f'FIP-{n}: {title}',
         description=f'FIP-{n} ({status}): {title}. Status history, Last Call window, network upgrade and the calls that discussed it.',
-        current='dashboard', subtitle=sub, body_html=body, base=B,
+        current='dashboard', subtitle=sub, body_html=body, base=B, path=f'fip/{n}.html',
+        og_image=f'og/{n}.png' if og_cards.available() else None,
     )
 
 
@@ -378,7 +400,7 @@ def this_week_card(ctx, base=''):
         epoch = f' · epoch {x["mainnet_epoch"]:,}' if x.get('mainnet_epoch') else ''
         up_body = (f'<div class="big">NV{x["number"]} in {days_word(days)}</div>'
                    f'<div class="small">{esc(x["name"])} · mainnet {fmt(x["mainnet"])}{epoch}</div>'
-                   f'<div class="small" style="margin-top:6px"><a href="{base}network-upgrades.html#nv{x["number"]}">What\'s in it →</a></div>')
+                   f'<div class="small" style="margin-top:6px"><a href="{base}network-upgrades.html#readiness">Get ready checklist →</a></div>')
     else:
         live = [x['number'] for x in ctx['upgrades'] if x['mainnet'] and x['mainnet'] <= now and isinstance(x['number'], int)]
         plan = next((p for p in sorted(ctx.get('planning') or [], key=lambda p: p['nv']) if p['nv'] > max(live or [0])), None)
@@ -402,7 +424,9 @@ def this_week_card(ctx, base=''):
 
     return (f'<section class="card" id="this-week"><div class="card-head"><h2>This week</h2>'
             f'<span class="hint">What\'s open for input and what\'s coming up. '
-            f'<a href="{base}calendar.ics">Add to your calendar</a> · <a href="{base}feed.xml">RSS</a></span></div>'
+            f'<a href="{base}calendar.ics">Add to your calendar</a> · <a href="{base}feed.xml">RSS</a>'
+            + (f' · <a href="{esc(extras.digest_signup_url())}" target="_blank" rel="noopener">Email digest</a>' if extras.digest_signup_url() else '')
+            + '</span></div>'
             f'<div class="card-body"><div class="week">{lc_col}{cd_col}{up_col}{ch_col}</div></div></section>')
 
 
@@ -418,7 +442,9 @@ def search_index(ctx):
     out = []
     for n in sorted(_all_fips(ctx), key=int, reverse=True):
         f, fl = ctx['fips'].get(n) or {}, ctx['files'].get(n) or {}
-        out.append({'n': n, 't': (f.get('title') or fl.get('title') or '').replace('`', ''), 's': f.get('status') or fl.get('_status') or ''})
+        authors = fl.get('author') if isinstance(fl.get('author'), str) else ', '.join(fl.get('author') or [])
+        out.append({'n': n, 't': (f.get('title') or fl.get('title') or '').replace('`', ''), 's': f.get('status') or fl.get('_status') or '',
+                    'a': authors or f.get('authors') or ''})
     return json.dumps(out, ensure_ascii=False, separators=(',', ':'))
 
 
@@ -542,7 +568,8 @@ def write_all(ctx):
         with open(os.path.join(OUT_DIR, f'{n}.html'), 'w', encoding='utf-8') as f:
             f.write(fip_page_html(n, ctx, prev_n, next_n))
     for name, content in ((os.path.join(OUT_DIR, 'index.html'), REDIRECT_INDEX), ('fips-index.json', search_index(ctx)),
-                          ('feed.xml', rss(ctx)), ('calendar.ics', calendar(ctx))):
+                          ('feed.xml', rss(ctx)), ('calendar.ics', calendar(ctx)), ('data.json', extras.data_json(ctx))):
         with open(name, 'w', encoding='utf-8', newline='') as f:
             f.write(content)
-    print(f'Generated {len(nums)} FIP pages, fips-index.json, feed.xml, calendar.ics')
+    print(f'Generated {len(nums)} FIP pages, fips-index.json, feed.xml, calendar.ics, data.json')
+    og_cards.write_all(ctx)

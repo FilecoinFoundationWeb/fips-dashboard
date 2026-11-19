@@ -63,6 +63,30 @@ Last Calls with days left, the next Core Devs agenda and latest meeting, a count
 - `feed.xml`: RSS of FIP status changes, Last Calls opening, upgrade activations and Core Devs meetings (last 120 days).
 - `calendar.ics`: Core Devs and implementers' calls, Last Call review deadlines and upgrade dates on mainnet and calibration. Subscribe by URL in Google Calendar, Outlook or Apple Calendar and it refreshes as the site rebuilds.
 
+**Editor checklist** (`editors.html`)
+
+Signals from the records for FIP editors: Last Calls past their review period, FIPs live on mainnet but still Accepted, README/file status mismatches, PRs idle 30+ days, Drafts with no activity for a year, and open FIPs with no discussion link. Prompts, not judgments. Each FIP page also has a "Where it's at" list built the same way, and "The FIP's text mentions" tags (storage providers, clients, smart contract developers, wallets and exchanges, RPC and tooling) found by searching the FIP's own wording; they're labelled as such and aren't an impact assessment.
+
+**Upgrade readiness**
+
+The Upgrades page opens with a "Get ready for NVxx" checklist for the next upgrade (or one that shipped in the last 30 days): dates, epoch, actors version, the client releases (Lotus, Venus, Forest, Curio) named in the core-devs upgrade notes, and what changes. Every upgrade card lists its client releases too.
+
+**Open data and feedback**
+
+- `data.json`: every FIP (status, history, Last Call, upgrade, discussion links, mentions) and every upgrade (dates, FIPs, client releases), for anyone to build on.
+- "Report a data problem" on every page opens a pre-filled GitHub issue.
+- `og/*.png`: link-preview images for every page and FIP, so links shared in Slack, X or Discord show a card. Drawn with Pillow (installed by the workflow); without it pages just don't advertise an image.
+
+**Optional features** (`data/site.json`, all off until filled in)
+
+- `analytics`: privacy-friendly page counts with Plausible (`provider: plausible`, `domain`) or GoatCounter (`provider: goatcounter`, `goatcounter_code`).
+- `giscus`: embed each FIP's GitHub discussion on its page so people can read and reply there (as themselves). Needs the [giscus app](https://github.com/apps/giscus) installed on `filecoin-project/FIPs` by that org, and the `repo_id` / `category_id` from [giscus.app](https://giscus.app).
+- `digest_signup_url`: a sign-up page for the email digest (e.g. a Google Group or Buttondown form), shown in the footer and the This week card.
+
+**Checks**
+
+`check_site.py` builds nothing; it checks the built site: every page present, every internal link and image resolves, the feed and calendar are valid, and the search index and `data.json` agree. The update workflow runs it before publishing, so a broken build never goes live, and `.github/workflows/check.yml` runs the full build and check on every pull request.
+
 **Internal report** (not published)
 - `python3 internal_report.py` writes `internal/fips-internal-report.html`: every in-flight FIP with its full time in status and authors, the complete Last Call history, the consistency check and PRs idle 30+ days. `internal/` is gitignored and the workflow never commits it, so it stays off GitHub Pages. Share the file directly.
 
@@ -78,6 +102,9 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 | `lifecycle_explainers.py` | Explainer sections for the lifecycle page, paraphrasing FIP-0001 and proposing.md |
 | `scope_planning.py` | Upgrade scope planning parsed from the core-devs planning discussions |
 | `fip_pages.py` | Builds `fip/NNNN.html` for every FIP, the This week card, `fips-index.json` (search), `feed.xml` and `calendar.ics` |
+| `extras.py` | Editor checklist, "where it's at", text mentions, upgrade readiness, `data.json`, optional features from `data/site.json` |
+| `og_cards.py` | Link-preview images (optional, needs Pillow) |
+| `check_site.py` | Checks the built site before it's published |
 | `generate_hub.py` | Builds `index.html` (lifecycle), `overview.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |

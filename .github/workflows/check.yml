@@ -1,0 +1,39 @@
+name: Check site
+
+# Builds the whole site from a pull request and runs check_site.py, so a change
+# that breaks a page, a link or a feed shows up on the PR before it's merged.
+# Nothing is committed or published.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install link-preview image support
+        continue-on-error: true
+        run: pip install pillow
+
+      - name: Build the site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FIPS_REPO_DIR: ${{ runner.temp }}/fips-src
+          CORE_DEVS_REPO_DIR: ${{ runner.temp }}/core-devs-src
+        run: |
+          python3 -m py_compile *.py
+          python3 generate_fips_dashboard.py
+          python3 fips_timeline_tracker.py
+          python3 generate_hub.py
+
+      - name: Check pages, links and feeds
+        run: python3 check_site.py

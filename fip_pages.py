@@ -36,6 +36,7 @@ CALLS_SHOWN = 12
 # Short, plain definitions. FIP-0001 is the authority; these are paraphrases.
 GLOSSARY = {
     'FIP': 'Filecoin Improvement Proposal: a written proposal to change the protocol, its standards or the governance process.',
+    'FRC': 'Filecoin Request for Comments: a standard or convention, such as a token standard, API or data format, that tools and apps can follow. FRCs don\'t change the protocol, so they don\'t ship in a network upgrade.',
     'Draft': 'The FIP has a number and is being refined in the open. Anyone can comment.',
     'Last Call': 'A final review window, normally 14 days, before the FIP is Accepted (core) or Final (everything else).',
     'Accepted': 'A core FIP approved for implementation. It ships in a network upgrade, then becomes Final.',
@@ -94,9 +95,9 @@ def _inline_md(text):
     return re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', out)  # relative links: keep the words
 
 
-def fip_summary(repo, num, limit=900):
+def fip_summary(repo, num, limit=900, folder='FIPS'):
     """(html, section name) from the FIP's Simple Summary, else its Abstract."""
-    path = os.path.join(repo or '', 'FIPS', f'fip-{num}.md')
+    path = os.path.join(repo or '', folder, f'{folder[:3].lower()}-{num}.md')
     try:
         with open(path, encoding='utf-8', errors='replace') as f:
             text = f.read()
@@ -162,13 +163,18 @@ def status_path(status, history, core):
         steps.append((status, 'now'))
     items = ''.join(f'<li class="{cls}"><span class="dot" aria-hidden="true"></span>{term(s)}'
                     f'{"<span class=visually-hidden> (current)</span>" if cls == "now" else ""}</li>' for s, cls in steps)
-    return f'<ol class="path" aria-label="Where this FIP is in the process">{items}</ol>'
+    return f'<ol class="path" aria-label="Where it is in the process">{items}</ol>'
 
 
 def fip_page_html(n, ctx, prev_n, next_n):
     fips, files = ctx['fips'], ctx['files']
+    K = ctx.get('kind', 'FIP')           # 'FIP', or 'FRC' for frc_view(ctx)
+    frc = K == 'FRC'
+    ID = f'{K}-{n}'
+    file_url = u.frc_url(n) if frc else u.fip_url(n)
+    folder = 'FRCs' if frc else 'FIPS'
     fip, f = fips.get(n) or {}, files.get(n) or {}
-    title = fip.get('title') or f.get('title') or f'FIP-{n}'
+    title = fip.get('title') or f.get('title') or ID
     status = fip.get('status') or f.get('_status') or 'Draft'
     history = ctx['history'].get(n) or []
     now = datetime.now(timezone.utc)
@@ -178,7 +184,7 @@ def fip_page_html(n, ctx, prev_n, next_n):
     core = _is_core(fip, f)
 
     # Upgrade: shipped, or a candidate in the active planning discussion
-    up_html = '<span class="muted">Not in a network upgrade</span>'
+    up_html = '' if frc else '<span class="muted">Not in a network upgrade</span>'
     for x in ctx['upgrades']:
         if n in x['fips']:
             live = x['mainnet'] and x['mainnet'] <= now
@@ -194,8 +200,12 @@ def fip_page_html(n, ctx, prev_n, next_n):
                 break
 
     # Calls that mentioned it
-    convos = [m for m in ctx['meetings'] if n in m['fips'] and m['date']] + \
-             [c for c in ctx.get('calls') or [] if n in c['fips'] and c['date']]
+    frc_pat = re.compile(rf'(?<![A-Za-z])FRC[\s#-]?0*{int(n)}(?!\d)', re.I) if frc else None
+
+    def mentions(c):
+        return n in c['fips'] or bool(frc_pat and frc_pat.search(c.get('match_text') or ''))
+    convos = [m for m in ctx['meetings'] if m['date'] and mentions(m)] + \
+             [c for c in ctx.get('calls') or [] if c['date'] and mentions(c)]
     convos.sort(key=lambda c: c['date'], reverse=True)
 
     # Call to action
@@ -206,28 +216,28 @@ def fip_page_html(n, ctx, prev_n, next_n):
         if left >= 0:
             when = (f'Review ends <strong>{fmt(lc["end"])}</strong>{est}'
                     + (f', {days_word(left)} left' if left else ', today')
-                    + '. This is the last chance to raise concerns before the FIP moves on.')
+                    + f'. This is the last chance to raise concerns before the {K} moves on.')
         else:
             when = 'Comments are open in the discussion thread.'
         cta = (f'<div class="cta"><span><strong>In {term("Last Call")}.</strong> {when}</span>'
                f'{ext(discuss, "Comment on the discussion ↗", "btn primary")}</div>')
     elif status == 'Draft':
-        cta = (f'<div class="cta info"><span><strong>Open for feedback.</strong> This FIP is a {term("Draft")}: '
+        cta = (f'<div class="cta info"><span><strong>Open for feedback.</strong> This {K} is a {term("Draft")}: '
                'questions and suggestions go in its discussion thread.</span>'
                f'{ext(discuss, "Join the discussion ↗", "btn primary")}</div>')
     else:
         cta = ''
 
     # Summary
-    summary, section = fip_summary(ctx.get('fips_repo'), n)
+    summary, section = fip_summary(ctx.get('fips_repo'), n, folder=folder)
     summary_card = (f'<section class="card"><div class="card-head"><h2>What it proposes</h2>'
-                    f'<span class="hint">From the FIP\'s own {esc(section)}.</span></div><div class="card-body">'
+                    f'<span class="hint">From the {K}\'s own {esc(section)}.</span></div><div class="card-body">'
                     f'<div class="summary-text">{summary}</div>'
-                    f'<div class="btn-row">{ext(u.fip_url(n), "Read the full FIP ↗")}</div></div></section>'
+                    f'<div class="btn-row">{ext(file_url, f"Read the full {K} ↗")}</div></div></section>'
                     if summary else
                     f'<section class="card"><div class="card-head"><h2>What it proposes</h2></div><div class="card-body">'
-                    f'<p class="empty">No summary section found in the FIP file.</p>'
-                    f'<div class="btn-row">{ext(u.fip_url(n), "Read the full FIP ↗")}</div></div></section>')
+                    f'<p class="empty">No summary section found in the {K} file.</p>'
+                    f'<div class="btn-row">{ext(file_url, f"Read the full {K} ↗")}</div></div></section>')
 
     # At a glance
     def listval(v):
@@ -237,7 +247,7 @@ def fip_page_html(n, ctx, prev_n, next_n):
     req_html = ', '.join(u.fip_anchor(m.group(1).zfill(4), base=B) if (m := re.search(r'(\d+)', r)) else esc(r)
                          for r in requires)
     rows = [
-        ('Status', badge(status) + (f' <span class="muted small">(listed in the FIPs README; the FIP file itself says {esc(f["_status"])})</span>'
+        ('Status', badge(status) + (f' <span class="muted small">(listed in the FIPs README; the {K} file itself says {esc(f["_status"])})</span>'
                                      if f.get('_status') and f['_status'] != status else '')),
         ('Type', esc(' · '.join(x for x in (listval(f.get('type')) or fip.get('type', ''), listval(f.get('category'))) if x)) or '—'),
         ('Authors', esc(listval(f.get('author')) or fip.get('authors', '')) or '—'),
@@ -248,10 +258,10 @@ def fip_page_html(n, ctx, prev_n, next_n):
                                   for i, d in enumerate(discussions)) or '<span class="muted">None listed</span>'),
     ]
     facts = ''.join(f'<dt>{k}</dt><dd>{v}</dd>' for k, v in rows if v)
-    groups = extras.affected(ctx.get('fips_repo'), n)
-    groups_html = (f'<div class="mentions"><h3 class="sub-h">The FIP\'s text mentions</h3><div class="chips">'
+    groups = extras.affected(ctx.get('fips_repo'), n, folder)
+    groups_html = (f'<div class="mentions"><h3 class="sub-h">The {K}\'s text mentions</h3><div class="chips">'
                    + ''.join(f'<span class="chip static">{esc(g)}</span>' for g in groups) +
-                   '</div><p class="note" style="margin-top:6px">Found by searching the FIP\'s own wording. Not an official impact assessment; read the FIP.</p></div>'
+                   f'</div><p class="note" style="margin-top:6px">Found by searching the {K}\'s own wording. Not an official impact assessment; read the {K}.</p></div>'
                    if groups else '')
     glance = (f'<section class="card"><div class="card-head"><h2>At a glance</h2></div><div class="card-body">'
               f'{status_path(status, history, core)}<dl class="facts">{facts}</dl>{groups_html}</div></section>')
@@ -271,7 +281,7 @@ def fip_page_html(n, ctx, prev_n, next_n):
                        for w in past if w.get('exit'))
     hist_card = (f'<section class="card"><div class="card-head"><h2>Status history</h2>'
                  '<span class="hint">From the FIPs README. Dates are when the table changed, which can lag the decision by a few days.</span></div>'
-                 f'<div class="card-body">{"<ol class=history>" + "".join(reversed(hist)) + "</ol>" if hist else "<p class=empty>No README history.</p>"}'
+                 f'<div class="card-body">{"<ol class=history>" + "".join(reversed(hist)) + "</ol>" if hist else "<p class=empty>Not listed in the FIPs README table yet.</p>"}'
                  f'{"<ul class=topics style=margin-top:12px>" + lc_notes + "</ul>" if lc_notes else ""}</div></section>')
 
     # Calls
@@ -289,7 +299,7 @@ def fip_page_html(n, ctx, prev_n, next_n):
         items.append(f'<li><time>{fmt(c["date"])}</time><span class="kind {kind}">{label}</span><span>{link}{rec}</span></li>')
     more = f'<p class="note">Showing the latest {CALLS_SHOWN} of {len(convos)}.</p>' if len(convos) > CALLS_SHOWN else ''
     calls_card = (f'<section class="card"><div class="card-head"><h2>Discussed in calls ({len(convos)})</h2>'
-                  f'<span class="hint">{term("Core Devs")} meetings and implementers\' calls whose notes mention FIP-{n}. A mention means it was discussed, not decided.</span></div>'
+                  f'<span class="hint">{term("Core Devs")} meetings and implementers\' calls whose notes mention {ID}. A mention means it was discussed, not decided.</span></div>'
                   f'<div class="card-body">{"<ul class=convo-list>" + "".join(items) + "</ul>" + more if items else "<p class=empty>Not mentioned in any call notes yet.</p>"}'
                   '</div></section>')
 
@@ -308,13 +318,13 @@ def fip_page_html(n, ctx, prev_n, next_n):
                            f'<span class="pr-meta">@{esc(p["author"])} · {"draft · " if p["draft"] else ""}'
                            f'updated {esc(p["updated_at"][:10])}</span></div>' for p in prs)
         pr_card = (f'<section class="card"><div class="card-head"><h2>Open pull requests ({len(prs)})</h2>'
-                   '<span class="hint">Proposed edits to this FIP waiting on review.</span></div>'
+                   f'<span class="hint">Proposed edits to this {K} waiting on review.</span></div>'
                    f'<div class="card-body">{pr_items}</div></section>')
 
     # Take part
     involve = (f'<section class="card"><div class="card-head"><h2>Take part</h2></div><div class="card-body">'
                '<div class="links-grid">'
-               f'<a class="link-card" href="{esc(discuss)}" target="_blank" rel="noopener"><strong>Comment on FIP-{n} ↗</strong><span>Questions and feedback go in the discussion thread on GitHub.</span></a>'
+               f'<a class="link-card" href="{esc(discuss)}" target="_blank" rel="noopener"><strong>Comment on {ID} ↗</strong><span>Questions and feedback go in the discussion thread on GitHub.</span></a>'
                f'<a class="link-card" href="https://github.com/filecoin-project/core-devs/issues" target="_blank" rel="noopener"><strong>Raise it at Core Devs ↗</strong><span>Add a topic to the next meeting\'s agenda issue.</span></a>'
                f'<a class="link-card" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener"><strong>How the process works ↗</strong><span>FIP-0001 sets out every stage and who decides.</span></a>'
                '</div>'
@@ -326,24 +336,28 @@ def fip_page_html(n, ctx, prev_n, next_n):
         if not num:
             return '<span></span>'
         t = (fips.get(num) or files.get(num) or {}).get('title', '')
-        return f'<a class="{cls}" href="{num}.html"><span>{label}</span>FIP-{num} {esc(short(t, 60))}</a>'
-    prevnext = f'<nav class="prev-next" aria-label="Other FIPs">{pn(prev_n, "prev", "← Previous")}{pn(next_n, "next", "Next →")}</nav>'
+        return f'<a class="{cls}" href="{num}.html"><span>{label}</span>{K}-{num} {esc(short(t, 60))}</a>'
+    prevnext = f'<nav class="prev-next" aria-label="Other {K}s">{pn(prev_n, "prev", "← Previous")}{pn(next_n, "next", "Next →")}</nav>'
 
-    report = extras.report_url(f'FIP-{n}', f'{u.SITE_URL}fip/{n}.html')
-    crumbs = (f'<div class="crumbs"><span><a href="{B}fips-dashboard-static.html#by-status">← All FIPs</a> · '
+    path = f'{"frc" if frc else "fip"}/{n}.html'
+    report = extras.report_url(ID, f'{u.SITE_URL}{path}')
+    all_href = 'frcs.html' if frc else 'fips-dashboard-static.html#by-status'
+    crumbs = (f'<div class="crumbs"><span><a href="{B}{all_href}">← All {K}s</a> · '
               f'<a href="{B}">How FIPs move</a></span><span>{ext(report, "Report a data problem", "")} · '
-              f'{ext(u.fip_url(n), "View on GitHub ↗", "")}</span></div>')
+              f'{ext(file_url, "View on GitHub ↗", "")}</span></div>')
 
     body = '\n'.join(x for x in [
         crumbs, cta,
         f'<div class="grid-2"><div>{summary_card}{calls_card}</div><div>{glance}{hist_card}</div></div>',
         disc_card, pr_card, involve, prevnext,
     ] if x)
-    sub = f'{esc(listval(f.get("type")) or fip.get("type") or "FIP")} · {badge(status)}'
+    sub = f'{esc(listval(f.get("type")) or fip.get("type") or K)} · {badge(status)}'
+    what = 'Status history, Last Call window and the calls that discussed it.' if frc else \
+        'Status history, Last Call window, network upgrade and the calls that discussed it.'
     return page(
-        title=f'FIP-{n}: {title}',
-        description=f'FIP-{n} ({status}): {title}. Status history, Last Call window, network upgrade and the calls that discussed it.',
-        current='dashboard', subtitle=sub, body_html=body, base=B, path=f'fip/{n}.html',
+        title=f'{ID}: {title}',
+        description=f'{ID} ({status}): {title}. {what}',
+        current='frcs' if frc else 'dashboard', subtitle=sub, body_html=body, base=B, path=path,
         og_image=f'og/{n}.png' if og_cards.available() else None,
     )
 
@@ -437,11 +451,13 @@ def search_index(ctx):
         out.append({'n': n, 't': (f.get('title') or fl.get('title') or '').replace('`', ''), 's': f.get('status') or fl.get('_status') or '',
                     'a': authors or f.get('authors') or ''})
     # Proposals that are still an open PR: searchable, linking to the PR
-    known = set(ctx['fips']) | set(ctx['files'])
+    known = set(ctx['fips']) | set(ctx['files']) | set(ctx.get('frcs') or ()) | set(ctx.get('frc_files') or ())
     for n, prs in sorted((ctx.get('prs_by_fip') or {}).items()):
         if n != 'General' and n.isdigit() and n not in known and prs:
             title = re.sub(r'^\s*(add\s+)?FIP[-\s]?0*\d+\s*[:\-–]?\s*', '', prs[0]['title'], flags=re.I) or prs[0]['title']
             out.append({'n': n, 't': title, 's': 'Proposed (open PR)', 'a': prs[0].get('author', ''), 'u': prs[0]['url']})
+    import frc_pages  # FRCs share the search box; imported here to avoid a cycle
+    out += frc_pages.search_entries(ctx)
     return json.dumps(out, ensure_ascii=False, separators=(',', ':'))
 
 

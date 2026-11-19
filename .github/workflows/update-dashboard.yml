@@ -13,6 +13,8 @@ on:
       - 'fips-index.json'
       - 'feed.xml'
       - 'calendar.ics'
+      - 'data.json'
+      - 'og/**'
 
 jobs:
   update:
@@ -30,6 +32,14 @@ jobs:
         with:
           python-version: '3.x'
       
+      - name: Install link-preview image support
+        # Optional: Pillow draws og/*.png. If this step fails the site still builds without images.
+        continue-on-error: true
+        run: |
+          pip install pillow
+          curl -sSfL -o "$RUNNER_TEMP/Archivo.ttf" "https://github.com/google/fonts/raw/main/ofl/archivo/Archivo%5Bwdth%2Cwght%5D.ttf"
+          echo "ARCHIVO_FONT=$RUNNER_TEMP/Archivo.ttf" >> "$GITHUB_ENV"
+
       - name: Generate Dashboard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,6 +54,10 @@ jobs:
           python3 generate_fips_dashboard.py
           python3 fips_timeline_tracker.py
           python3 generate_hub.py
+
+      - name: Check the site before publishing
+        # Stops a broken build (missing pages, broken links, bad feeds) from going live.
+        run: python3 check_site.py
       
       - name: Commit and Push changes
         run: |
@@ -52,7 +66,8 @@ jobs:
           git add index.html overview.html fips-dashboard-static.html fips-timeline-tracker.html core-devs.html implementers.html fip-lifecycle.html network-upgrades.html
           # Per-FIP pages (-A also stages pages removed for FIPs no longer listed), search index and feeds
           git add -A fip
-          git add fips-index.json feed.xml calendar.ics
+          git add fips-index.json feed.xml calendar.ics editors.html data.json
+          if [ -d og ]; then git add -A og; fi
           if ! git diff --staged --quiet; then
             git commit -m "Auto-update dashboard $(date +'%Y-%m-%d %H:%M:%S')"
             git push

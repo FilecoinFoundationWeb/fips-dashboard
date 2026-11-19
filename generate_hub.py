@@ -6,7 +6,6 @@
   fip-lifecycle.html     Redirect to the home page, for old links
   core-devs.html         Core Devs meetings, recordings, FIPs on the agenda
   network-upgrades.html  Network upgrades and the FIPs they shipped
-  editors.html           Checklist for FIP editors (see extras.py)
   fip/NNNN.html          One page per FIP, plus fips-index.json, feed.xml and
                          calendar.ics (see fip_pages.py)
 
@@ -205,9 +204,10 @@ def overview(ctx):
     items = []
     for w in open_lc:
         left = (w['end'] - now).days
+        when = (f'Review ends {fmt_date(w["end"])}{" (est.)" if w["estimated_end"] else ""}{f", {left} days left" if left > 0 else ""}'
+                if w['end'] > now else 'Comments are open')
         items.append(f'<li><span class="kind fip">Last Call</span> {fip_link(w["number"])} {esc(w["title"])}. '
-                     f'Review ends {fmt_date(w["end"])}{" (est.)" if w["estimated_end"] else ""}'
-                     f'{f", {left} days left" if left > 0 else ""}. {discussion_link_inline(w["discussions"])}</li>')
+                     f'{when}. {discussion_link_inline(w["discussions"])}</li>')
     for a in (ctx['agenda'] or [])[:2]:
         items.append(f'<li><span class="kind meeting">Agenda</span> <a href="{esc(a["url"])}" target="_blank" rel="noopener">{esc(a["title"])}</a>. '
                      f'Add topics for the next Core Devs meeting.</li>')
@@ -662,10 +662,6 @@ def lifecycle_page(ctx):
             '</div></section>')
 
     # Board: where the open FIPs are now
-    def since(n):
-        d = u.current_status_since(history, n, fips[n]['status'])
-        return d, (now - d).days if d else None
-
     def where_discussed(n):
         bits = []
         if n in md:
@@ -676,21 +672,19 @@ def lifecycle_page(ctx):
         return ' · '.join(bits)
 
     def item(n, extra=''):
-        d, days = since(n)
-        age = f'{u.humanize_days(days)} in stage' if days is not None else ''
         disc = where_discussed(n)
         return (f'<li><div>{fip_a(n)} <span class="item-title">{esc(fips[n]["title"])}</span></div>'
-                f'<div class="muted small">{" · ".join(x for x in (age, extra) if x)}</div>'
+                f'{f"<div class=muted small>{extra}</div>" if extra else ""}'
                 f'{f"<div class=muted small>Last discussed: {esc(disc)}</div>" if disc else ""}</li>')
 
     def accepted_note(n):
         if n in shipped:
             x = shipped[n]
-            return f'Shipped in NV{x["number"]} {esc(x["name"])}; awaiting Final'
+            return f'Shipped in NV{x["number"]} {esc(x["name"])}'
         if n in candidates:
             r = candidates[n]
             return f'NV{plan["nv"]} candidate ({READY_SHORT[r["readiness"]].lower()})'
-        return 'Not in an upgrade yet'
+        return ''
 
     def draft_note(n):
         if n in candidates:
@@ -701,30 +695,19 @@ def lifecycle_page(ctx):
     lc_end = {w['number']: w for w in ctx['open_lc']}
     cols = [
         ('Draft', 'draft', lambda n: draft_note(n)),
-        ('Last Call', 'lastcall', lambda n: (f'Review ends {fmt_date(lc_end[n]["end"], False)}' + (' (est.)' if lc_end[n]['estimated_end'] else '')) if n in lc_end else ''),
+        ('Last Call', 'lastcall', lambda n: ((f'Review ends {fmt_date(lc_end[n]["end"], False)}' + (' (est.)' if lc_end[n]['estimated_end'] else ''))
+                                             if n in lc_end and lc_end[n]['end'] > now else 'Open for comments')),
         ('Accepted', 'accepted', accepted_note),
     ]
     col_html = []
     for key, cls, note in cols:
-        nums = sorted(by_status.get(key, []), key=lambda n: since(n)[0] or now)
+        nums = sorted(by_status.get(key, []), key=int, reverse=True)
         lis = ''.join(item(n, note(n)) for n in nums) or '<li class="muted small">None right now.</li>'
         col_html.append(f'<div class="board-col {cls}" id="stage-{key.lower().replace(" ", "-")}"><h3>{key} <span class="muted">{len(nums)}</span></h3><ul>{lis}</ul></div>')
     board = (f'<section class="card"><div class="card-head"><h2>Where open FIPs are now</h2>'
-             '<span class="hint">Every FIP in Draft, Last Call or Accepted, longest in stage first.</span></div>'
+             '<span class="hint">Every FIP in Draft, Last Call or Accepted, newest first.</span></div>'
              f'<div class="card-body"><div class="board">{"".join(col_html)}</div>'
-             f'<p class="note">Time in stage is measured from when the FIPs README showed the change, which can lag the decision by a few days.'
-             f'{" Upgrade candidates come from the NV" + str(plan["nv"]) + " planning discussion." if plan else ""}</p></div></section>')
-
-    # Shipped but still Accepted: a nudge for editors
-    waiting_final = [n for n in by_status.get('Accepted', []) if n in shipped and shipped[n]['mainnet'] and shipped[n]['mainnet'] <= now]
-    nudge = ''
-    if waiting_final:
-        rows = ''.join(f'<tr><td>{fip_a(n)}</td><td class="title-cell">{esc(fips[n]["title"])}</td>'
-                       f'<td class="nowrap">NV{shipped[n]["number"]} · {fmt_date(shipped[n]["mainnet"])}</td></tr>' for n in waiting_final)
-        nudge = (f'<section class="card"><div class="card-head"><h2>Live on mainnet, still Accepted ({len(waiting_final)})</h2>'
-                 '<span class="hint">Shipped in an activated upgrade but not yet marked Final. Flagged for editors; it may be intentional.</span></div>'
-                 f'<div class="card-body"><div class="table-scroll"><table class="data"><thead><tr><th>FIP</th><th>Title</th><th>Shipped</th></tr></thead>'
-                 f'<tbody>{rows}</tbody></table></div></div></section>')
+             f'{"<p class=note>Upgrade candidates come from the NV" + str(plan["nv"]) + " planning discussion.</p>" if plan else ""}</div></section>')
 
     # Stage guide
     guide_rows = []
@@ -753,7 +736,7 @@ def lifecycle_page(ctx):
               ) if trows else ''
 
     repo = ctx['fips_repo']
-    body = '\n'.join([fip_pages.this_week_card(ctx), lx.intro(repo, fips), flow, board, nudge, lx.steps_card(),
+    body = '\n'.join([fip_pages.this_week_card(ctx), lx.intro(repo, fips), flow, board, lx.steps_card(),
                       lx.types_card(repo, files), lx.contents_card(), timing, guide])
     return page(
         title='FIP Lifecycle',
@@ -867,8 +850,8 @@ def upgrades_page(ctx):
     md = cd.last_discussed(ctx['meetings'])
     waiting_rows = ''.join(f'''<tr><td>{fip_link(n)}</td><td class="title-cell">{esc(fips[n]["title"])}</td>
 <td class="nowrap">{f'<a href="{esc(md[n]["notes_url"] or "#")}" target="_blank" rel="noopener">Core Devs #{md[n]["number"]}</a> · {fmt_date(md[n]["date"])}' if n in md else '<span class="muted">—</span>'}</td></tr>''' for n in waiting)
-    waiting_card = f'''<section class="card"><div class="card-head"><h2>Accepted, not yet in an upgrade</h2>
-<span class="hint">Accepted FIPs that aren't listed in any network upgrade so far.</span></div>
+    waiting_card = f'''<section class="card"><div class="card-head"><h2>Accepted, awaiting a network upgrade</h2>
+<span class="hint">Accepted FIPs not yet listed in a network upgrade. Which upgrade a FIP ships in is set in upgrade planning with the implementers.</span></div>
 <div class="card-body">{f"""<div class="table-scroll"><table class="data"><thead><tr><th>FIP</th><th>Title</th><th>Last discussed</th></tr></thead><tbody>{waiting_rows}</tbody></table></div>""" if waiting_rows else '<p class="empty">Every Accepted FIP is in a network upgrade.</p>'}</div></section>'''
 
     body = '\n'.join([
@@ -938,8 +921,7 @@ def main():
     for name, fn in (('index.html', lifecycle_page), ('overview.html', overview),
                      ('fip-lifecycle.html', lambda _ctx: REDIRECT_HOME), ('core-devs.html', core_devs_page),
                      ('implementers.html', implementers_page),
-                     ('network-upgrades.html', upgrades_page),
-                     ('editors.html', lambda c: extras.editors_page(c, page, fip_a, fmt_date))):
+                     ('network-upgrades.html', upgrades_page)):
         with open(name, 'w', encoding='utf-8') as f:
             f.write(fn(ctx))
         print(f'Generated {name}')

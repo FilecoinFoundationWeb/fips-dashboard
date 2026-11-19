@@ -7,6 +7,7 @@ Dark #091B2A) and Filecoin Foundation's Archivo typeface. Swap the tokens in
 """
 
 from datetime import datetime, timezone
+from urllib.parse import quote
 from fip_utils import html_escape
 
 FONT_LINK = (
@@ -558,6 +559,18 @@ FILECOIN_LOGO = '''<svg aria-hidden="true" focusable="false" class="brand-mark" 
 </svg>'''
 
 
+# Favicon: the circle and glyph of the Filecoin mark above, without the mask/filter scaffolding.
+_GLYPH_START = FILECOIN_LOGO.index('<path class="st1-logo" d="M21.9')
+_GLYPH = FILECOIN_LOGO[_GLYPH_START:FILECOIN_LOGO.index('/>', _GLYPH_START) + 2]
+FAVICON_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">'
+    '<circle cx="20" cy="20" r="20" fill="#0090ff"/>'
+    + _GLYPH.replace('class="st1-logo"', 'fill="#fff" fill-rule="evenodd"')
+    + '</svg>'
+)
+FAVICON_LINK = f'<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,{quote(FAVICON_SVG)}">'
+
+
 NAV = [
     ('lifecycle', 'Lifecycle', './'),
     ('overview', 'Overview', 'overview.html'),
@@ -590,6 +603,12 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
 <meta name="generated-at" content="{generated_at.strftime('%Y-%m-%dT%H:%M:%SZ')}">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>{html_escape(title)}</title>
+{FAVICON_LINK}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Filecoin Governance Hub">
+<meta property="og:title" content="{html_escape(title)}">
+<meta property="og:description" content="{html_escape(description)}">
+<meta name="twitter:card" content="summary">
 {FRESHNESS_JS}
 {FONT_LINK}
 <style>{CSS}</style>

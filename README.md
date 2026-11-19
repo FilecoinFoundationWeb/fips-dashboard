@@ -46,6 +46,23 @@ One place to keep up with Filecoin governance. It pulls the public records in [f
 - Every status change in the README, dated by commit and linked to it, back to December 2020.
 - A count of transitions (e.g. Draft → Last Call) over the last 24 months.
 
+**FIP pages** (`fip/0119.html`)
+
+One page per FIP, linked from every FIP number on the site and reachable from the search box in the header (type a number or words from the title; press `/` to jump to it).
+- What it proposes: the FIP's own Simple Summary (or Abstract), with a link to the full text.
+- At a glance: where it is on the Draft → Last Call → Accepted → Final path, time in stage, type, authors, the network upgrade it shipped in or is a planning candidate for, the FIPs it requires and its discussion thread.
+- A Last Call or Draft banner with the review deadline and a button to comment, while input still counts.
+- Status history from the README, with commits and past Last Call windows; every Core Devs meeting and implementers' call whose notes mention it; open PRs; ways to take part, a short glossary, and previous / next FIP.
+
+**This week** (top of the home page)
+
+Last Calls with days left, the next Core Devs agenda and latest meeting, a countdown to the next network upgrade (or the one in planning), and status changes in the last 7 days.
+
+**Follow along without visiting**
+
+- `feed.xml`: RSS of FIP status changes, Last Calls opening, upgrade activations and Core Devs meetings (last 120 days).
+- `calendar.ics`: Core Devs and implementers' calls, Last Call review deadlines and upgrade dates on mainnet and calibration. Subscribe by URL in Google Calendar, Outlook or Apple Calendar and it refreshes as the site rebuilds.
+
 **Internal report** (not published)
 - `python3 internal_report.py` writes `internal/fips-internal-report.html`: every in-flight FIP with its full time in status and authors, the complete Last Call history, the consistency check and PRs idle 30+ days. `internal/` is gitignored and the workflow never commits it, so it stays off GitHub Pages. Share the file directly.
 
@@ -60,6 +77,7 @@ The scripts clone `filecoin-project/FIPs` (about 25 MB) and `filecoin-project/co
 | `implementers.py` | Implementers' calls from the public Notion meetings database (API token or CSV export as fallbacks) |
 | `lifecycle_explainers.py` | Explainer sections for the lifecycle page, paraphrasing FIP-0001 and proposing.md |
 | `scope_planning.py` | Upgrade scope planning parsed from the core-devs planning discussions |
+| `fip_pages.py` | Builds `fip/NNNN.html` for every FIP, the This week card, `fips-index.json` (search), `feed.xml` and `calendar.ics` |
 | `generate_hub.py` | Builds `index.html` (lifecycle), `overview.html`, `core-devs.html`, `implementers.html` and `network-upgrades.html` |
 | `theme.py` | Shared page shell: navigation, Filecoin colors, Archivo font, light/dark mode, the corgi |
 | `generate_fips_dashboard.py` | Builds `fips-dashboard-static.html` |

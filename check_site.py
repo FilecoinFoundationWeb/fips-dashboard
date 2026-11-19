@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 
 PAGES = ['index.html', 'overview.html', 'fips-dashboard-static.html', 'fips-timeline-tracker.html',
-         'core-devs.html', 'implementers.html', 'network-upgrades.html', 'editors.html']
+         'core-devs.html', 'implementers.html', 'network-upgrades.html']
 MIN_FIP_PAGES = 50
 
 
@@ -86,7 +86,7 @@ def check():
 
     try:
         with open('fips-index.json', encoding='utf-8') as f:
-            index = {x['n'] for x in json.load(f)}
+            index = {x['n'] for x in json.load(f) if not x.get('u')}  # 'u': open-PR proposals, no page
         with open('data.json', encoding='utf-8') as f:
             data = {x['number'] for x in json.load(f)['fips']}
         if index != data:

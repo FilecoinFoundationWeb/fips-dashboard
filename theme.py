@@ -8,7 +8,9 @@ Dark #091B2A) and Filecoin Foundation's Archivo typeface. Swap the tokens in
 
 from datetime import datetime, timezone
 from urllib.parse import quote
-from fip_utils import html_escape
+from fip_utils import html_escape, SITE_URL
+import extras
+import og_cards
 
 FONT_LINK = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
@@ -476,6 +478,11 @@ abbr.term { text-decoration: underline dotted var(--muted); text-underline-offse
 .week-col .big { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
 .days-left { display: inline-block; font-size: .74rem; font-weight: 700; padding: 1px 7px; border-radius: 6px; background: var(--lastcall-bg); color: var(--lastcall-fg); white-space: nowrap; }
 .days-left.soon { background: var(--rejected-bg); color: var(--rejected-fg); }
+.where-at, .mentions { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.where-at ul { padding-left: 18px; display: grid; gap: 4px; font-size: .92rem; }
+.chip.static { cursor: default; font-weight: 600; }
+.chip.static:hover { border-color: var(--border); color: var(--text); }
+.giscus-wrap { min-height: 120px; }
 
 @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; gap: 0; } }
 @media (max-width: 640px) {
@@ -644,10 +651,10 @@ FAVICON_LINK = f'<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
 
 
 def search_box(base=''):
-    """FIP search in the header: type a number or words from a title."""
+    """FIP search in the header: a number, words from a title, or an author."""
     return (f'<div class="fip-search" data-base="{base}" role="search">'
             '<label class="visually-hidden" for="fip-search-input">Find a FIP</label>'
-            '<input id="fip-search-input" type="search" placeholder="Find a FIP: number or title" autocomplete="off" '
+            '<input id="fip-search-input" type="search" placeholder="Find a FIP: number, title or author" autocomplete="off" '
             'aria-controls="fip-search-results" aria-expanded="false">'
             '<ul id="fip-search-results" class="fip-search-results" role="listbox" hidden></ul></div>')
 
@@ -673,7 +680,7 @@ SEARCH_JS = """
     var words = q.split(/\\s+/).filter(Boolean);
     var hits = index.filter(function (f) {
       if (/^\\d+$/.test(num) && (f.n === num.padStart(4, '0') || f.n.indexOf(num) === 0 || String(+f.n) === num)) return true;
-      var t = f.t.toLowerCase();
+      var t = (f.t + ' ' + (f.a || '')).toLowerCase();
       return words.every(function (w) { return t.indexOf(w) !== -1; });
     }).slice(0, 8);
     list.innerHTML = hits.length ? hits.map(function (f) {
@@ -712,15 +719,25 @@ NAV = [
     ('implementers', 'Implementers', 'implementers.html'),
     ('upgrades', 'Upgrades', 'network-upgrades.html'),
     ('timeline', 'Timeline', 'fips-timeline-tracker.html'),
+    ('editors', 'Editors', 'editors.html'),
 ]
 
 
-def page(title, description, current, subtitle, body_html, generated_at=None, base=''):
+def page(title, description, current, subtitle, body_html, generated_at=None, base='', og_image=None, path=''):
     """Wrap page content in the shared FF-themed shell with the corgi header.
 
     `base` is the path back to the site root ('../' for pages in fip/), so the
-    nav, search and feed links work from any folder.
+    nav, search and feed links work from any folder. `og_image` is a
+    link-preview image relative to the site root (default og/site.png, when
+    Pillow is available to draw it); `path` is the page's own path, for links.
     """
+    image = og_image or ('og/site.png' if og_cards.available() else '')
+    og_tags = (f'<meta property="og:image" content="{SITE_URL}{image}">\n'
+               f'<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">\n'
+               '<meta name="twitter:card" content="summary_large_image">'
+               if image else '<meta name="twitter:card" content="summary">')
+    report = extras.report_url(title, SITE_URL + path)
+    signup = extras.digest_signup_url()
     generated_at = generated_at or datetime.now(timezone.utc)
     stamp = generated_at.strftime('%Y-%m-%d %H:%M UTC')
 
@@ -746,7 +763,8 @@ def page(title, description, current, subtitle, body_html, generated_at=None, ba
 <meta property="og:site_name" content="Filecoin Governance Hub">
 <meta property="og:title" content="{html_escape(title)}">
 <meta property="og:description" content="{html_escape(description)}">
-<meta name="twitter:card" content="summary">
+{og_tags}
+{extras.analytics_snippet()}
 <link rel="alternate" type="application/rss+xml" title="Filecoin governance updates" href="{base}feed.xml">
 {FRESHNESS_JS}
 {FONT_LINK}
@@ -780,6 +798,7 @@ def page(title, description, current, subtitle, body_html, generated_at=None, ba
   <div class="wrap">
     <p>Read-only view of public governance records in <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a> and <a href="https://github.com/filecoin-project/core-devs" target="_blank" rel="noopener">filecoin-project/core-devs</a>. Nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors, Core Devs and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
     <p>Follow along: <a href="{base}feed.xml">RSS feed</a> of status changes, Last Calls and upgrades · <a href="{base}calendar.ics">calendar</a> of meetings, review deadlines and upgrade dates (subscribe in Google Calendar, Outlook or Apple Calendar).</p>
+    <p>Spotted something wrong? <a href="{html_escape(report)}" target="_blank" rel="noopener">Report a data problem</a>{f' · <a href="{html_escape(signup)}" target="_blank" rel="noopener">Get the twice-weekly email digest</a>' if signup else ''} · <a href="{base}data.json">Download the data (JSON)</a> · <a href="{base}editors.html">Editor checklist</a></p>
     <p>Generated {stamp}. Unofficial community tool.</p>
   </div>
 </footer>

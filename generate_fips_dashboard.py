@@ -83,7 +83,7 @@ def stats_html(fips, open_lc, prs, prs_loaded=True, plans=None, flags=None):
     for f in fips.values():
         counts[f['status']] += 1
     cards = [
-        ('Total FIPs', len(fips), False),
+        ('FIPs in the repo', len(fips), False),
         ('In Last Call', len(open_lc), bool(open_lc)),
         ('Draft', counts['Draft'], False),
         ('Accepted', counts['Accepted'], False),
@@ -92,7 +92,7 @@ def stats_html(fips, open_lc, prs, prs_loaded=True, plans=None, flags=None):
     ]
     for p in plans or []:
         n = sum(1 for v in (flags or {}).values() if any(f['nv'] == p['nv'] for f in v))
-        cards.append((f'Active upgrade planning · NV{p["nv"]}',
+        cards.append((f'FIPs in NV{p["nv"]} planning',
                       f'<a href="network-upgrades.html#plan-nv{p["nv"]}">{n}</a>', bool(n)))
     return '<section class="stats">' + ''.join(
         f'<div class="stat{" accent" if accent else ""}"><div class="label">{esc(label)}</div>'
@@ -107,7 +107,7 @@ def last_call_html(open_lc, past_lc, flags=None):
         rows = []
         for w in open_lc:
             left = (w['end'] - now).days
-            left_txt = f'{left} days left' if left > 0 else ('ends today' if left == 0 else f'ended {-left} days ago')
+            left_txt = f'{left} days left' if left > 0 else ('ends today' if left == 0 else 'open for comments')
             est = ' <span class="pill est" title="No review-period-end set; FIP-0001 default of 14 days">est.</span>' if w['estimated_end'] else ''
             rows.append(f'''<tr>
 <td>{fip_link(w["number"])}</td><td class="title-cell">{esc(w["title"])}{plan_flags(w["number"], flags)}</td>
@@ -124,12 +124,12 @@ def last_call_html(open_lc, past_lc, flags=None):
     past_rows = ''.join(f'''<tr>
 <td>{fip_link(w["number"])}</td><td class="title-cell">{esc(w["title"])}</td>
 <td class="nowrap">{date_str(w["start"])}</td><td class="nowrap">{date_str(w["exit"])}</td>
-<td class="num">{w["days"]}</td><td>{badge(w["outcome"])}</td></tr>''' for w in past_lc[:10])
+<td>{badge(w["outcome"])}</td></tr>''' for w in past_lc[:10])
     past = ''
     if past_lc:
         past = f'''<details class="more"><summary>Recent Last Calls ({min(10, len(past_lc))} of {len(past_lc)})</summary>
 <div class="table-scroll" style="margin-top:10px"><table class="data">
-<thead><tr><th>FIP</th><th>Title</th><th>Entered</th><th>Left</th><th class="num">Days</th><th>Moved to</th></tr></thead>
+<thead><tr><th>FIP</th><th>Title</th><th>Entered</th><th>Left</th><th>Moved to</th></tr></thead>
 <tbody>{past_rows}</tbody></table></div></details>'''
 
     return f'''<section class="card" id="last-call">
@@ -166,23 +166,19 @@ def in_flight_html(fips, history, files, prs_grouped, discussed=None, flags=None
         rows.append((days if days is not None else 10**6, f'''<tr>
 <td>{fip_link(num)}</td><td class="title-cell">{esc(f["title"])}{plan_flags(num, flags)}</td>
 <td>{badge(f["status"])}</td>
-<td class="nowrap">{date_str(since)}</td><td>{age_cell(days)}</td>
+<td class="nowrap">{date_str(since)}</td>
 <td>{discussion_links(meta.get("_discussions", []))}</td>
 <td class="nowrap">{cd_cell}</td>
 <td class="num">{f'<a href="#pr-{num}">{pr_count}</a>' if pr_count else '0'}</td></tr>'''))
-    rows.sort(key=lambda r: r[0])
+    rows.sort(key=lambda r: r[0])  # most recent change first
     body = (f'''<div class="table-scroll"><table class="data">
-<thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Time in status</th><th>Discussion</th><th>Last at Core Devs</th><th class="num">Open PRs</th></tr></thead>
+<thead><tr><th>FIP</th><th>Title</th><th>Status</th><th>Since</th><th>Discussion</th><th>Last at Core Devs</th><th class="num">Open PRs</th></tr></thead>
 <tbody>{"".join(r[1] for r in rows)}</tbody></table></div>''' if rows
             else '<p class="empty">No FIPs have changed status in the last year.</p>')
-    if older:
-        body += (f'<p class="note">* {older} other in-flight FIP{"s have" if older != 1 else " has"} '
-                 'been in the same status for more than a year and '
-                 f'{"are" if older != 1 else "is"} not listed here. '
-                 'See <a href="#by-status">All FIPs by status</a>.</p>')
+    body += '<p class="note">Every FIP, whatever its status, is listed under <a href="#by-status">All FIPs by status</a>.</p>'
     return f'''<section class="card" id="in-flight">
 <div class="card-head"><h2>In flight</h2>
-<span class="hint">Draft, Last Call, Accepted and Deferred FIPs that changed status in the last year, plus any FIP in the active upgrade planning, most recent first.*</span></div>
+<span class="hint">Draft, Last Call, Accepted and Deferred FIPs with a status change in the last year, plus any FIP in the active upgrade planning, most recent first.</span></div>
 <div class="card-body">{body}</div></section>'''
 
 
@@ -198,7 +194,7 @@ def mismatch_html(mismatches):
         body = f'''<div class="table-scroll"><table class="data">
 <thead><tr><th>FIP</th><th>Title</th><th>README says</th><th>FIP file says</th><th>Note</th></tr></thead>
 <tbody>{rows}</tbody></table></div>
-<p class="note">Flagged for FIP editors to look at. The dashboard doesn't decide which one is right.</p>'''
+<p class="note">For FIP editors. The report doesn't decide which one is right.</p>'''
     return f'''<section class="card" id="consistency">
 <div class="card-head"><h2>Consistency check</h2>
 <span class="hint">Compares the README table with the <code>status:</code> line in each FIP's own file.</span></div>
@@ -220,8 +216,15 @@ def by_status_html(fips, prs_grouped, flags=None):
                          + (plan_flags(num, flags, compact=True) if num in (flags or {}) else ''))
         rows.append(f'<tr><td>{badge(status)}</td><td class="num"><strong>{len(groups[status])}</strong></td>'
                     f'<td><div class="chips">{"".join(chips)}</div></td></tr>')
+    # Numbers given to proposals that are still an open PR (not merged into the repo yet)
+    proposed = sorted((k for k in prs_grouped if k != 'General' and k.isdigit() and k not in fips), key=int)
+    if proposed:
+        chips = ''.join(f'<a class="chip" href="{esc(prs_grouped[k][0]["url"])}" target="_blank" rel="noopener" '
+                        f'title="{esc(prs_grouped[k][0]["title"])}">FIP-{k} ↗</a>' for k in proposed)
+        rows.append(f'<tr><td><span class="pill">Proposed (open PR)</span></td><td class="num"><strong>{len(proposed)}</strong></td>'
+                    f'<td><div class="chips">{chips}</div></td></tr>')
     return f'''<section class="card" id="by-status">
-<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FRCs are excluded. Blue dots show open PRs; NV tags mark FIPs in the active upgrade planning.</span></div>
+<div class="card-head"><h2>All FIPs by status</h2><span class="hint">FIPs merged into the FIPs repo, plus proposals that are still an open pull request. FIP numbers run higher than the count because FIPs and FRCs (excluded here) share one numbering sequence, and some numbers went to proposals that were later closed. Blue dots show open PRs; NV tags mark FIPs in the active upgrade planning.</span></div>
 <div class="card-body"><div class="table-scroll"><table class="data">
 <thead><tr><th>Status</th><th class="num">Count</th><th>FIPs</th></tr></thead>
 <tbody>{"".join(rows)}</tbody></table></div></div></section>'''
@@ -251,12 +254,11 @@ def prs_html(prs_grouped, fips, loaded=True, flags=None):
                 anchor = f'pr-{key}'
             items = []
             for pr in sorted(prs_grouped[key], key=lambda p: p['updated_at'], reverse=True):
-                idle = pr['idle_days']
                 items.append(f'''<div class="pr-item">
 <a href="{esc(pr["url"])}" target="_blank" rel="noopener">#{pr["number"]}: {esc(pr["title"])}</a>
 <span class="pr-meta">{review_pill(pr["review"])}<span>@{esc(pr["author"])}</span>
 <span>opened {esc(pr["created_at"][:10])}</span>
-<span>{"active today" if idle == 0 else f"idle {idle} day" + ("s" if idle != 1 else "")}</span></span></div>''')
+<span>updated {esc(pr["updated_at"][:10])}</span></span></div>''')
             groups.append(f'<div class="pr-group" id="{anchor}">{head}{"".join(items)}</div>')
         body = ''.join(groups)
     return f'''<section class="card" id="prs">
@@ -315,7 +317,6 @@ def main():
         stats_html(fips, open_lc, processed, prs_loaded=raw_prs is not None, plans=plans, flags=flags),
         last_call_html(open_lc, past_lc, flags),
         in_flight_html(fips, history, files, grouped, discussed, flags),
-        mismatch_html(mismatches),
         prs_html(grouped, fips, loaded=raw_prs is not None, flags=flags),
         by_status_html(fips, grouped, flags),
     ])

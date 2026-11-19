@@ -9,6 +9,10 @@ on:
       - master
     paths-ignore:
       - '*.html'
+      - 'fip/**'
+      - 'fips-index.json'
+      - 'feed.xml'
+      - 'calendar.ics'
 
 jobs:
   update:
@@ -46,6 +50,9 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add index.html overview.html fips-dashboard-static.html fips-timeline-tracker.html core-devs.html implementers.html fip-lifecycle.html network-upgrades.html
+          # Per-FIP pages (-A also stages pages removed for FIPs no longer listed), search index and feeds
+          git add -A fip
+          git add fips-index.json feed.xml calendar.ics
           if ! git diff --staged --quiet; then
             git commit -m "Auto-update dashboard $(date +'%Y-%m-%d %H:%M:%S')"
             git push

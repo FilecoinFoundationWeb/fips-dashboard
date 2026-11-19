@@ -85,6 +85,38 @@ def fip_url(number):
     return f'{FIPS_BASE_URL}FIPS/fip-{number}.md'
 
 
+# Public address of the published site, for feeds and emails (absolute links).
+SITE_URL = 'https://filecoinfoundationweb.github.io/fips-dashboard/'
+
+# FIP numbers that get their own page (fip/NNNN.html). Each generator registers
+# the FIPs it loaded, so links point at the dashboard page only when one exists.
+KNOWN_FIPS = set()
+
+
+def register_fips(*sources):
+    for src in sources:
+        KNOWN_FIPS.update(src or ())
+
+
+def fip_page(number, base=''):
+    """Relative link to a FIP's dashboard page, or None if it has none."""
+    return f'{base}fip/{number}.html' if number in KNOWN_FIPS else None
+
+
+def fip_href(number, base=''):
+    """(href, opens_in_new_tab): the dashboard page if there is one, else the FIP file on GitHub."""
+    page = fip_page(number, base)
+    return (page, False) if page else (fip_url(number), True)
+
+
+def fip_anchor(number, cls='fip-id', base='', title='', inner=None):
+    """<a> to a FIP: its dashboard page when it has one, otherwise the file on GitHub."""
+    href, external = fip_href(number, base)
+    target = ' target="_blank" rel="noopener"' if external else ''
+    tip = f' title="{html_escape(title)}"' if title else ''
+    return f'<a class="{cls}" href="{html_escape(href)}"{target}{tip}>{inner or "FIP-" + html_escape(number)}</a>'
+
+
 def days_between(start, end=None):
     end = end or datetime.now(timezone.utc)
     return max(0, (end - start).days)

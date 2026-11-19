@@ -89,7 +89,8 @@ a:hover { color: var(--fil-blue); }
     var(--fil-navy);
   padding: 28px 0 118px;
 }
-.site-header .wrap { position: relative; z-index: 2; }
+.site-header .wrap { position: relative; z-index: 4; }
+@supports (overflow: clip) { .site-header { overflow-x: clip; overflow-y: visible; z-index: 5; } }
 .brand {
   position: absolute; top: 0; right: 16px; display: inline-flex; align-items: center; gap: 10px;
   color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em;
@@ -303,6 +304,7 @@ footer.site-footer p + p { margin-top: 6px; }
 /* ---------- Hub components ---------- */
 .grid-2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
 .grid-2 > .card { margin-top: 20px; }
+.grid-2 > div { min-width: 0; }
 .stat a { color: inherit; text-decoration: none; }
 .stat .sub-value { font-size: .86rem; color: var(--muted); margin-top: 2px; }
 .stat.accent .sub-value { color: rgba(255,255,255,.85); }
@@ -411,7 +413,77 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .muted { color: var(--muted); }
 .small { font-size: .84rem; }
 
+/* ---------- FIP search (header) ---------- */
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.fip-search { position: relative; flex: 1 1 220px; max-width: 320px; }
+.fip-search input {
+  width: 100%; padding: 8px 14px 8px 34px; border-radius: 999px; font: inherit; font-size: .9rem;
+  color: #fff; background: rgba(255,255,255,.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237CC4FF' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 12px center / 15px;
+  border: 1px solid rgba(255,255,255,.22);
+}
+.fip-search input::placeholder { color: #9FB6CC; }
+.fip-search input:focus { outline: 2px solid var(--fil-blue); outline-offset: 1px; background-color: rgba(255,255,255,.12); }
+.fip-search-results {
+  position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; right: 0; min-width: 300px; list-style: none;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow);
+  padding: 6px; max-height: 360px; overflow-y: auto;
+}
+.fip-search-results a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: .9rem; }
+.fip-search-results a:hover, .fip-search-results a:focus { background: var(--surface-2); outline: none; color: var(--text); }
+.fip-search-results a strong { color: var(--link); margin-right: 4px; }
+.fip-search-results .s { color: var(--muted); font-size: .78rem; white-space: nowrap; }
+.fip-search-results .none { padding: 8px 10px; color: var(--muted); font-size: .9rem; }
+
+/* ---------- FIP pages ---------- */
+.crumbs { font-size: .88rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: space-between; margin-top: 4px; }
+.crumbs a { text-decoration: none; font-weight: 600; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; font-size: .93rem; }
+.facts dt { color: var(--muted); font-weight: 600; }
+.facts dd { min-width: 0; overflow-wrap: anywhere; }
+.summary-text p + p { margin-top: 8px; }
+.summary-text { font-size: .98rem; max-width: 900px; }
+.path { list-style: none; display: flex; flex-wrap: wrap; gap: 0; margin: 4px 0 10px; }
+.path li { display: flex; align-items: center; font-size: .86rem; font-weight: 600; color: var(--muted); }
+.path li + li::before { content: ''; width: 22px; height: 2px; background: var(--border); margin: 0 6px; }
+.path .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); margin-right: 6px; flex: none; }
+.path li.done { color: var(--text); } .path li.done .dot { background: var(--fil-blue); border-color: var(--fil-blue); }
+.path li.now { color: var(--fil-blue); } .path li.now .dot { background: var(--surface); border-color: var(--fil-blue); box-shadow: 0 0 0 4px rgba(0,144,255,.2); }
+.history { list-style: none; display: grid; gap: 2px; }
+.history li { display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: .92rem; }
+.history li:last-child { border-bottom: 0; }
+.history time { color: var(--muted); font-size: .84rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.history .arrow { color: var(--muted); margin: 0 4px; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 12px;
+       background: var(--lastcall-bg); color: var(--lastcall-fg); font-size: .95rem; margin-top: 20px; }
+.cta strong { color: inherit; }
+.cta .btn.primary { flex: none; }
+.cta.info { background: var(--accepted-bg); color: var(--accepted-fg); }
+.prev-next { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.prev-next a { flex: 1 1 260px; max-width: 49%; display: block; text-decoration: none; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.prev-next a:hover { border-color: var(--fil-blue); color: var(--text); }
+.prev-next a.next { text-align: right; margin-left: auto; }
+.prev-next span { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+abbr.term { text-decoration: underline dotted var(--muted); text-underline-offset: 3px; cursor: help; }
+.glossary { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 8px 18px; font-size: .88rem; }
+.glossary dt { font-weight: 700; }
+.glossary dd { color: var(--muted); margin-bottom: 6px; }
+
+/* ---------- This week ---------- */
+.week { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.week-col { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--surface-2); }
+.week-col h3 { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.week-col ul { list-style: none; display: grid; gap: 8px; font-size: .9rem; }
+.week-col .big { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.days-left { display: inline-block; font-size: .74rem; font-weight: 700; padding: 1px 7px; border-radius: 6px; background: var(--lastcall-bg); color: var(--lastcall-fg); white-space: nowrap; }
+.days-left.soon { background: var(--rejected-bg); color: var(--rejected-fg); }
+
 @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 640px) {
+  .fip-search { max-width: none; flex-basis: 100%; }
+  .history li { grid-template-columns: 1fr; gap: 2px; }
+  .facts { grid-template-columns: 1fr; gap: 2px; } .facts dd { margin-bottom: 8px; }
+  .prev-next a { max-width: none; }
+}
 @media (max-width: 640px) {
   .feed li { grid-template-columns: 64px 1fr; }
   .feed li .kind { grid-column: 2; grid-row: 1; }
@@ -571,6 +643,67 @@ FAVICON_SVG = (
 FAVICON_LINK = f'<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,{quote(FAVICON_SVG)}">'
 
 
+def search_box(base=''):
+    """FIP search in the header: type a number or words from a title."""
+    return (f'<div class="fip-search" data-base="{base}" role="search">'
+            '<label class="visually-hidden" for="fip-search-input">Find a FIP</label>'
+            '<input id="fip-search-input" type="search" placeholder="Find a FIP: number or title" autocomplete="off" '
+            'aria-controls="fip-search-results" aria-expanded="false">'
+            '<ul id="fip-search-results" class="fip-search-results" role="listbox" hidden></ul></div>')
+
+
+# Loads fips-index.json on first focus; matches FIP numbers and title words.
+SEARCH_JS = """
+<script>
+(function () {
+  var box = document.querySelector('.fip-search');
+  if (!box) return;
+  var base = box.getAttribute('data-base') || '', input = box.querySelector('input'),
+      list = box.querySelector('ul'), index = null, loading = null;
+  function load() {
+    if (!loading) loading = fetch(base + 'fips-index.json').then(function (r) { return r.json(); })
+      .then(function (d) { index = d; }).catch(function () { index = []; });
+    return loading;
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function render() {
+    var q = input.value.trim().toLowerCase();
+    if (!q || !index) { list.hidden = true; input.setAttribute('aria-expanded', 'false'); return; }
+    var num = q.replace(/^fip[-\\s]*/, '');
+    var words = q.split(/\\s+/).filter(Boolean);
+    var hits = index.filter(function (f) {
+      if (/^\\d+$/.test(num) && (f.n === num.padStart(4, '0') || f.n.indexOf(num) === 0 || String(+f.n) === num)) return true;
+      var t = f.t.toLowerCase();
+      return words.every(function (w) { return t.indexOf(w) !== -1; });
+    }).slice(0, 8);
+    list.innerHTML = hits.length ? hits.map(function (f) {
+      return '<li role="option"><a href="' + base + 'fip/' + f.n + '.html"><strong>FIP-' + f.n + '</strong> ' + esc(f.t) +
+             ' <span class="s">' + esc(f.s) + '</span></a></li>';
+    }).join('') : '<li class="none">No FIP matches</li>';
+    list.hidden = false; input.setAttribute('aria-expanded', 'true');
+  }
+  input.addEventListener('focus', load);
+  input.addEventListener('input', function () { load().then(render); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { var a = list.querySelector('a'); if (a) { e.preventDefault(); location.href = a.href; } }
+    if (e.key === 'Escape') { input.value = ''; render(); }
+    if (e.key === 'ArrowDown') { var f = list.querySelector('a'); if (f) { e.preventDefault(); f.focus(); } }
+  });
+  list.addEventListener('keydown', function (e) {
+    var a = document.activeElement, li = a && a.parentNode;
+    if (e.key === 'ArrowDown' && li.nextSibling) { e.preventDefault(); li.nextSibling.querySelector('a').focus(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); (li.previousSibling ? li.previousSibling.querySelector('a') : input).focus(); }
+    if (e.key === 'Escape') { input.focus(); list.hidden = true; }
+  });
+  document.addEventListener('click', function (e) { if (!box.contains(e.target)) list.hidden = true; });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && document.activeElement === document.body) { e.preventDefault(); input.focus(); }
+  });
+})();
+</script>
+"""
+
+
 NAV = [
     ('lifecycle', 'Lifecycle', './'),
     ('overview', 'Overview', 'overview.html'),
@@ -582,13 +715,18 @@ NAV = [
 ]
 
 
-def page(title, description, current, subtitle, body_html, generated_at=None):
-    """Wrap page content in the shared FF-themed shell with the corgi header."""
+def page(title, description, current, subtitle, body_html, generated_at=None, base=''):
+    """Wrap page content in the shared FF-themed shell with the corgi header.
+
+    `base` is the path back to the site root ('../' for pages in fip/), so the
+    nav, search and feed links work from any folder.
+    """
     generated_at = generated_at or datetime.now(timezone.utc)
     stamp = generated_at.strftime('%Y-%m-%d %H:%M UTC')
 
     def nav_link(href, label, key):
         cls = ' class="current" aria-current="page"' if key == current else ''
+        href = (base or './') if href == './' else base + href
         return f'<a href="{href}"{cls}>{label}</a>'
 
     nav = ''.join(nav_link(href, label, key) for key, label, href in NAV)
@@ -609,6 +747,7 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
 <meta property="og:title" content="{html_escape(title)}">
 <meta property="og:description" content="{html_escape(description)}">
 <meta name="twitter:card" content="summary">
+<link rel="alternate" type="application/rss+xml" title="Filecoin governance updates" href="{base}feed.xml">
 {FRESHNESS_JS}
 {FONT_LINK}
 <style>{CSS}</style>
@@ -622,6 +761,7 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
     <p class="sub">{subtitle}</p>
     <div class="header-meta">
       <nav class="nav" aria-label="Pages">{nav}</nav>
+      {search_box(base)}
       <span>Updated {stamp}</span>
     </div>
   </div>
@@ -639,10 +779,12 @@ def page(title, description, current, subtitle, body_html, generated_at=None):
 <footer class="site-footer">
   <div class="wrap">
     <p>Read-only view of public governance records in <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a> and <a href="https://github.com/filecoin-project/core-devs" target="_blank" rel="noopener">filecoin-project/core-devs</a>. Nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors, Core Devs and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
+    <p>Follow along: <a href="{base}feed.xml">RSS feed</a> of status changes, Last Calls and upgrades · <a href="{base}calendar.ics">calendar</a> of meetings, review deadlines and upgrade dates (subscribe in Google Calendar, Outlook or Apple Calendar).</p>
     <p>Generated {stamp}. Unofficial community tool.</p>
   </div>
 </footer>
 {CORGI_JS}
 {VIDEO_JS}
+{SEARCH_JS}
 </body>
 </html>'''

@@ -22,7 +22,7 @@ def badge(status):
 
 
 def event_html(e):
-    link = f'<a class="fip-id" href="{esc(u.fip_url(e["number"]))}" target="_blank" rel="noopener">FIP-{esc(e["number"])}</a>'
+    link = u.fip_anchor(e['number'])
     title = esc(e['title'][:70] + ('…' if len(e['title']) > 70 else ''))
     commit = f'https://github.com/{u.FIPS_REPO}/commit/{e["sha"]}'
     if e['from'] is None:
@@ -55,6 +55,7 @@ def main():
     if not current:
         print('ERROR: No FIPs parsed. Aborting to avoid overwriting existing tracker.')
         return 1
+    u.register_fips(current, u.load_fip_files(repo))
 
     print('Walking README history...')
     _, events = u.build_status_history(repo)

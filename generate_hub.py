@@ -6,6 +6,7 @@
   fip-lifecycle.html     Redirect to the home page, for old links
   core-devs.html         Core Devs meetings, recordings, FIPs on the agenda
   network-upgrades.html  Network upgrades and the FIPs they shipped
+  editors.html           Checklist for FIP editors (see extras.py)
   fip/NNNN.html          One page per FIP, plus fips-index.json, feed.xml and
                          calendar.ics (see fip_pages.py)
 
@@ -22,6 +23,7 @@ import implementers as impl
 import scope_planning as sp
 import lifecycle_explainers as lx
 import fip_pages
+import extras
 from fip_utils import html_escape as esc
 from theme import page
 from generate_fips_dashboard import badge, fip_link, date_str
@@ -850,11 +852,15 @@ def upgrades_page(ctx):
                   if x['actors'] else '')
         epoch = f' · epoch {x["mainnet_epoch"]:,}' if x['mainnet_epoch'] else ''
         doc = f'<a href="{esc(x["doc_url"])}" target="_blank" rel="noopener">Upgrade notes</a>' if x['doc_url'] else ''
+        rel = extras.upgrade_releases(ctx.get('cd_repo'), x['number'])
+        rel_html = ('<div class="small" style="margin:-2px 0 8px">Client releases: '
+                    + ' · '.join(f'<a href="{esc(url)}" target="_blank" rel="noopener">{esc(c)} {esc(v)}</a>' for c, v, url in rel)
+                    + '</div>') if rel else ''
         convo = upgrade_convo_html(ctx['upgrade_conv'].get(x['number'], []), open_=bool(upcoming or x is latest_live))
         cards.append(f'''<div class="up-card{" latest" if x is latest_live else ""}" id="nv{esc(str(x["number"]))}">
 <div class="up-head"><h3><span class="nv">NV{esc(str(x["number"]))}</span>{esc(x["name"])}</h3>{state}</div>
 <div class="up-dates"><span>Mainnet: <strong>{fmt_date(x["mainnet"])}</strong>{epoch}</span><span>Calibration: {fmt_date(x["calibration"])}</span>{f"<span>{actors}</span>" if actors else ""}{f"<span>{doc}</span>" if doc else ""}</div>
-<div class="up-fips">{fip_lines}</div>{convo}</div>''')
+{rel_html}<div class="up-fips">{fip_lines}</div>{convo}</div>''')
 
     # Accepted FIPs not yet in any upgrade
     waiting = [n for n, f in sorted(fips.items()) if f['status'] == 'Accepted' and n not in shipped]
@@ -866,6 +872,7 @@ def upgrades_page(ctx):
 <div class="card-body">{f"""<div class="table-scroll"><table class="data"><thead><tr><th>FIP</th><th>Title</th><th>Last discussed</th></tr></thead><tbody>{waiting_rows}</tbody></table></div>""" if waiting_rows else '<p class="empty">Every Accepted FIP is in a network upgrade.</p>'}</div></section>'''
 
     body = '\n'.join([
+        extras.readiness_card(ctx, fmt_date, fip_link),
         scope_planning_card(ctx),
         waiting_card,
         f'''<section class="card"><div class="card-head"><h2>All network upgrades ({len(upgrades)})</h2>
@@ -897,7 +904,7 @@ def load_context():
     prs = u.process_prs(raw_prs, with_reviews=False) if raw_prs is not None else None
     return {
         'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc, 'past_lc': past_lc,
-        'history': history, 'fips_repo': fips_repo,
+        'history': history, 'fips_repo': fips_repo, 'cd_repo': cd_repo,
         'meetings': cd.load_meetings(cd_repo), 'upgrades': cd.load_upgrades(cd_repo),
         'prs': prs,
         'prs_by_fip': u.prs_by_fip(prs) if prs else {},
@@ -931,7 +938,8 @@ def main():
     for name, fn in (('index.html', lifecycle_page), ('overview.html', overview),
                      ('fip-lifecycle.html', lambda _ctx: REDIRECT_HOME), ('core-devs.html', core_devs_page),
                      ('implementers.html', implementers_page),
-                     ('network-upgrades.html', upgrades_page)):
+                     ('network-upgrades.html', upgrades_page),
+                     ('editors.html', lambda c: extras.editors_page(c, page, fip_a, fmt_date))):
         with open(name, 'w', encoding='utf-8') as f:
             f.write(fn(ctx))
         print(f'Generated {name}')

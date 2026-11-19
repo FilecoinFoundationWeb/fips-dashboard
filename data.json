@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs. Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-19T15:15:01Z",
+ "generated_at": "2026-11-19T15:32:30Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {

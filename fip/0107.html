@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FIP-0107 (Accepted): Implicit Messages in Block Receipts. Status history, Last Call window, network upgrade and the calls that discussed it.">
+<meta name="color-scheme" content="light dark">
+<meta name="generated-at" content="2026-11-19T14:24:53Z">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>FIP-0107: Implicit Messages in Block Receipts</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%2220%22%20fill%3D%22%230090ff%22/%3E%3Cpath%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%20d%3D%22M21.9%2017.6l-.6%203.2%205.7.8-.4%201.5-5.6-.8c-.4%201.3-.6%202.7-1.1%203.9-.5%201.4-1%202.8-1.6%204.1-.8%201.7-2.2%202.9-4.1%203.2-1.1.2-2.3.1-3.2-.6-.3-.2-.6-.6-.6-.9%200-.4.2-.9.5-1.1.2-.1.7%200%201%20.1.3.3.6.7.8%201.1.6.8%201.4.9%202.2.3.9-.8%201.4-1.9%201.7-3%20.6-2.4%201.2-4.7%201.7-7.1v-.4l-5.3-.8.2-1.5%205.5.8.7-3.1-5.7-.9.2-1.6%205.9.8c.2-.6.3-1.1.5-1.6.5-1.8%201-3.6%202.2-5.2%201.2-1.6%202.6-2.6%204.7-2.5.9%200%201.8.3%202.4%201%20.1.1.3.3.3.5%200%20.4%200%20.9-.3%201.2-.4.3-.9.2-1.3-.2-.3-.3-.5-.6-.8-.9-.6-.8-1.5-.9-2.2-.2-.5.5-1%201.2-1.3%201.9-.7%202.1-1.2%204.3-1.9%206.5l5.5.8-.4%201.5-5.3-.8%22%20/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Filecoin Governance Hub">
+<meta property="og:title" content="FIP-0107: Implicit Messages in Block Receipts">
+<meta property="og:description" content="FIP-0107 (Accepted): Implicit Messages in Block Receipts. Status history, Last Call window, network upgrade and the calls that discussed it.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="application/rss+xml" title="Filecoin governance updates" href="../feed.xml">
+
+<script>
+(function () {
+  if (!window.fetch || location.protocol === 'file:') return;
+  var meta = document.querySelector('meta[name="generated-at"]');
+  if (!meta) return;
+  var mine = meta.getAttribute('content');
+  fetch(location.pathname, { cache: 'reload' })
+    .then(function (r) { return r.ok ? r.text() : ''; })
+    .then(function (html) {
+      var m = html.match(/<meta name="generated-at" content="([^"]+)"/);
+      if (!m || m[1] <= mine) return;
+      var key = 'fips-reloaded-for';
+      try { if (sessionStorage.getItem(key) === m[1]) return; sessionStorage.setItem(key, m[1]); } catch (e) {}
+      location.reload();
+    })
+    .catch(function () {});
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fil-blue: #0090FF;
+  --fil-blue-strong: #0072CC;
+  --fil-navy: #091B2A;
+  --fil-navy-2: #0F2A42;
+  --fil-sky: #7CC4FF;
+
+  --bg: #F3F7FB;
+  --surface: #FFFFFF;
+  --surface-2: #EEF4FA;
+  --text: #091B2A;
+  --muted: #4B6178;
+  --border: #D7E2EE;
+  --link: #0072CC;
+  --shadow: 0 1px 2px rgba(9,27,42,.06), 0 8px 24px rgba(9,27,42,.06);
+
+  --final-bg: #DDF5E8;   --final-fg: #0B6B3A;
+  --accepted-bg: #DCEEFF;--accepted-fg: #00539A;
+  --lastcall-bg: #FFF0D1;--lastcall-fg: #8A5300;
+  --draft-bg: #E6EBF5;   --draft-fg: #34476B;
+  --active-bg: #D7F3F5;  --active-fg: #0A6670;
+  --deferred-bg: #F1EBDD;--deferred-fg: #6E5A2E;
+  --rejected-bg: #FDE2E2;--rejected-fg: #A11A1A;
+  --muted-bg: #ECEFF3;   --muted-fg: #55606C;
+  --warn-bg: #FFF6E0;    --warn-border: #F2C45A;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #06131F;
+    --surface: #0C2133;
+    --surface-2: #10293F;
+    --text: #E6F0F9;
+    --muted: #9AB0C6;
+    --border: #1D3A55;
+    --link: #6CBBFF;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    --final-bg: #0E3B27;   --final-fg: #7FE0AC;
+    --accepted-bg: #0D3256;--accepted-fg: #8CC8FF;
+    --lastcall-bg: #44310B;--lastcall-fg: #FFCB6B;
+    --draft-bg: #1E2C45;   --draft-fg: #B4C4E4;
+    --active-bg: #0C3A3F;  --active-fg: #7EDDE6;
+    --deferred-bg: #3A3221;--deferred-fg: #E0CB97;
+    --rejected-bg: #4A1717;--rejected-fg: #FFA3A3;
+    --muted-bg: #1C2733;   --muted-fg: #A8B3BF;
+    --warn-bg: #3A2E10;    --warn-border: #A8812A;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+a { color: var(--link); }
+a:hover { color: var(--fil-blue); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(900px 300px at 85% -20%, rgba(0,144,255,.45), transparent 60%),
+    radial-gradient(600px 260px at 0% 120%, rgba(124,196,255,.18), transparent 60%),
+    var(--fil-navy);
+  padding: 28px 0 118px;
+}
+.site-header .wrap { position: relative; z-index: 4; }
+@supports (overflow: clip) { .site-header { overflow-x: clip; overflow-y: visible; z-index: 5; } }
+.brand {
+  position: absolute; top: 0; right: 16px; display: inline-flex; align-items: center; gap: 10px;
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em;
+  padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04);
+  transition: border-color .2s, background .2s;
+}
+.brand:hover { color: #fff; border-color: rgba(0,144,255,.6); background: rgba(0,144,255,.14); }
+.brand-mark { width: 34px; height: 34px; flex: none; }
+@media (max-width: 640px) {
+  .brand { top: -6px; font-size: 1rem; padding: 4px 12px 4px 4px; gap: 8px; }
+  .brand-mark { width: 28px; height: 28px; }
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fil-sky);
+}
+.eyebrow::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--fil-blue); box-shadow: 0 0 0 4px rgba(0,144,255,.25); }
+.site-header h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -.02em; margin: 10px 0 6px; }
+.site-header p.sub { color: #B9CDE0; max-width: 680px; }
+.header-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 18px; font-size: .88rem; color: #9FB6CC; }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.nav a {
+  color: #fff; text-decoration: none; font-weight: 600; font-size: .92rem;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.04); transition: background .2s, border-color .2s;
+}
+.nav a:hover { background: rgba(0,144,255,.18); border-color: rgba(0,144,255,.6); color: #fff; }
+.nav a.current { background: var(--fil-blue); border-color: var(--fil-blue); }
+
+/* ---------- Corgi ---------- */
+.ground {
+  position: absolute; left: 0; right: 0; bottom: 14px; height: 2px; z-index: 1;
+  background: repeating-linear-gradient(90deg, rgba(124,196,255,.35) 0 14px, transparent 14px 26px);
+}
+.corgi-walk {
+  position: absolute; bottom: 14px; left: -300px; width: 128px; z-index: 3;
+  animation: corgi-walk 22s linear infinite;
+  cursor: pointer;
+}
+.corgi-flip > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.corgi-flip { position: relative; animation: corgi-flip 22s steps(1) infinite; transform-origin: center; }
+/* Off-screen margins are wide enough that the ball (which runs ahead of the
+   corgi) is also hidden when they turn around. */
+@keyframes corgi-walk {
+  0%   { left: -300px; }
+  48%  { left: calc(100% + 140px); }
+  50%  { left: calc(100% + 140px); }
+  98%  { left: -300px; }
+  100% { left: -300px; }
+}
+@keyframes corgi-flip { 0% { transform: scaleX(1); } 49% { transform: scaleX(-1); } 99% { transform: scaleX(1); } }
+
+/* The FIP ball: lives inside the flipped box so it's always ahead of the
+   corgi, and counter-flips so the label stays readable. */
+.fip-ball { position: absolute; left: calc(100% + 18px); bottom: 2px; width: 40px; height: 80px; pointer-events: none; }
+.fip-ball .ball-shadow {
+  position: absolute; left: 4px; bottom: 0; width: 32px; height: 6px; border-radius: 50%;
+  background: rgba(0,0,0,.3); animation: ball-shadow .7s infinite;
+}
+.fip-ball .ball-bounce { position: absolute; left: 0; bottom: 2px; width: 40px; height: 40px; animation: ball-bounce .7s infinite; transform-origin: 50% 100%; }
+.fip-ball .ball-unflip { width: 100%; height: 100%; animation: corgi-flip 22s steps(1) infinite; transform-origin: center; }
+.fip-ball svg { display: block; width: 40px; height: 40px; }
+@keyframes ball-bounce {
+  0%   { transform: translateY(0) scale(1.18, .82); animation-timing-function: ease-out; }
+  8%   { transform: translateY(-4px) scale(1, 1); animation-timing-function: ease-out; }
+  50%  { transform: translateY(-40px) scale(1, 1); animation-timing-function: ease-in; }
+  92%  { transform: translateY(-3px) scale(1, 1); }
+  100% { transform: translateY(0) scale(1.18, .82); }
+}
+@keyframes ball-shadow {
+  0%, 100% { transform: scale(1); opacity: .9; }
+  50%      { transform: scale(.45); opacity: .35; }
+}
+.corgi-bob { animation: corgi-bob .36s ease-in-out infinite alternate; }
+@keyframes corgi-bob { from { transform: translateY(0); } to { transform: translateY(-2.5px); } }
+.leg { transform-box: fill-box; transform-origin: 50% 0; animation: corgi-step .36s ease-in-out infinite alternate; }
+.leg.b { animation-direction: alternate-reverse; }
+@keyframes corgi-step { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+.tail { transform-box: fill-box; transform-origin: 100% 60%; animation: corgi-wag .22s ease-in-out infinite alternate; }
+@keyframes corgi-wag { from { transform: rotate(-18deg); } to { transform: rotate(14deg); } }
+.ear { transform-box: fill-box; transform-origin: 50% 100%; animation: corgi-ear 3.2s ease-in-out infinite; }
+.ear.r { animation-delay: .15s; }
+@keyframes corgi-ear { 0%, 88%, 100% { transform: rotate(0); } 92% { transform: rotate(-12deg); } 96% { transform: rotate(6deg); } }
+.tongue { transform-box: fill-box; transform-origin: 50% 0; animation: corgi-pant .36s ease-in-out infinite alternate; }
+@keyframes corgi-pant { from { transform: scaleY(.85); } to { transform: scaleY(1.1); } }
+.woof {
+  position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, 4px) scale(.6);
+  background: #fff; color: var(--fil-navy); font-weight: 800; font-size: .85rem;
+  padding: 4px 10px; border-radius: 12px; opacity: 0; pointer-events: none; white-space: nowrap;
+  transition: opacity .15s, transform .15s;
+}
+.woof::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; border: 6px solid transparent; border-top-color: #fff; }
+.corgi-walk.barking .woof { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+.corgi-walk.barking .corgi-bob { animation: corgi-hop .5s ease-out 1; }
+@keyframes corgi-hop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-16px); } }
+@media (prefers-reduced-motion: reduce) {
+  .corgi-walk { animation: none; left: auto; right: 24px; }
+  .corgi-flip, .fip-ball .ball-unflip { animation: none; transform: scaleX(-1); }
+  .corgi-bob, .leg, .tail, .ear, .tongue, .fip-ball .ball-bounce, .fip-ball .ball-shadow { animation: none; }
+}
+
+/* ---------- Content ---------- */
+main { margin-top: 22px; position: relative; z-index: 4; padding-bottom: 48px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stats.compact { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
+.stats.compact .value { font-size: 1.6rem; }
+.stat {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px 18px; box-shadow: var(--shadow);
+}
+.stat .label { font-size: .76rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.stat .value { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); line-height: 1.2; margin-top: 4px; }
+.stat.accent { background: var(--fil-blue); border-color: var(--fil-blue); }
+.stat.accent .label { color: rgba(255,255,255,.85); }
+.stat.accent .value { color: #fff; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: var(--shadow); margin-top: 20px; overflow: hidden;
+}
+.card-head { padding: 18px 20px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.card-head h2 { font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; }
+.card-head .hint { color: var(--muted); font-size: .88rem; max-width: 640px; }
+.card-body { padding: 0 20px 20px; }
+.empty { color: var(--muted); font-style: italic; padding: 8px 0 4px; }
+.note { font-size: .85rem; color: var(--muted); margin-top: 12px; }
+
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table.data { width: 100%; border-collapse: collapse; font-size: .92rem; }
+table.data th {
+  text-align: left; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+  background: var(--surface-2);
+}
+table.data td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.data tr:last-child td { border-bottom: 0; }
+table.data tbody tr:hover td { background: var(--surface-2); }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.nowrap { white-space: nowrap; }
+.fip-id { font-weight: 700; text-decoration: none; white-space: nowrap; }
+.title-cell { min-width: 220px; }
+
+.status-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  font-size: .74rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.status-final { background: var(--final-bg); color: var(--final-fg); }
+.status-accepted { background: var(--accepted-bg); color: var(--accepted-fg); }
+.status-last-call { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.status-draft { background: var(--draft-bg); color: var(--draft-fg); }
+.status-active { background: var(--active-bg); color: var(--active-fg); }
+.status-deferred { background: var(--deferred-bg); color: var(--deferred-fg); }
+.status-rejected { background: var(--rejected-bg); color: var(--rejected-fg); }
+.status-withdrawn, .status-superseded { background: var(--muted-bg); color: var(--muted-fg); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; text-decoration: none;
+  padding: 4px 10px; border-radius: 8px; font-size: .86rem; font-weight: 600;
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+  transition: border-color .15s, color .15s;
+}
+.chip:hover { border-color: var(--fil-blue); color: var(--fil-blue); }
+.pr-dot { font-size: .72rem; font-weight: 700; color: #fff; background: var(--fil-blue); border-radius: 999px; padding: 0 6px; }
+
+.age { font-weight: 600; white-space: nowrap; }
+.age.old { color: var(--rejected-fg); }
+.age.mid { color: var(--lastcall-fg); }
+.pill {
+  display: inline-block; font-size: .74rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); white-space: nowrap;
+}
+.pill.approved { background: var(--final-bg); color: var(--final-fg); border-color: transparent; }
+.pill.changes { background: var(--rejected-bg); color: var(--rejected-fg); border-color: transparent; }
+.pill.waiting { background: var(--lastcall-bg); color: var(--lastcall-fg); border-color: transparent; }
+.pill.est { background: transparent; }
+a.pill.nv-flag { text-decoration: none; margin-left: 4px; font-size: .7rem; vertical-align: middle; }
+a.pill.nv-flag:not(.approved):not(.waiting):not(.changes) { background: var(--draft-bg); color: var(--draft-fg); border-color: transparent; }
+a.pill.nv-flag:hover { filter: brightness(.95); text-decoration: underline; }
+.chips > a.pill.nv-flag { align-self: center; margin-left: -2px; }
+
+.callout {
+  background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 12px;
+  padding: 12px 14px; font-size: .9rem;
+}
+
+.pr-group { border-top: 1px solid var(--border); padding: 14px 0; }
+.pr-group:first-child { border-top: 0; padding-top: 0; }
+.pr-group h3 { font-size: .95rem; margin-bottom: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pr-item { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; padding: 8px 12px; border-left: 3px solid var(--fil-blue); background: var(--surface-2); border-radius: 0 8px 8px 0; margin-top: 6px; }
+.pr-item a { font-weight: 600; text-decoration: none; }
+.pr-meta { color: var(--muted); font-size: .84rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+details.more > summary { cursor: pointer; color: var(--link); font-weight: 600; margin-top: 12px; }
+
+.timeline { position: relative; padding-left: 22px; }
+.timeline::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+.tl-month { position: relative; margin-bottom: 22px; }
+.tl-month::before { content: ''; position: absolute; left: -21px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--fil-blue); box-shadow: 0 0 0 4px var(--surface); }
+.tl-month h3 { font-size: 1rem; display: flex; gap: 10px; align-items: baseline; }
+.tl-month h3 span { color: var(--muted); font-size: .84rem; font-weight: 500; }
+.tl-events { margin-top: 8px; display: grid; gap: 6px; }
+.tl-event { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: start; padding: 8px 12px; background: var(--surface-2); border-radius: 8px; font-size: .9rem; }
+.tl-event time { color: var(--muted); font-variant-numeric: tabular-nums; font-size: .82rem; padding-top: 2px; }
+.tl-event .arrow { color: var(--muted); margin: 0 4px; }
+
+footer.site-footer { color: var(--muted); font-size: .85rem; padding: 24px 0 40px; border-top: 1px solid var(--border); }
+footer.site-footer p + p { margin-top: 6px; }
+
+/* ---------- Hub components ---------- */
+.grid-2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.grid-2 > .card { margin-top: 20px; }
+.grid-2 > div { min-width: 0; }
+.stat a { color: inherit; text-decoration: none; }
+.stat .sub-value { font-size: .86rem; color: var(--muted); margin-top: 2px; }
+.stat.accent .sub-value { color: rgba(255,255,255,.85); }
+a.stat { display: block; text-decoration: none; transition: border-color .15s, transform .15s; }
+a.stat:hover { border-color: var(--fil-blue); transform: translateY(-1px); }
+.meeting-title { font-size: 1.05rem; font-weight: 700; }
+.meeting-meta { color: var(--muted); font-size: .88rem; margin: 2px 0 10px; }
+ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 600; font-size: .88rem;
+  padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+}
+.btn:hover { border-color: var(--fil-blue); color: var(--fil-blue); }
+.btn.primary { background: var(--fil-blue); border-color: var(--fil-blue); color: #fff; }
+.btn.primary:hover { background: var(--fil-blue-strong); color: #fff; }
+.passcode { font-size: .8rem; color: var(--muted); }
+.video { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #000; margin-top: 12px; }
+.video button { all: unset; cursor: pointer; position: absolute; inset: 0; display: block; }
+.video img { width: 100%; height: 100%; object-fit: cover; opacity: .85; transition: opacity .2s; }
+.video button:hover img { opacity: 1; }
+.video .play { position: absolute; left: 50%; top: 50%; width: 68px; height: 48px; margin: -24px 0 0 -34px; border-radius: 14px; background: var(--fil-blue); display: grid; place-items: center; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+.video .play::before { content: ''; border-left: 18px solid #fff; border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 4px; }
+.video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.feed { list-style: none; display: grid; gap: 2px; }
+.feed li { display: grid; grid-template-columns: 74px 104px 1fr; gap: 10px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .92rem; }
+.feed li:last-child { border-bottom: 0; }
+.feed time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kind { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; justify-self: start; white-space: nowrap; }
+.kind.fip { background: var(--accepted-bg); color: var(--accepted-fg); }
+.kind.meeting { background: var(--active-bg); color: var(--active-fg); }
+.kind.upgrade { background: var(--final-bg); color: var(--final-fg); }
+.kind.discussion { background: var(--lastcall-bg); color: var(--lastcall-fg); }
+.kind.impl { background: var(--deferred-bg); color: var(--deferred-fg); }
+.open-list { list-style: none; display: grid; gap: 10px; font-size: .93rem; }
+.open-list li { padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.open-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.open-list .kind { margin-right: 6px; }
+.links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+.link-card { display: block; text-decoration: none; color: var(--text); padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); transition: border-color .15s; }
+.link-card:hover { border-color: var(--fil-blue); color: var(--text); }
+.link-card strong { display: block; margin-bottom: 2px; }
+.link-card span { color: var(--muted); font-size: .86rem; }
+.search { width: 100%; max-width: 360px; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-size: .92rem; }
+.search:focus { outline: 2px solid var(--fil-blue); outline-offset: 1px; }
+.up-list { display: grid; gap: 12px; }
+.up-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--surface-2); }
+.up-card.latest { border-color: var(--fil-blue); box-shadow: 0 0 0 3px rgba(0,144,255,.12); }
+.up-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; justify-content: space-between; }
+.up-head h3 { font-size: 1.05rem; }
+.up-head h3 .nv { color: var(--fil-blue); margin-right: 6px; }
+.up-dates { color: var(--muted); font-size: .86rem; display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 8px; }
+.up-fips { display: grid; gap: 4px; font-size: .9rem; }
+.up-convo { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.up-convo > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .9rem; }
+.convo-list { list-style: none; display: grid; gap: 2px; margin-top: 6px; }
+.convo-list li { display: grid; grid-template-columns: 96px 104px 1fr; gap: 10px; align-items: baseline; padding: 5px 0; font-size: .88rem; }
+.sub-h { font-size: .9rem; margin: 14px 0 6px; }
+.call-notes { margin: 12px 0; border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; background: var(--surface-2); }
+.call-notes > summary { cursor: pointer; color: var(--link); font-weight: 600; font-size: .92rem; }
+.call-notes.compact { margin: 8px 0 0; padding: 6px 10px; border-radius: 8px; }
+.call-notes.compact > summary { font-size: .84rem; }
+.note-group { margin-top: 10px; }
+.note-group h4 { font-size: .9rem; margin-bottom: 4px; }
+.note-group ul { padding-left: 18px; font-size: .88rem; display: grid; gap: 3px; }
+.note-group ul ul { margin-top: 3px; color: var(--muted); }
+.explainer .lead { font-size: 1.02rem; max-width: 900px; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px; margin-top: 14px; }
+.role { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.role strong { display: block; margin-bottom: 4px; }
+.type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+.type-card { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); font-size: .9rem; }
+.type-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.type-n { margin-left: auto; font-weight: 800; font-size: 1.2rem; }
+.steps { list-style: none; counter-reset: step; display: grid; gap: 10px; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; font-size: .93rem; }
+.steps li::before { content: counter(step); grid-row: 1 / span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--fil-blue); color: #fff; }
+.steps li strong { display: block; }
+.sections-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 8px 18px; font-size: .9rem; }
+.sections-list li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.sections-list li span:last-child { display: block; color: var(--muted); }
+.flow { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.flow .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; }
+.stage { flex: 1 1 0; min-width: 120px; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; text-decoration: none; color: var(--text); border: 1px solid var(--border); background: var(--surface-2); }
+.stage:hover { border-color: var(--fil-blue); color: var(--text); }
+.stage-name { font-weight: 700; font-size: .9rem; }
+.stage-n { font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
+.stage-sub { font-size: .78rem; color: var(--muted); }
+.stage.draft { background: var(--draft-bg); } .stage.lastcall { background: var(--lastcall-bg); }
+.stage.accepted { background: var(--accepted-bg); } .stage.final { background: var(--final-bg); }
+.side-stages { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 12px; font-size: .88rem; }
+.side-stage { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); }
+.board { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.board-col { border-radius: 12px; padding: 12px; border: 1px solid var(--border); background: var(--surface-2); border-top: 4px solid var(--border); }
+.board-col.draft { border-top-color: var(--draft-fg); } .board-col.lastcall { border-top-color: var(--lastcall-fg); }
+.board-col.accepted { border-top-color: var(--accepted-fg); } .board-col.deferred { border-top-color: var(--deferred-fg); }
+.board-col h3 { font-size: .95rem; margin-bottom: 8px; }
+.board-col ul { list-style: none; display: grid; gap: 8px; }
+.board-col li { padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); font-size: .88rem; }
+.board-col .item-title { font-weight: 600; }
+@media (max-width: 640px) { .flow { flex-direction: column; } .flow .arrow { transform: rotate(90deg); } .stage { min-width: 0; } }
+.milestones { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 6px 14px; font-size: .88rem; }
+.milestones li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.milestones strong { white-space: nowrap; }
+.convo-list time { color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.muted { color: var(--muted); }
+.small { font-size: .84rem; }
+
+/* ---------- FIP search (header) ---------- */
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.fip-search { position: relative; flex: 1 1 220px; max-width: 320px; }
+.fip-search input {
+  width: 100%; padding: 8px 14px 8px 34px; border-radius: 999px; font: inherit; font-size: .9rem;
+  color: #fff; background: rgba(255,255,255,.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237CC4FF' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 12px center / 15px;
+  border: 1px solid rgba(255,255,255,.22);
+}
+.fip-search input::placeholder { color: #9FB6CC; }
+.fip-search input:focus { outline: 2px solid var(--fil-blue); outline-offset: 1px; background-color: rgba(255,255,255,.12); }
+.fip-search-results {
+  position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; right: 0; min-width: 300px; list-style: none;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow);
+  padding: 6px; max-height: 360px; overflow-y: auto;
+}
+.fip-search-results a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: .9rem; }
+.fip-search-results a:hover, .fip-search-results a:focus { background: var(--surface-2); outline: none; color: var(--text); }
+.fip-search-results a strong { color: var(--link); margin-right: 4px; }
+.fip-search-results .s { color: var(--muted); font-size: .78rem; white-space: nowrap; }
+.fip-search-results .none { padding: 8px 10px; color: var(--muted); font-size: .9rem; }
+
+/* ---------- FIP pages ---------- */
+.crumbs { font-size: .88rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: space-between; margin-top: 4px; }
+.crumbs a { text-decoration: none; font-weight: 600; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; font-size: .93rem; }
+.facts dt { color: var(--muted); font-weight: 600; }
+.facts dd { min-width: 0; overflow-wrap: anywhere; }
+.summary-text p + p { margin-top: 8px; }
+.summary-text { font-size: .98rem; max-width: 900px; }
+.path { list-style: none; display: flex; flex-wrap: wrap; gap: 0; margin: 4px 0 10px; }
+.path li { display: flex; align-items: center; font-size: .86rem; font-weight: 600; color: var(--muted); }
+.path li + li::before { content: ''; width: 22px; height: 2px; background: var(--border); margin: 0 6px; }
+.path .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); margin-right: 6px; flex: none; }
+.path li.done { color: var(--text); } .path li.done .dot { background: var(--fil-blue); border-color: var(--fil-blue); }
+.path li.now { color: var(--fil-blue); } .path li.now .dot { background: var(--surface); border-color: var(--fil-blue); box-shadow: 0 0 0 4px rgba(0,144,255,.2); }
+.history { list-style: none; display: grid; gap: 2px; }
+.history li { display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: .92rem; }
+.history li:last-child { border-bottom: 0; }
+.history time { color: var(--muted); font-size: .84rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.history .arrow { color: var(--muted); margin: 0 4px; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 12px;
+       background: var(--lastcall-bg); color: var(--lastcall-fg); font-size: .95rem; margin-top: 20px; }
+.cta strong { color: inherit; }
+.cta .btn.primary { flex: none; }
+.cta.info { background: var(--accepted-bg); color: var(--accepted-fg); }
+.prev-next { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.prev-next a { flex: 1 1 260px; max-width: 49%; display: block; text-decoration: none; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.prev-next a:hover { border-color: var(--fil-blue); color: var(--text); }
+.prev-next a.next { text-align: right; margin-left: auto; }
+.prev-next span { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+abbr.term { text-decoration: underline dotted var(--muted); text-underline-offset: 3px; cursor: help; }
+.glossary { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 8px 18px; font-size: .88rem; }
+.glossary dt { font-weight: 700; }
+.glossary dd { color: var(--muted); margin-bottom: 6px; }
+
+/* ---------- This week ---------- */
+.week { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.week-col { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--surface-2); }
+.week-col h3 { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.week-col ul { list-style: none; display: grid; gap: 8px; font-size: .9rem; }
+.week-col .big { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.days-left { display: inline-block; font-size: .74rem; font-weight: 700; padding: 1px 7px; border-radius: 6px; background: var(--lastcall-bg); color: var(--lastcall-fg); white-space: nowrap; }
+.days-left.soon { background: var(--rejected-bg); color: var(--rejected-fg); }
+
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 640px) {
+  .fip-search { max-width: none; flex-basis: 100%; }
+  .history li { grid-template-columns: 1fr; gap: 2px; }
+  .facts { grid-template-columns: 1fr; gap: 2px; } .facts dd { margin-bottom: 8px; }
+  .prev-next a { max-width: none; }
+}
+@media (max-width: 640px) {
+  .feed li { grid-template-columns: 64px 1fr; }
+  .feed li .kind { grid-column: 2; grid-row: 1; }
+  .feed li .feed-text { grid-column: 1 / -1; }
+  .convo-list li { grid-template-columns: 1fr auto; }
+  .convo-list li > span:last-child { grid-column: 1 / -1; }
+  .stat .value { font-size: 1.6rem; }
+  .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
+  .corgi-walk { width: 104px; }
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="https://filecoin.io" target="_blank" rel="noopener" aria-label="Filecoin website"><svg aria-hidden="true" focusable="false" class="brand-mark" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 40 40" xml:space="preserve" enable-background="new 0 0 40 40">
+    <style>
+    .st1-logo {
+        fill-rule: evenodd;
+        clip-rule: evenodd;
+        fill: #fff
+    }
+    </style>
+    <defs>
+        <filter id="a-logo" filterUnits="userSpaceOnUse" x="0" y="0" width="40" height="40">
+            <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0" />
+        </filter>
+    </defs>
+    <mask maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="40" id="b-logo_1">
+        <g filter="url(#a-logo)">
+            <path id="a-logo_1" class="st1-logo" d="M0 0h40v40H0V0z" />
+        </g>
+    </mask>
+    <path d="M20 40C9 40 0 31 0 19.9.1 8.9 9-.1 20.1 0 31.1.1 40 9 40 20.2 39.9 31.1 31 40 20 40" mask="url(#b-logo_1)" fill-rule="evenodd" clip-rule="evenodd" fill="#0090ff" />
+    <path class="st1-logo" d="M21.9 17.6l-.6 3.2 5.7.8-.4 1.5-5.6-.8c-.4 1.3-.6 2.7-1.1 3.9-.5 1.4-1 2.8-1.6 4.1-.8 1.7-2.2 2.9-4.1 3.2-1.1.2-2.3.1-3.2-.6-.3-.2-.6-.6-.6-.9 0-.4.2-.9.5-1.1.2-.1.7 0 1 .1.3.3.6.7.8 1.1.6.8 1.4.9 2.2.3.9-.8 1.4-1.9 1.7-3 .6-2.4 1.2-4.7 1.7-7.1v-.4l-5.3-.8.2-1.5 5.5.8.7-3.1-5.7-.9.2-1.6 5.9.8c.2-.6.3-1.1.5-1.6.5-1.8 1-3.6 2.2-5.2 1.2-1.6 2.6-2.6 4.7-2.5.9 0 1.8.3 2.4 1 .1.1.3.3.3.5 0 .4 0 .9-.3 1.2-.4.3-.9.2-1.3-.2-.3-.3-.5-.6-.8-.9-.6-.8-1.5-.9-2.2-.2-.5.5-1 1.2-1.3 1.9-.7 2.1-1.2 4.3-1.9 6.5l5.5.8-.4 1.5-5.3-.8" />
+</svg><span>Filecoin</span></a>
+    <span class="eyebrow">Filecoin governance</span>
+    <h1>FIP-0107: Implicit Messages in Block Receipts</h1>
+    <p class="sub">Technical · <span class="status-badge status-accepted">Accepted</span></p>
+    <div class="header-meta">
+      <nav class="nav" aria-label="Pages"><a href="../">Lifecycle</a><a href="../overview.html">Overview</a><a href="../fips-dashboard-static.html" class="current" aria-current="page">FIPs</a><a href="../core-devs.html">Core Devs</a><a href="../implementers.html">Implementers</a><a href="../network-upgrades.html">Upgrades</a><a href="../fips-timeline-tracker.html">Timeline</a></nav>
+      <div class="fip-search" data-base="../" role="search"><label class="visually-hidden" for="fip-search-input">Find a FIP</label><input id="fip-search-input" type="search" placeholder="Find a FIP: number or title" autocomplete="off" aria-controls="fip-search-results" aria-expanded="false"><ul id="fip-search-results" class="fip-search-results" role="listbox" hidden></ul></div>
+      <span>Updated 2026-11-19 14:24 UTC</span>
+    </div>
+  </div>
+  <div class="ground" aria-hidden="true"></div>
+  <div class="corgi-walk" tabindex="0" role="button" aria-label="Pet the corgi chasing the FIP ball">
+    <span class="woof">Woof!</span>
+    <div class="corgi-flip">
+<svg viewBox="0 0 170 112" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A cartoon corgi trotting">
+  <ellipse cx="82" cy="106" rx="54" ry="4" fill="rgba(0,0,0,.28)"/>
+  <g class="corgi-bob">
+    <!-- far legs -->
+    <g class="leg b"><rect x="38" y="66" width="12" height="30" rx="6" fill="#C46F22"/><ellipse cx="44" cy="96" rx="7" ry="4" fill="#E9E2D8"/></g>
+    <g class="leg a"><rect x="98" y="66" width="12" height="30" rx="6" fill="#C46F22"/><ellipse cx="104" cy="96" rx="7" ry="4" fill="#E9E2D8"/></g>
+    <!-- tail -->
+    <g class="tail"><ellipse cx="22" cy="50" rx="13" ry="9" fill="#E58A33"/><ellipse cx="13" cy="48" rx="6" ry="5" fill="#FFF7EC"/></g>
+    <!-- body -->
+    <ellipse cx="74" cy="60" rx="50" ry="24" fill="#E58A33"/>
+    <ellipse cx="80" cy="72" rx="36" ry="11" fill="#FFF7EC"/>
+    <ellipse cx="114" cy="62" rx="16" ry="17" fill="#FFF7EC"/>
+    <!-- near legs -->
+    <g class="leg a"><rect x="50" y="68" width="13" height="30" rx="6.5" fill="#E58A33"/><ellipse cx="56.5" cy="98" rx="7.5" ry="4.5" fill="#FFF7EC"/></g>
+    <g class="leg b"><rect x="110" y="68" width="13" height="30" rx="6.5" fill="#FFF7EC"/><ellipse cx="116.5" cy="98" rx="7.5" ry="4.5" fill="#FFFFFF"/></g>
+    <!-- collar (Filecoin blue) -->
+    <path d="M106 44 q12 10 26 2" stroke="#0090FF" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="120" cy="53" r="4.2" fill="#7CC4FF" stroke="#0072CC" stroke-width="1.2"/>
+    <!-- head -->
+    <g>
+      <g class="ear"><path d="M109 30 L113 2 L128 24 Z" fill="#E58A33"/><path d="M113 25 L115 10 L123 23 Z" fill="#F7B8B0"/></g>
+      <g class="ear r"><path d="M124 23 L138 0 L144 27 Z" fill="#D4782A"/><path d="M129 22 L137 8 L140 24 Z" fill="#F7B8B0"/></g>
+      <ellipse cx="128" cy="38" rx="23" ry="19" fill="#E58A33"/>
+      <path d="M128 21 q-3 10 2 20 q8 10 22 6 l-4 -12 q-10 -4 -14 -14 z" fill="#FFF7EC"/>
+      <ellipse cx="146" cy="46" rx="16" ry="10" fill="#FFF7EC"/>
+      <ellipse cx="160" cy="42" rx="4.6" ry="3.6" fill="#1A1A1A"/>
+      <circle cx="159" cy="40.8" r="1.1" fill="#fff"/>
+      <circle cx="137" cy="33" r="3" fill="#091B2A"/>
+      <circle cx="138" cy="32" r="1" fill="#fff"/>
+      <ellipse cx="132" cy="44" rx="4.5" ry="2.8" fill="#F7A59B" opacity=".7"/>
+      <path d="M148 51 q5 4 10 -1" stroke="#5A3A22" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path class="tongue" d="M150 52 q3 9 7 0 z" fill="#F0727F"/>
+    </g>
+  </g>
+</svg>
+
+<div class="fip-ball" aria-hidden="true">
+  <div class="ball-shadow"></div>
+  <div class="ball-bounce"><div class="ball-unflip">
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="17" cy="17" r="15.5" fill="#D6EA3C" stroke="#AFC21F" stroke-width="1.2"/>
+      <path d="M4.5 8.5 C11 12 11 22 4.5 25.5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M29.5 8.5 C23 12 23 22 29.5 25.5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="12" cy="10" r="3" fill="#FFFFFF" opacity=".35"/>
+      <text x="17" y="20.5" text-anchor="middle" font-family="Archivo, system-ui, sans-serif" font-size="10" font-weight="800" fill="#091B2A" letter-spacing=".3">FIP</text>
+    </svg>
+  </div></div>
+</div>
+</div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+<div class="crumbs"><span><a href="../fips-dashboard-static.html#by-status">← All FIPs</a> · <a href="../">How FIPs move</a></span><a class="" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">View on GitHub ↗</a></div>
+<div class="grid-2"><div><section class="card"><div class="card-head"><h2>What it proposes</h2><span class="hint">From the FIP's own Simple Summary.</span></div><div class="card-body"><div class="summary-text"><p>This FIP adds implicit messages (cron and reward) to block receipts, allowing their execution to be inspected and events generated by system operations to be properly captured and tracked in the chain. A primary benefit of this is better visibility into sector lifecycles. Additionally, it simplifies determining which messages actually executed without needing to deduplicate messages across parent tipset blocks. The FIP also extends the <code>MessageReceipt</code> structure to include codec information for return data, enabling proper interpretation of execution results.</p></div><div class="btn-row"><a class="btn" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0107.md" target="_blank" rel="noopener">Read the full FIP ↗</a></div></div></section><section class="card"><div class="card-head"><h2>Discussed in calls (9)</h2><span class="hint"><abbr class="term" tabindex="0" title="The regular open meeting where implementation and research teams discuss FIPs and upgrade priorities.">Core Devs</abbr> meetings and implementers' calls whose notes mention FIP-0107. A mention means it was discussed, not decided.</span></div><div class="card-body"><ul class=convo-list><li><time>Nov 3, 2026</time><span class="kind impl">Implementers</span><span><a href="https://filecoindev.notion.site/3f7dc41950c18003be18e5b4fa5a250f" target="_blank" rel="noopener">2026-11-03 FIL Implementer Call</a></span></li><li><time>Oct 28, 2026</time><span class="kind meeting">Core Devs</span><span><a href="https://github.com/filecoin-project/core-devs/blob/master/Core%20Dev%20Meetings/Meeting%200095.md" target="_blank" rel="noopener">Core Devs #95</a> · <a class="small" href="https://youtu.be/mS7vNktSWNI?si=93tuMo-DiAhwcWSO" target="_blank" rel="noopener">recording</a></span></li><li><time>Aug 11, 2026</time><span class="kind impl">Implementers</span><span><a href="https://filecoindev.notion.site/39fdc41950c1800ea7decd886eec142c" target="_blank" rel="noopener">2026-08-11 FIL Implementer Call</a></span></li><li><time>Jun 30, 2026</time><span class="kind impl">Implementers</span><span><a href="https://filecoindev.notion.site/38edc41950c1807dbda9ff60481de550" target="_blank" rel="noopener">2026-06-30 FIL Implementer Call</a></span></li><li><time>Mar 17, 2026</time><span class="kind meeting">Core Devs</span><span><a href="https://docs.google.com/presentation/d/1Da8zdoqSXxleenidcm6vHgm-ZS764A1NGipWx2GEc5w/edit?slide=id.g3c583afd27e_0_3#slide=id.g3c583afd27e_0_3" target="_blank" rel="noopener">Core Devs #89</a> · <a class="small" href="https://us02web.zoom.us/rec/play/-oP7WTgbAZlCz0F9KD5p2hshI6gSJ-xVy1utTJQ4ZcT1dOoBWEZcXuiuzRAG4Q3mG5S7l-UYGiLbX2OP.JENSD19Rfuz2_v6Q?eagerLoadZvaPages=sidemenu.billing.plan_management&amp;accessLevel=meeting&amp;canPlayFromShare=true&amp;from=share_recording_detail&amp;continueMode=true&amp;oldStyle=true&amp;iet=79jyVeSE_Byp6W9T9pte84aFoCFWW-9Zt_G814ymYVg.AG.Q8XfiSPfbubTBeywlI2s6VnBuhwPoPv9lMiVTPAAoixtMK8y-k4QkPoL2sg0dKump8B3dkhO2_zc5qYzZVCgm78XxDORJB1TrWf4T1uZVQldMr08UTeV6TGK.d38ZE6COOx1zaKnkerf13Q.rKrHivx5H8jcAkYw&amp;componentName=rec-play&amp;originRequestUrl=https%3A%2F%2Fus02web.zoom.us%2Frec%2Fshare%2FxnJUMwVnfbqYWzK7zh0-rN3_89Fc0TOCvaaiMVaflTQKPNUZ2SE8FHcjLtvLjmB8.rjN3dltAuJ1fFWiz%3Fiet%3D79jyVeSE_Byp6W9T9pte84aFoCFWW-9Zt_G814ymYVg.AG.Q8XfiSPfbubTBeywlI2s6VnBuhwPoPv9lMiVTPAAoixtMK8y-k4QkPoL2sg0dKump8B3dkhO2_zc5qYzZVCgm78XxDORJB1TrWf4T1uZVQldMr08UTeV6TGK.d38ZE6COOx1zaKnkerf13Q.rKrHivx5H8jcAkYw" target="_blank" rel="noopener">recording</a></span></li><li><time>Feb 24, 2026</time><span class="kind meeting">Core Devs</span><span><a href="https://docs.google.com/presentation/d/16NVKAsGIl0L9Yh11l8-UxmbMH17cMckkz5fy0Hsv56Q/edit?slide=id.g3bae32cf71d_2_297#slide=id.g3bae32cf71d_2_297" target="_blank" rel="noopener">Core Devs #88</a> · <a class="small" href="https://us02web.zoom.us/rec/play/y7rKDYBb-6PekjNU-WMwr1MWV29Kqpe-OYqMoQmDkD_fFgF6AvVkm7DzGx8-5szXYQMsbXQ37b7Ax8QG.qdg0hhcSHzcTOa1c?eagerLoadZvaPages=sidemenu.billing.plan_management&amp;accessLevel=meeting&amp;canPlayFromShare=true&amp;from=share_recording_detail&amp;continueMode=true&amp;oldStyle=true&amp;iet=gVeA2hmQeLqlW3lDY8h_jnwX494QbuopRGcltvPFg1M.AG.Z0OxU_sC2llwf1ZuecYHPOMAfYYSrcMBzbzzk5NKma1tsyHHUW7P_4po6l22WQBwhZq0mMDa-j4A038_SfFT-EQ9r7zez4vJSapZ260KZtZ8T0MO3EGZ3JiC.Gy9HXjzoz6apc6UyTeBzzQ.eS34Z1qnhZ5HnGG0&amp;componentName=rec-play&amp;originRequestUrl=https%3A%2F%2Fus02web.zoom.us%2Frec%2Fshare%2FcqqpX677Sx49M_F9MRizQCIy8kUx9O0r5XN8Ipc1dnR7baUs0gQkGVN0KrpC0Fy9.h1TXMmU-T5NsABSH%3Fiet%3DgVeA2hmQeLqlW3lDY8h_jnwX494QbuopRGcltvPFg1M.AG.Z0OxU_sC2llwf1ZuecYHPOMAfYYSrcMBzbzzk5NKma1tsyHHUW7P_4po6l22WQBwhZq0mMDa-j4A038_SfFT-EQ9r7zez4vJSapZ260KZtZ8T0MO3EGZ3JiC.Gy9HXjzoz6apc6UyTeBzzQ.eS34Z1qnhZ5HnGG0" target="_blank" rel="noopener">recording</a></span></li><li><time>Jan 20, 2026</time><span class="kind meeting">Core Devs</span><span><a href="https://docs.google.com/presentation/d/1fTPOod9Pq-bQ0_qIziN0_k-ZzMLsAjC7vMLhDqyiCDY/edit?slide=id.g3bae32cf71d_2_245#slide=id.g3bae32cf71d_2_245" target="_blank" rel="noopener">Core Devs #87</a> · <a class="small" href="https://us02web.zoom.us/rec/play/JPSHL8bBqxUJh5IyDK5PwVGDwxt13qU8lsQoHjW7mWNJeA0QgFNqtm1zabJZXiChTc39IW_qOib3Sut9.VyLf9Xwm5Q-dB5O1?eagerLoadZvaPages=sidemenu.billing.plan_management&amp;accessLevel=meeting&amp;canPlayFromShare=true&amp;from=share_recording_detail&amp;continueMode=true&amp;oldStyle=true&amp;iet=M8_7qsJ8vDrSR5Dgod02GR_hcoZRoizdbT0TkJoSEUU.AG.Lv0-rcbyX71zqrPs1fe_OI5kMG_rpYe9eraF_IelYkG-c_cF560n9CnbXI-qkKgTgvqSSTRQz63ILQj6Pj6fwFSt09G9xtK7K174xX481BISD3ISArf0hD72.HIwpE9-9Ae_QrFCYiDQk1w.F4btu5kzWHhUAUko&amp;componentName=rec-play&amp;originRequestUrl=https%3A%2F%2Fus02web.zoom.us%2Frec%2Fshare%2FrTX1UwVUCcZd1nTwOG5Hmm45F3qmU00EUYTPfnQkFzJOUko5OZZIHLf1Ne4XHAxf.tOmlt0yUoX56XSf7%3Fiet%3DM8_7qsJ8vDrSR5Dgod02GR_hcoZRoizdbT0TkJoSEUU.AG.Lv0-rcbyX71zqrPs1fe_OI5kMG_rpYe9eraF_IelYkG-c_cF560n9CnbXI-qkKgTgvqSSTRQz63ILQj6Pj6fwFSt09G9xtK7K174xX481BISD3ISArf0hD72.HIwpE9-9Ae_QrFCYiDQk1w.F4btu5kzWHhUAUko" target="_blank" rel="noopener">recording</a></span></li><li><time>Sep 5, 2025</time><span class="kind meeting">Core Devs</span><span><a href="https://github.com/filecoin-project/core-devs/blob/master/Core%20Dev%20Meetings/Meeting%200083.md" target="_blank" rel="noopener">Core Devs #83</a> · <a class="small" href="https://fil-org.zoom.us/rec/share/pPkLyzSELAKgaGLMZweInyZ3E06o27PCIbAs-jeErM27ZfNWWZbv-VYiNSTB1wFP.qC9jlqnjUCoqNmRW" target="_blank" rel="noopener">recording</a></span></li><li><time>Aug 14, 2025</time><span class="kind meeting">Core Devs</span><span><a href="https://github.com/filecoin-project/core-devs/blob/master/Core%20Dev%20Meetings/Meeting%200082.md" target="_blank" rel="noopener">Core Devs #82</a> · <a class="small" href="https://danny.spesh.com/video/coredevs-2025-08-07/GMT20250807-150442_Recording_1790x920.mp4" target="_blank" rel="noopener">recording</a></span></li></ul></div></section></div><div><section class="card"><div class="card-head"><h2>At a glance</h2></div><div class="card-body"><ol class="path" aria-label="Where this FIP is in the process"><li class="done"><span class="dot" aria-hidden="true"></span><abbr class="term" tabindex="0" title="The FIP has a number and is being refined in the open. Anyone can comment.">Draft</abbr></li><li class="done"><span class="dot" aria-hidden="true"></span><abbr class="term" tabindex="0" title="A final review window, normally 14 days, before the FIP is Accepted (core) or Final (everything else).">Last Call</abbr></li><li class="now"><span class="dot" aria-hidden="true"></span><abbr class="term" tabindex="0" title="A core FIP approved for implementation. It ships in a network upgrade, then becomes Final.">Accepted</abbr><span class=visually-hidden> (current)</span></li><li class=""><span class="dot" aria-hidden="true"></span><abbr class="term" tabindex="0" title="Done: implemented and adopted. Only errata are fixed from here.">Final</abbr></li></ol><dl class="facts"><dt>Status</dt><dd><span class="status-badge status-accepted">Accepted</span></dd><dt>In this stage</dt><dd>2 months (since Sep 4, 2026)</dd><dt>Type</dt><dd>Technical · Core</dd><dt>Authors</dt><dd>Rod Vagg (@rvagg)</dd><dt>Created</dt><dd>2025-05-14</dd><dt>Network upgrade</dt><dd>Candidate for <a href="../network-upgrades.html#plan-nv30">NV30</a> (carried over). Candidates aren't commitments.</dd><dt>Requires</dt><dd>N/A</dd><dt>Discussion</dt><dd><a class="" href="https://github.com/filecoin-project/FIPs/discussions/1149" target="_blank" rel="noopener">Discussion thread ↗</a></dd></dl></div></section><section class="card"><div class="card-head"><h2>Status history</h2><span class="hint">From the FIPs README. Dates are when the table changed, which can lag the decision by a few days.</span></div><div class="card-body"><ol class=history><li><time datetime="2026-09-04T16:21:46+00:00">Sep 4, 2026</time><span><span class="status-badge status-last-call">Last Call</span><span class="arrow">→</span><span class="status-badge status-accepted">Accepted</span> <a class="muted small" href="https://github.com/filecoin-project/FIPs/commit/3d3dfcab887ea8b637cc0f9c22428e674cee0266" target="_blank" rel="noopener">commit</a></span></li><li><time datetime="2025-06-30T02:49:32+00:00">Jun 30, 2025</time><span><span class="status-badge status-draft">Draft</span><span class="arrow">→</span><span class="status-badge status-last-call">Last Call</span> <a class="muted small" href="https://github.com/filecoin-project/FIPs/commit/406c52bab29869428777f72ad18b019e961f03aa" target="_blank" rel="noopener">commit</a></span></li><li><time datetime="2025-06-17T05:25:10+00:00">Jun 17, 2025</time><span>Listed as <span class="status-badge status-draft">Draft</span> <a class="muted small" href="https://github.com/filecoin-project/FIPs/commit/2c4e07a4c89cb6b04ce4815f46e4400fa273166a" target="_blank" rel="noopener">commit</a></span></li></ol><ul class=topics style=margin-top:12px><li>Last Call Jun 30, 2025 to Sep 4, 2026 (431 days), then <span class="status-badge status-accepted">Accepted</span></li></ul></div></section></div></div>
+<section class="card"><div class="card-head"><h2>Take part</h2></div><div class="card-body"><div class="links-grid"><a class="link-card" href="https://github.com/filecoin-project/FIPs/discussions/1149" target="_blank" rel="noopener"><strong>Comment on FIP-0107 ↗</strong><span>Questions and feedback go in the discussion thread on GitHub.</span></a><a class="link-card" href="https://github.com/filecoin-project/core-devs/issues" target="_blank" rel="noopener"><strong>Raise it at Core Devs ↗</strong><span>Add a topic to the next meeting's agenda issue.</span></a><a class="link-card" href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener"><strong>How the process works ↗</strong><span>FIP-0001 sets out every stage and who decides.</span></a></div><details class="more"><summary>What the terms mean</summary><dl class="glossary" style="margin-top:10px"><div><dt>FIP</dt><dd>Filecoin Improvement Proposal: a written proposal to change the protocol, its standards or the governance process.</dd></div><div><dt>Draft</dt><dd>The FIP has a number and is being refined in the open. Anyone can comment.</dd></div><div><dt>Last Call</dt><dd>A final review window, normally 14 days, before the FIP is Accepted (core) or Final (everything else).</dd></div><div><dt>Accepted</dt><dd>A core FIP approved for implementation. It ships in a network upgrade, then becomes Final.</dd></div><div><dt>Final</dt><dd>Done: implemented and adopted. Only errata are fixed from here.</dd></div><div><dt>Core Devs</dt><dd>The regular open meeting where implementation and research teams discuss FIPs and upgrade priorities.</dd></div><div><dt>Network upgrade</dt><dd>A scheduled change to the protocol that all nodes adopt at a set epoch, named NV followed by a number (NV30).</dd></div><div><dt>Epoch</dt><dd>One 30-second slot of the Filecoin chain. Upgrades activate at a specific epoch.</dd></div><div><dt>Implementers</dt><dd>The teams that build Filecoin node software (such as Lotus, Venus and Forest) and ship upgrades.</dd></div><div><dt>FIP editor</dt><dd>Maintainers of the FIPs repo who check proposals for format and move them between statuses.</dd></div></dl></details></div></section>
+<nav class="prev-next" aria-label="Other FIPs"><a class="prev" href="0106.html"><span>← Previous</span>FIP-0106 Removal of the ProveReplicaUpdates method from the miner…</a><a class="next" href="0109.html"><span>Next →</span>FIP-0109 Enable smart contract notifications for Direct Data…</a></nav>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Read-only view of public governance records in <a href="https://github.com/filecoin-project/FIPs" target="_blank" rel="noopener">filecoin-project/FIPs</a> and <a href="https://github.com/filecoin-project/core-devs" target="_blank" rel="noopener">filecoin-project/core-devs</a>. Nothing here changes a FIP's status or decides an outcome. That stays with authors, FIP editors, Core Devs and the process in <a href="https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0001.md" target="_blank" rel="noopener">FIP-0001</a>.</p>
+    <p>Follow along: <a href="../feed.xml">RSS feed</a> of status changes, Last Calls and upgrades · <a href="../calendar.ics">calendar</a> of meetings, review deadlines and upgrade dates (subscribe in Google Calendar, Outlook or Apple Calendar).</p>
+    <p>Generated 2026-11-19 14:24 UTC. Unofficial community tool.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var c = document.querySelector('.corgi-walk');
+  if (!c) return;
+  function bark() {
+    c.classList.remove('barking'); void c.offsetWidth; c.classList.add('barking');
+    clearTimeout(c._t); c._t = setTimeout(function () { c.classList.remove('barking'); }, 900);
+  }
+  c.addEventListener('click', bark);
+  c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); bark(); } });
+})();
+</script>
+
+
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.video button[data-yt]');
+  if (!b) return;
+  var f = document.createElement('iframe');
+  f.src = 'https://www.youtube-nocookie.com/embed/' + b.getAttribute('data-yt') + '?autoplay=1&rel=0';
+  f.title = b.getAttribute('aria-label') || 'Meeting recording';
+  f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  f.allowFullscreen = true;
+  b.parentNode.replaceChild(f, b);
+});
+</script>
+
+
+<script>
+(function () {
+  var box = document.querySelector('.fip-search');
+  if (!box) return;
+  var base = box.getAttribute('data-base') || '', input = box.querySelector('input'),
+      list = box.querySelector('ul'), index = null, loading = null;
+  function load() {
+    if (!loading) loading = fetch(base + 'fips-index.json').then(function (r) { return r.json(); })
+      .then(function (d) { index = d; }).catch(function () { index = []; });
+    return loading;
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function render() {
+    var q = input.value.trim().toLowerCase();
+    if (!q || !index) { list.hidden = true; input.setAttribute('aria-expanded', 'false'); return; }
+    var num = q.replace(/^fip[-\s]*/, '');
+    var words = q.split(/\s+/).filter(Boolean);
+    var hits = index.filter(function (f) {
+      if (/^\d+$/.test(num) && (f.n === num.padStart(4, '0') || f.n.indexOf(num) === 0 || String(+f.n) === num)) return true;
+      var t = f.t.toLowerCase();
+      return words.every(function (w) { return t.indexOf(w) !== -1; });
+    }).slice(0, 8);
+    list.innerHTML = hits.length ? hits.map(function (f) {
+      return '<li role="option"><a href="' + base + 'fip/' + f.n + '.html"><strong>FIP-' + f.n + '</strong> ' + esc(f.t) +
+             ' <span class="s">' + esc(f.s) + '</span></a></li>';
+    }).join('') : '<li class="none">No FIP matches</li>';
+    list.hidden = false; input.setAttribute('aria-expanded', 'true');
+  }
+  input.addEventListener('focus', load);
+  input.addEventListener('input', function () { load().then(render); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { var a = list.querySelector('a'); if (a) { e.preventDefault(); location.href = a.href; } }
+    if (e.key === 'Escape') { input.value = ''; render(); }
+    if (e.key === 'ArrowDown') { var f = list.querySelector('a'); if (f) { e.preventDefault(); f.focus(); } }
+  });
+  list.addEventListener('keydown', function (e) {
+    var a = document.activeElement, li = a && a.parentNode;
+    if (e.key === 'ArrowDown' && li.nextSibling) { e.preventDefault(); li.nextSibling.querySelector('a').focus(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); (li.previousSibling ? li.previousSibling.querySelector('a') : input).focus(); }
+    if (e.key === 'Escape') { input.focus(); list.hidden = true; }
+  });
+  document.addEventListener('click', function (e) { if (!box.contains(e.target)) list.hidden = true; });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && document.activeElement === document.body) { e.preventDefault(); input.focus(); }
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 
 PAGES = ['index.html', 'overview.html', 'fips-dashboard-static.html', 'fips-timeline-tracker.html',
-         'core-devs.html', 'implementers.html', 'network-upgrades.html']
+         'core-devs.html', 'implementers.html', 'network-upgrades.html', 'frcs.html']
 MIN_FIP_PAGES = 50
 
 
@@ -47,7 +47,7 @@ def check():
         problems.append(f'only {len(fip_pages)} FIP pages (expected at least {MIN_FIP_PAGES})')
 
     checked = 0
-    for page in sorted(glob.glob('*.html') + glob.glob('fip/*.html')):
+    for page in sorted(glob.glob('*.html') + glob.glob('fip/*.html') + glob.glob('frc/*.html')):
         parser = Links()
         with open(page, encoding='utf-8') as f:
             parser.feed(f.read())
@@ -86,14 +86,20 @@ def check():
 
     try:
         with open('fips-index.json', encoding='utf-8') as f:
-            index = {x['n'] for x in json.load(f) if not x.get('u')}  # 'u': open-PR proposals, no page
+            entries = [x for x in json.load(f) if not x.get('u')]  # 'u': open-PR proposals, no page
+        index = {x['n'] for x in entries if x.get('k') != 'FRC'}
+        frc_index = {x['n'] for x in entries if x.get('k') == 'FRC'}
         with open('data.json', encoding='utf-8') as f:
-            data = {x['number'] for x in json.load(f)['fips']}
+            d = json.load(f)
+        data, frc_data = {x['number'] for x in d['fips']}, {x['number'] for x in d.get('frcs', [])}
         if index != data:
             problems.append(f'fips-index.json and data.json disagree on {len(index ^ data)} FIPs')
-        missing = [n for n in index if not os.path.exists(f'fip/{n}.html')]
+        if frc_index != frc_data:
+            problems.append(f'fips-index.json and data.json disagree on {len(frc_index ^ frc_data)} FRCs')
+        missing = [n for n in index if not os.path.exists(f'fip/{n}.html')] + \
+                  [n for n in frc_index if not os.path.exists(f'frc/{n}.html')]
         if missing:
-            problems.append(f'no page for {len(missing)} FIPs, e.g. {missing[:3]}')
+            problems.append(f'no page for {len(missing)} FIPs/FRCs, e.g. {missing[:3]}')
     except (OSError, ValueError, KeyError) as e:
         problems.append(f'JSON files: {e}')
 

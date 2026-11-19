@@ -22,6 +22,7 @@ import implementers as impl
 import scope_planning as sp
 import lifecycle_explainers as lx
 import fip_pages
+import frc_pages
 import extras
 from fip_utils import html_escape as esc
 from theme import page
@@ -881,6 +882,9 @@ def load_context():
     history, events = u.build_status_history(fips_repo)
     files = u.load_fip_files(fips_repo)
     u.register_fips(fips, files)
+    frcs, frc_files = u.load_frcs(fips_repo)
+    frc_history = {n: h for n, h in u.build_status_history(fips_repo, 'all')[0].items() if n in frcs or n in frc_files}
+    frc_open_lc, frc_past_lc = u.last_call_windows(frc_history, frc_files, frcs)
     open_lc, past_lc = u.last_call_windows(history, files, fips)
     print('Fetching PRs, discussions and agenda issues (optional)...')
     raw_prs = u.fetch_open_prs()
@@ -888,6 +892,8 @@ def load_context():
     return {
         'fips': fips, 'files': files, 'events': events, 'open_lc': open_lc, 'past_lc': past_lc,
         'history': history, 'fips_repo': fips_repo, 'cd_repo': cd_repo,
+        'frcs': frcs, 'frc_files': frc_files, 'frc_history': frc_history,
+        'frc_open_lc': frc_open_lc, 'frc_past_lc': frc_past_lc,
         'meetings': cd.load_meetings(cd_repo), 'upgrades': cd.load_upgrades(cd_repo),
         'prs': prs,
         'prs_by_fip': u.prs_by_fip(prs) if prs else {},
@@ -926,6 +932,7 @@ def main():
             f.write(fn(ctx))
         print(f'Generated {name}')
     fip_pages.write_all(ctx)
+    frc_pages.write_all(ctx)
     return 0
 
 

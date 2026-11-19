@@ -71,7 +71,8 @@ def a(url, text, bold=True):
 
 
 def fip_a(num):
-    return a(u.fip_url(num), f'FIP-{num}')
+    page = u.fip_page(num)
+    return a(SITE + page if page else u.fip_url(num), f'FIP-{num}')
 
 
 def muted(text):
@@ -227,6 +228,7 @@ def collect(hours):
     fips = {f['number']: f for f in u.parse_fip_table(u.read_readme(repo))}
     history, events = u.build_status_history(repo)
     files = u.load_fip_files(repo)
+    u.register_fips(fips, files)
     open_lc, _ = u.last_call_windows(history, files, fips)
     d.update(fips=fips, files=files, last_call=open_lc,
              status_changes=sorted((e for e in events if e['date'] >= since and e['from'] != e['to']),

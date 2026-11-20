@@ -16,6 +16,7 @@ from datetime import datetime, timedelta, timezone
 import re
 
 import fip_utils as u
+import scope_planning as sp
 from fip_utils import html_escape as esc
 
 IDLE_PR_DAYS = 30
@@ -250,28 +251,53 @@ def editors_page(ctx, page, fip_a, fmt_date):
 
     # 1. Idea discussions with traction that no FIP or FRC links to yet
     ideas = ctx['_ideas'] if '_ideas' in ctx else fetch_ideas()
-    linked = set()
-    for f in all_files.values():
+    disc_re = re.compile(r'github\.com/filecoin-project/FIPs/discussions/(\d+)', re.I)
+    drafted = {}   # discussion number -> what already exists for it
+    for n, f in all_files.items():
         for url in f.get('_discussions') or []:
-            m = re.search(r'/discussions/(\d+)', url)
+            m = disc_re.search(url) or re.search(r'/discussions/(\d+)', url)
             if m:
-                linked.add(int(m.group(1)))
-    ready_draft = []
+                drafted.setdefault(int(m.group(1)), u.label(n))
+    for pr in raw or []:
+        for m in disc_re.finditer(f'{pr.get("title") or ""} {pr.get("body") or ""}'):
+            drafted.setdefault(int(m.group(1)), f'PR #{pr["number"]}')
+    for plan in ctx.get('planning') or []:
+        for row in plan['scope']:
+            if row.get('fip'):
+                for url in row.get('links') or []:
+                    m = disc_re.search(url)
+                    if m:
+                        drafted.setdefault(int(m.group(1)), u.label(row['fip']))
+    in_plan = {}   # discussion number -> NV, for planning rows that only have a discussion
+    for plan_ in sp.upcoming(ctx.get('planning'), ctx['upgrades']):
+        for row in plan_['scope']:
+            for url in row.get('links') or []:
+                m = disc_re.search(url)
+                if m and row['readiness'] != 'deferred-out':
+                    in_plan.setdefault(int(m.group(1)), plan_['nv'])
+    ready_draft, skipped = [], 0
     for d in ideas or []:
-        if d['closed'] or d['number'] in linked or re.search(r'\bF(IP|RC)[-\s]?0*\d+', d['title'], re.I) and \
-                any(int(x) == int(n) for x in re.findall(r'F(?:IP|RC)[-\s]?0*(\d+)', d['title'], re.I) for n in all_rows):
+        if d['closed']:
+            continue
+        if d['number'] in drafted or re.search(r'\bF(IP|RC)[-\s]?(\d+|X{2,})\b', d['title'], re.I) \
+                or re.search(r'\b(FIP|FRC) draft\b|\bdraft (FIP|FRC)\b', d['title'], re.I):
+            skipped += 1
             continue
         if (now - d['updated']).days > DISCUSSION_ACTIVE_DAYS:
             continue
-        if d['comments'] >= DISCUSSION_MIN_COMMENTS or d['upvotes'] >= DISCUSSION_MIN_UPVOTES:
+        if d['number'] in in_plan or d['comments'] >= DISCUSSION_MIN_COMMENTS or d['upvotes'] >= DISCUSSION_MIN_UPVOTES:
             ready_draft.append(d)
-    ready_draft.sort(key=lambda d: -(d['comments'] + d['upvotes']))
+    ready_draft.sort(key=lambda d: (d['number'] not in in_plan, -(d['comments'] + d['upvotes'])))
     disc_note = '' if ideas is not None else ' Discussions couldn\'t be loaded on this run.'
     q1, m1 = section('ready-draft', 'Discussions that may be ready for a FIP draft',
                      f'Open discussions in the FIPs repo with {DISCUSSION_MIN_COMMENTS}+ comments or {DISCUSSION_MIN_UPVOTES}+ upvotes, '
-                     f'active in the last {DISCUSSION_ACTIVE_DAYS} days, that no FIP or FRC links to yet. Traction, not consensus.' + disc_note,
+                     f'active in the last {DISCUSSION_ACTIVE_DAYS} days, with no FIP or FRC yet, plus any that upcoming upgrade planning names. '
+                     'Ones in planning come first. Traction, not consensus. '
+                     f'{skipped} open discussion{"s" if skipped != 1 else ""} skipped because they already have one: a FIP or FRC links to them, '
+                     'an open FIPs PR links to them, their title carries a FIP number, or the upgrade planning lists them with a FIP number.' + disc_note,
                      ['Discussion', 'Category', 'Author', 'Comments', 'Upvotes', 'Last active'],
-                     [f'<tr><td class="title-cell"><a href="{esc(d["url"])}" target="_blank" rel="noopener">#{d["number"]} {esc(d["title"])}</a></td>'
+                     [f'<tr><td class="title-cell"><a href="{esc(d["url"])}" target="_blank" rel="noopener">#{d["number"]} {esc(d["title"])}</a>'
+                      f'{" <span class=pill>In NV" + str(in_plan[d["number"]]) + " planning</span>" if d["number"] in in_plan else ""}</td>'
                       f'<td class="small">{esc(d["category"])}</td><td>@{esc(d["author"])}</td>'
                       f'<td class="num">{d["comments"]}</td><td class="num">{d["upvotes"]}</td><td class="nowrap">{fmt_date(d["updated"])}</td></tr>'
                       for d in ready_draft],
@@ -339,6 +365,98 @@ def editors_page(ctx, page, fip_a, fmt_date):
                       f'<td class="small">{"<br>".join(sig)}</td></tr>' for _, n, sig in lc_ready],
                      'No Drafts show those signals right now.')
 
+    # --- Upgrade timetable: everything aimed at the next network upgrade ----
+    plan = (sp.active(ctx.get('planning'), ctx['upgrades']) or [None])[0]
+    pr_by_num = {p['number']: p for p in ctx.get('prs') or []}
+    lc_by_num = {w['number']: w for w in ctx['open_lc'] + (ctx.get('frc_open_lc') or [])}
+
+    def pr_state(p):
+        info = (reviews or {}).get(p['number'])
+        if p['draft']:
+            st = 'draft PR'
+        elif not info:
+            st = 'review state unknown'
+        elif info['changes']:
+            st = f'changes requested by {who(info["changes"])}'
+        else:
+            st = f'{len(info["editor_ok"])}/{EDITOR_APPROVALS_NEEDED} editor approvals'
+        return f'<a href="{esc(p["url"])}" target="_blank" rel="noopener">PR #{p["number"]}</a> ({st})'
+
+    def next_step(row):
+        n = row.get('fip')
+        linked_prs = [pr_by_num[int(m.group(1))] for url in row.get('links') or []
+                      if (m := re.search(r'FIPs/pull/(\d+)', url, re.I)) and int(m.group(1)) in pr_by_num]
+        prs_for = (ctx.get('prs_by_fip') or {}).get(n, []) if n else []
+        prs = list({p['number']: p for p in linked_prs + prs_for}.values())
+        status = (all_rows.get(n) or {}).get('status') or ((all_files.get(n) or {}).get('_status') if n else None)
+        steps = []
+        if not n:
+            discs = [url for url in row.get('links') or [] if '/discussions/' in url]
+            if prs:
+                steps.append('Proposal PR open: ' + ', '.join(pr_state(p) for p in prs))
+            elif discs:
+                steps.append(f'Only a discussion so far (<a href="{esc(discs[0])}" target="_blank" rel="noopener">thread</a>). '
+                             '<strong>Needs a FIP draft.</strong>')
+            else:
+                steps.append('<span class="muted">No FIP linked in the planning table.</span>')
+            return status, steps
+        if not status:
+            steps.append('<strong>Not merged yet.</strong> ' + (', '.join(pr_state(p) for p in prs) or 'No open PR found.'))
+            return status, steps
+        if status == 'Draft':
+            lc_prs = [p for p in prs if re.search(r'last[\s-]?call', f'{p["title"]} {p.get("body") or ""}', re.I)]
+            other = [p for p in prs if p not in lc_prs]
+            if other:
+                steps.append('Open edits: ' + ', '.join(pr_state(p) for p in other))
+            steps.append('Last Call PR: ' + ', '.join(pr_state(p) for p in lc_prs) if lc_prs
+                         else '<strong>Needs a PR opening Last Call.</strong>')
+        elif status == 'Last Call':
+            w = lc_by_num.get(n)
+            if w and w['end'] < now:
+                steps.append(f'<strong>Review period ended {fmt_date(w["end"])}{" (est.)" if w["estimated_end"] else ""}: ready to move on.</strong>')
+            elif w:
+                steps.append(f'In Last Call until {fmt_date(w["end"])}{" (est.)" if w["estimated_end"] else ""}.')
+        elif status in ('Accepted', 'Final'):
+            steps.append(f'{esc(status)}. Nothing for editors.')
+        else:
+            steps.append(esc(status))
+        if prs and status not in ('Draft',):
+            steps.append('Open PRs: ' + ', '.join(pr_state(p) for p in prs))
+        return status, steps
+
+    order = {'ready': 0, 'risk': 1, 'deferred-in': 2, 'unknown': 3, 'none': 4, 'deferred-out': 5}
+    nv_rows, out_of_scope = [], False
+    for i, row in sorted(enumerate((plan or {}).get('scope') or []), key=lambda x: (order.get(x[1]['readiness'], 3), x[0])):
+        status, steps = next_step(row)
+        if row['readiness'] == 'deferred-out' and not out_of_scope:
+            out_of_scope = True
+            nv_rows.append('<tr><td colspan="5" class="muted small" style="text-align:center;font-weight:600">'
+                           'Moved to a later upgrade</td></tr>')
+        item = (fip_a(row['fip']) if row.get('fip') else
+                (f'<a href="{esc(row["link"])}" target="_blank" rel="noopener">{esc(row.get("link_label") or "link")}</a>' if row.get('link') else '—'))
+        detail = ' · '.join(x for x in (esc(row.get('status') or ''), esc(row.get('timeline') or ''),
+                                         f'size {esc(row["size"])}' if row.get('size') else '') if x)
+        nv_rows.append(f'<tr><td class="nowrap">{item}</td><td class="title-cell">{esc(row["name"])}'
+                       f'{"<div class=muted small>" + esc(row["summary"]) + "</div>" if row.get("summary") else ""}</td>'
+                       f'<td class="small nowrap">{esc(row["readiness_label"])}</td>'
+                       f'<td class="small">{detail or "—"}{"<div class=muted>" + esc(row["notes"]) + "</div>" if row.get("notes") else ""}</td>'
+                       f'<td class="small">{"<br>".join(steps)}{"<div class=muted>FIP status: " + esc(status) + "</div>" if status else ""}</td></tr>')
+    if plan:
+        miles = ' · '.join(f'{esc(m["name"])}: <strong>{esc(m["date"])}</strong>' for m in plan.get('milestones') or [])
+        nv_title = f'NV{plan["nv"]} timetable'
+        nv_hint = (f'Everything in the <a href="{esc(plan["url"])}" target="_blank" rel="noopener">NV{plan["nv"]} planning discussion</a>, '
+                   'with the next step for FIP editors worked out from the FIPs repo and open PRs. Planning status and notes are the planners\' own words.')
+        nv_card, nv_count = section('nv', nv_title, nv_hint, ['FIP', 'Item', 'Readiness', 'Planning status', 'Next step for editors'],
+                                    nv_rows, 'The planning discussion has no scope table yet.')
+        if miles:
+            nv_card = nv_card.replace('<div class="card-body">', f'<div class="card-body"><p class="note" style="margin:0 0 12px">{miles}</p>', 1)
+    else:
+        nv_card, nv_count = ('<section class="card" id="nv"><div class="card-head"><h2>Next upgrade timetable</h2></div>'
+                             '<div class="card-body"><p class="empty">'
+                             + ('No active upgrade planning discussion found.' if ctx.get('planning') is not None else
+                                'The core-devs planning discussion couldn\'t be loaded on this run.')
+                             + '</p></div></section>'), 0
+
     # --- Tracking ------------------------------------------------------------
     in_lc = sorted((w for w in ctx['open_lc'] + (ctx.get('frc_open_lc') or []) if w['end'] >= now), key=lambda w: w['end'])
     t1, k1 = section('in-lc', 'In Last Call now',
@@ -368,7 +486,8 @@ def editors_page(ctx, page, fip_a, fmt_date):
                        for lbl, url, d in TOOLS)
              + f'</div>{agenda_html}{editor_list}</div></section>')
 
-    counts = [('approvals', 'Need editor approval', m0 if reviews is not None else '—'),
+    counts = [('nv', f'NV{plan["nv"]} items' if plan else 'Next upgrade', nv_count if plan else '—'),
+              ('approvals', 'Need editor approval', m0 if reviews is not None else '—'),
               ('ready-draft', 'Ideas ready to draft', m1 if ideas is not None else '—'),
               ('new-proposals', 'New proposals', m2 if ctx.get('prs') is not None else '—'),
               ('ready-lc', 'Drafts ready for LC?', m3),
@@ -388,7 +507,8 @@ def editors_page(ctx, page, fip_a, fmt_date):
     queues = '<h2 style="margin:22px 2px 0;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">To review</h2>'
     tracking = '<h2 style="margin:22px 2px 0;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Tracking</h2>'
     checks = '<h2 style="margin:22px 2px 0;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Housekeeping</h2>'
-    body = '\n'.join([stats, intro, tools, queues, q0, q1, q2, q3, tracking, t1, t2, checks, s1, s2, s3, s4, s5, s6])
+    upgrade_h = '<h2 style="margin:22px 2px 0;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Next network upgrade</h2>'
+    body = '\n'.join([stats, intro, upgrade_h, nv_card, tools, queues, q0, q1, q2, q3, tracking, t1, t2, checks, s1, s2, s3, s4, s5, s6])
     return page(title='Editor checklist',
                 description='Signals for FIP editors from the public records.',
                 current='editors', subtitle='One place for FIP editors: what to review, what is moving, and what needs tidying.',

@@ -23,6 +23,7 @@ import scope_planning as sp
 import lifecycle_explainers as lx
 import fip_pages
 import frc_pages
+import editors
 import extras
 from fip_utils import html_escape as esc
 from theme import page
@@ -927,7 +928,8 @@ def main():
     for name, fn in (('index.html', lifecycle_page), ('overview.html', overview),
                      ('fip-lifecycle.html', lambda _ctx: REDIRECT_HOME), ('core-devs.html', core_devs_page),
                      ('implementers.html', implementers_page),
-                     ('network-upgrades.html', upgrades_page)):
+                     ('network-upgrades.html', upgrades_page),
+                     ('editors.html', lambda c: editors.editors_page(c, page, fip_a, fmt_date))):
         with open(name, 'w', encoding='utf-8') as f:
             f.write(fn(ctx))
         print(f'Generated {name}')

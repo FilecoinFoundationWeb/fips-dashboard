@@ -680,17 +680,19 @@ SEARCH_JS = """
     if (!q || !index) { list.hidden = true; input.setAttribute('aria-expanded', 'false'); return; }
     var num = q.replace(/^f(ip|rc)[-\\s]*/, '');
     var words = q.split(/\\s+/).filter(Boolean);
+    var hidden = /^editors?$/.test(q) ? '<li role="option"><a href="' + base + 'editors.html"><strong>Editors</strong> FIP editor checklist ' +
+                 '<span class="s">unlisted</span></a></li>' : '';
     var hits = index.filter(function (f) {
       if (/^\\d+$/.test(num) && (f.n === num.padStart(4, '0') || f.n.indexOf(num) === 0 || String(+f.n) === num)) return true;
       var t = (f.t + ' ' + (f.a || '')).toLowerCase();
       return words.every(function (w) { return t.indexOf(w) !== -1; });
     }).slice(0, 8);
-    list.innerHTML = hits.length ? hits.map(function (f) {
+    list.innerHTML = hidden + (hits.length || hidden ? hits.map(function (f) {
       var k = f.k || 'FIP';
       var href = f.u ? esc(f.u) + '" target="_blank" rel="noopener' : base + k.toLowerCase() + '/' + f.n + '.html';
       return '<li role="option"><a href="' + href + '"><strong>' + k + '-' + f.n + '</strong> ' + esc(f.t) +
              ' <span class="s">' + esc(f.s) + '</span></a></li>';
-    }).join('') : '<li class="none">No FIP or FRC matches</li>';
+    }).join('') : '<li class="none">No FIP or FRC matches</li>');
     list.hidden = false; input.setAttribute('aria-expanded', 'true');
   }
   input.addEventListener('focus', load);
@@ -727,7 +729,7 @@ NAV = [
 ]
 
 
-def page(title, description, current, subtitle, body_html, generated_at=None, base='', og_image=None, path=''):
+def page(title, description, current, subtitle, body_html, generated_at=None, base='', og_image=None, path='', noindex=False):
     """Wrap page content in the shared FF-themed shell with the corgi header.
 
     `base` is the path back to the site root ('../' for pages in fip/), so the
@@ -740,6 +742,8 @@ def page(title, description, current, subtitle, body_html, generated_at=None, ba
                f'<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">\n'
                '<meta name="twitter:card" content="summary_large_image">'
                if image else '<meta name="twitter:card" content="summary">')
+    if noindex:  # unlisted pages: keep them out of search engines
+        og_tags += '\n<meta name="robots" content="noindex, nofollow">'
     report = extras.report_url(title, SITE_URL + path)
     signup = extras.digest_signup_url()
     generated_at = generated_at or datetime.now(timezone.utc)

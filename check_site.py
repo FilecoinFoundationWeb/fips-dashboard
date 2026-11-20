@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 
 PAGES = ['index.html', 'overview.html', 'fips-dashboard-static.html', 'fips-timeline-tracker.html',
-         'core-devs.html', 'implementers.html', 'network-upgrades.html', 'frcs.html']
+         'core-devs.html', 'implementers.html', 'network-upgrades.html', 'frcs.html', 'editors.html']
 MIN_FIP_PAGES = 50
 
 

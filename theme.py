@@ -697,10 +697,23 @@ I18N_JS = r"""
   var root = document.documentElement;
   root.style.visibility = 'hidden';
   var reveal = setTimeout(function () { root.style.visibility = ''; }, 1500);
-  fetch(base + 'i18n-zh.json').then(function (r) { return r.json(); }).then(apply)
-    .catch(function () {}).then(function () { clearTimeout(reveal); root.style.visibility = ''; });
+  var page = location.pathname.match(/\/(fip|frc)\/(\d{4})\.html$/);
+  function get(f) { return fetch(base + f).then(function (r) { return r.json(); }).catch(function () { return null; }); }
+  Promise.all([get('i18n-zh.json'), page ? get('i18n-zh-summaries.json') : null]).then(function (r) {
+    if (r[0]) apply(r[0], r[1]);
+  }).catch(function () {}).then(function () { clearTimeout(reveal); root.style.visibility = ''; });
 
-  function apply(data) {
+  function apply(data, summ) {
+    var key = page && (page[1] + '/' + page[2]), box = document.querySelector('.summary-text');
+    if (summ && key && box && summ.summaries && summ.summaries[key]) {
+      box.innerHTML = summ.summaries[key];
+      box.setAttribute('data-no-i18n', '');
+      var note = document.createElement('p');
+      note.className = 'muted'; note.style.fontSize = '12px';
+      note.textContent = summ.note;
+      box.parentNode.insertBefore(note, box.nextSibling);
+    }
+    var TT = data.titles || {}, TK = Object.keys(TT);
     var D = data.strings, P = data.patterns.map(function (p) { return [new RegExp(p[0]), p[1]]; });
     var MON = {Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12};
     var FULL = {January: 1, February: 2, March: 3, April: 4, May: 5, June: 6, July: 7, August: 8,
@@ -714,13 +727,36 @@ I18N_JS = r"""
               .replace(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2})$/,
                        function (m, a, d) { return MON[a] + '月' + (+d) + '日'; });
     }
-    function tr(s) {
+    function core(s) {
       if (has.call(D, s)) return D[s];
+      var lo = s.toLowerCase();
+      if (has.call(TT, lo)) return TT[lo];
       for (var i = 0; i < P.length; i++) {
         var m = s.match(P[i][0]);
         if (m) return P[i][1].replace(/\{(\d)\}/g, function (x, k) { return tr(m[+k] || ''); });
       }
       return dates(s);
+    }
+    function tr(s) {
+      var r = core(s), m, t;
+      if (r !== s || s.length < 2) return r;
+      if ((m = s.match(/^((?:#\d+ )?(?:FIP|FRC)-?\s?(?:\d{1,4}|XXXX))(: | )(.+)$/)) && (t = tr(m[3])) !== m[3]) return m[1] + (m[2] === ': ' ? '：' : ' ') + t;
+      if ((m = s.match(/^([:;·—–-]\s*)(.+)$/)) && (t = tr(m[2])) !== m[2]) return m[1] + t;
+      if ((m = s.match(/^(.+?)\s*([.:,;·])$/)) && (t = tr(m[1])) !== m[1])
+        return t + ({'.': '。', ':': '：', ',': '，', ';': '；', '·': ' ·'})[m[2]];
+      var seps = [['; ', '；'], [' · ', ' · ']];
+      for (var q = 0; q < seps.length; q++) {
+        if (s.indexOf(seps[q][0]) <= 0) continue;
+        var parts = s.split(seps[q][0]), out = parts.map(tr), changed = false;
+        for (var j = 0; j < parts.length; j++) if (out[j] !== parts[j]) changed = true;
+        if (changed) return out.join(seps[q][1]);
+      }
+      if (/(…|\.\.\.)$/.test(s)) {
+        var pre = s.replace(/\s*(…|\.\.\.)$/, '').toLowerCase();
+        if (pre.length > 12) for (var k = 0; k < TK.length; k++) if (TK[k].indexOf(pre) === 0) return TT[TK[k]] + '…';
+        if ((t = tr(s.replace(/\s*(…|\.\.\.)$/, ''))) !== s.replace(/\s*(…|\.\.\.)$/, '')) return t + '…';
+      }
+      return r;
     }
     function text(n) {
       var t = n.nodeValue, s = t.replace(/\s+/g, ' ').trim();
@@ -728,7 +764,7 @@ I18N_JS = r"""
       var r = tr(s);
       if (r !== s) n.nodeValue = t.match(/^\s*/)[0] + r + t.match(/\s*$/)[0];
     }
-    var SKIP = {SCRIPT: 1, STYLE: 1, CODE: 1, PRE: 1, TEXTAREA: 1};
+    var SKIP = {SCRIPT: 1, STYLE: 1, CODE: 1, PRE: 1, TEXTAREA: 1, script: 1, style: 1};
     function walk(el) {
       if (el.nodeType === 3) { if (!el.parentNode || !SKIP[el.parentNode.nodeName]) text(el); return; }
       if (el.nodeType !== 1 || SKIP[el.nodeName] || el.hasAttribute('data-no-i18n')) return;

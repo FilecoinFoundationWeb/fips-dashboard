@@ -264,7 +264,8 @@ def load_upgrades(repo):
             'number': num,
             'name': up.get('name') or '',
             'actors': up.get('actorsVersion') or '',
-            'fips': [str(x).zfill(4) for x in up.get('fips') or []],
+            # An entry can be ["0086", "F3 Soft Launch"]: a FIP number with a note.
+            'fips': [str(x[0] if isinstance(x, list) and x else x).zfill(4) for x in up.get('fips') or []],
             'mainnet': _ts(act.get('mainnet')),
             'mainnet_epoch': (act.get('mainnet') or {}).get('epoch') if isinstance(act.get('mainnet'), dict) else None,
             'calibration': _ts(act.get('calibrationnet') or act.get('calibration')),

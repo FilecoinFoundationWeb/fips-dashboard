@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-20T16:39:50Z",
+ "generated_at": "2026-11-20T23:52:53Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -3954,6 +3954,7 @@
    "mentions": [
     "Storage providers",
     "Clients and data onboarding",
+    "Smart contract developers",
     "RPC and tooling"
    ],
    "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0121.md",

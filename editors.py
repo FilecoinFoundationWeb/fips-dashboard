@@ -21,7 +21,8 @@ from fip_utils import html_escape as esc
 IDLE_PR_DAYS = 30
 QUIET_DRAFT_DAYS = 365
 RECENT_CHANGE_DAYS = 30     # status changes listed under "Recently moved"
-MAX_REVIEW_LOOKUPS = 30     # review-state API calls per build, for the proposals list
+MAX_REVIEW_LOOKUPS = 60     # PRs whose reviews are fetched per build
+EDITOR_APPROVALS_NEEDED = 2 # FIP editor approvals a PR needs before it is merged
 RECENT_CALL_DAYS = 90        # a Draft discussed in a call this recently counts as active
 DISCUSSION_MIN_COMMENTS = 5  # engagement for an idea discussion to be listed as a possible Draft
 DISCUSSION_MIN_UPVOTES = 5
@@ -66,6 +67,48 @@ TOOLS = [
     ('README table', f'{REPO}/blob/master/README.md', 'Where statuses are recorded'),
     ('Core Devs agenda issues', 'https://github.com/filecoin-project/core-devs/issues', 'Add a FIP to the next meeting'),
 ]
+
+
+def fip_editors(repo):
+    """FIP editors' GitHub logins, from the FIPs repo's CODEOWNERS file."""
+    try:
+        with open(f'{repo or ""}/CODEOWNERS', encoding='utf-8') as f:
+            return set(re.findall(r'@([A-Za-z0-9-]+)', f.read()))
+    except OSError:
+        return set()
+
+
+def review_info(raw_prs, editors):
+    """{pr number: who approved, who asked for changes, which editors are requested}.
+
+    Uses the latest decisive review per person; an author's own review doesn't count.
+    None when PRs couldn't be loaded.
+    """
+    editors = {e.lower() for e in editors}
+    if raw_prs is None:
+        return None
+    out = {}
+    for pr in [p for p in raw_prs if not p.get('draft')][:MAX_REVIEW_LOOKUPS]:
+        author = (pr.get('user') or {}).get('login', '')
+        try:
+            reviews = u._paged(f'{u.GITHUB_API_BASE}/pulls/{pr["number"]}/reviews')
+        except Exception as e:
+            print(f'Warning: Could not fetch reviews for PR #{pr["number"]}: {e}')
+            continue
+        latest = {}
+        for r in reviews:
+            who = (r.get('user') or {}).get('login', '')
+            if who and who != author and r.get('state') in ('APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'):
+                latest[who] = r['state']
+        approved = [w for w, st in latest.items() if st == 'APPROVED']
+        out[pr['number']] = {
+            'editor_ok': sorted(w for w in approved if w.lower() in editors),
+            'other_ok': sorted(w for w in approved if w.lower() not in editors),
+            'changes': sorted(w for w, st in latest.items() if st == 'CHANGES_REQUESTED'),
+            'requested': sorted(x['login'] for x in pr.get('requested_reviewers') or [] if x['login'].lower() in editors),
+            'author_is_editor': author.lower() in editors,
+        }
+    return out
 
 
 def _days(n):
@@ -168,6 +211,40 @@ def editors_page(ctx, page, fip_a, fmt_date):
                       for n in nodisc], 'Every open FIP links to a discussion.')
 
     # --- Review queues ---------------------------------------------------
+    editors = fip_editors(ctx.get('fips_repo'))
+    raw = ctx['_raw_prs'] if '_raw_prs' in ctx else (u.fetch_open_prs() if ctx.get('prs') is not None else None)
+    reviews = ctx['_reviews'] if '_reviews' in ctx else review_info(raw, editors)
+
+    # 0. PRs waiting on FIP editor approval
+    def who(names):
+        return ', '.join('@' + esc(x) for x in names) or '—'
+    waiting = []
+    for p in ctx.get('prs') or []:
+        info = (reviews or {}).get(p['number'])
+        if p['draft'] or not info or len(info['editor_ok']) >= EDITOR_APPROVALS_NEEDED:
+            continue
+        waiting.append((p, info))
+    # Closest to merge first: most editor approvals, then technical approvals, then oldest
+    waiting.sort(key=lambda x: (-len(x[1]['editor_ok']), -len(x[1]['other_ok']), x[0]['created_at']))
+    rows = []
+    for p, info in waiting:
+        need = EDITOR_APPROVALS_NEEDED - len(info['editor_ok'])
+        state = (f'<span class="pill waiting">changes requested by {who(info["changes"])}</span>' if info['changes']
+                 else f'<strong>needs {need} more</strong>')
+        nums = ' '.join(fip_a(x) for x in p['fip_numbers'] if x != 'General') or 'General'
+        rows.append(f'<tr><td class="title-cell"><a href="{esc(p["url"])}" target="_blank" rel="noopener">#{p["number"]} {esc(p["title"])}</a>'
+                    f'<div class="muted small">{nums} · by @{esc(p["author"])} · updated {esc(p["updated_at"][:10])}</div></td>'
+                    f'<td class="nowrap">{len(info["editor_ok"])} / {EDITOR_APPROVALS_NEEDED}<div class="muted small">{who(info["editor_ok"])}</div></td>'
+                    f'<td class="small">{who(info["other_ok"])}</td><td class="small">{state}</td>'
+                    f'<td class="small">{who(info["requested"])}</td></tr>')
+    rev_note = '' if reviews is not None else ' Pull requests couldn\'t be loaded on this run.'
+    q0, m0 = section('approvals', 'Waiting on FIP editor approval',
+                     f'Open, non-draft PRs on the FIPs repo with fewer than {EDITOR_APPROVALS_NEEDED} approvals from FIP editors '
+                     '(the CODEOWNERS list). Closest to merge first; "Other approvals" are reviewers who aren\'t editors, '
+                     'such as technical reviewers.' + rev_note,
+                     ['Pull request', 'Editor approvals', 'Other approvals', 'Status', 'Requested editors'],
+                     rows, 'Every open PR has its editor approvals.' if reviews is not None else
+                     'Pull requests couldn\'t be loaded on this run, so this list is empty.')
     all_files = {**(ctx.get('frc_files') or {}), **files}
     all_rows = {**(ctx.get('frcs') or {}), **fips}
 
@@ -209,9 +286,13 @@ def editors_page(ctx, page, fip_a, fmt_date):
         if unmerged or (not nums and re.search(r'\b(add|new|propos)', p['title'], re.I)):
             new_prs.append((p, unmerged))
     new_prs.sort(key=lambda x: x[0]['created_at'])
-    for p, _ in new_prs[:MAX_REVIEW_LOOKUPS]:
-        if p.get('review') in (None, 'Unknown'):
-            p['review'] = u.fetch_review_state(p['number'], p['draft'])
+    for p, _ in new_prs:
+        info = (reviews or {}).get(p['number'])
+        if p['draft']:
+            p['review'] = 'Draft PR'
+        elif info:
+            p['review'] = (f'Changes requested' if info['changes'] else
+                           f'{len(info["editor_ok"])} of {EDITOR_APPROVALS_NEEDED} editor approvals')
     q2, m2 = section('new-proposals', 'New proposals waiting on review',
                      'Open pull requests that add a FIP or FRC not yet merged into the repo. Oldest first.' + pr_note,
                      ['PR', 'Number', 'Author', 'Review', 'Opened', 'Updated'],
@@ -280,19 +361,22 @@ def editors_page(ctx, page, fip_a, fmt_date):
     agenda = (ctx.get('agenda') or [])[:1]
     agenda_html = (f'<p class="note" style="margin-top:10px">Next Core Devs agenda: <a href="{esc(agenda[0]["url"])}" target="_blank" rel="noopener">'
                    f'#{agenda[0]["number"]} {esc(agenda[0]["title"])}</a> ({agenda[0]["comments"]} comments).</p>' if agenda else '')
+    editor_list = (f'<p class="note" style="margin-top:10px">FIP editors (from CODEOWNERS): '
+                   f'{", ".join("@" + esc(e) for e in sorted(editors))}.</p>' if editors else '')
     tools = ('<section class="card" id="tools"><div class="card-head"><h2>Editor tools</h2></div><div class="card-body"><div class="links-grid">'
              + ''.join(f'<a class="link-card" href="{esc(url)}" target="_blank" rel="noopener"><strong>{esc(lbl)} ↗</strong><span>{esc(d)}</span></a>'
                        for lbl, url, d in TOOLS)
-             + f'</div>{agenda_html}</div></section>')
+             + f'</div>{agenda_html}{editor_list}</div></section>')
 
-    counts = [('ready-draft', 'Ideas ready to draft', m1 if ideas is not None else '—'),
+    counts = [('approvals', 'Need editor approval', m0 if reviews is not None else '—'),
+              ('ready-draft', 'Ideas ready to draft', m1 if ideas is not None else '—'),
               ('new-proposals', 'New proposals', m2 if ctx.get('prs') is not None else '—'),
               ('ready-lc', 'Drafts ready for LC?', m3),
               ('overdue', 'Last Calls over', n1), ('final', 'Awaiting Final', n2), ('mismatch', 'Status mismatches', n3),
               ('idle-prs', 'Idle PRs', n4 if ctx.get('prs') is not None else '—'), ('quiet', 'Quiet Drafts', n5),
               ('no-discussion', 'No discussion link', n6)]
     stats = '<section class="stats">' + ''.join(
-        f'<a class="stat{" accent" if isinstance(v, int) and v and k in ("ready-draft", "new-proposals", "ready-lc") else ""}" href="#{k}">'
+        f'<a class="stat{" accent" if isinstance(v, int) and v and k in ("approvals", "ready-draft", "new-proposals", "ready-lc") else ""}" href="#{k}">'
         f'<div class="label">{esc(lbl)}</div><div class="value">{v}</div></a>' for k, lbl, v in counts) + '</section>'
     intro = ('<section class="card"><div class="card-body" style="padding-top:18px">'
              '<p>Signals from the public records that may need an editor\'s attention. They are prompts, not judgments: '
@@ -304,7 +388,7 @@ def editors_page(ctx, page, fip_a, fmt_date):
     queues = '<h2 style="margin:22px 2px 0;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">To review</h2>'
     tracking = '<h2 style="margin:22px 2px 0;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Tracking</h2>'
     checks = '<h2 style="margin:22px 2px 0;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Housekeeping</h2>'
-    body = '\n'.join([stats, intro, tools, queues, q1, q2, q3, tracking, t1, t2, checks, s1, s2, s3, s4, s5, s6])
+    body = '\n'.join([stats, intro, tools, queues, q0, q1, q2, q3, tracking, t1, t2, checks, s1, s2, s3, s4, s5, s6])
     return page(title='Editor checklist',
                 description='Signals for FIP editors from the public records.',
                 current='editors', subtitle='One place for FIP editors: what to review, what is moving, and what needs tidying.',

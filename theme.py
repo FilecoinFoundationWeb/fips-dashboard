@@ -415,6 +415,14 @@ ul.topics { margin: 0 0 12px 18px; display: grid; gap: 4px; font-size: .94rem; }
 .muted { color: var(--muted); }
 .small { font-size: .84rem; }
 
+/* ---------- Language toggle (header) ---------- */
+.lang-toggle {
+  font: inherit; font-size: .85rem; font-weight: 700; color: #fff; cursor: pointer;
+  padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22);
+}
+.lang-toggle:hover { background: rgba(255,255,255,.16); border-color: var(--fil-blue); }
+.lang-toggle:focus-visible { outline: 2px solid var(--fil-blue); outline-offset: 2px; }
+
 /* ---------- FIP search (header) ---------- */
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .fip-search { position: relative; flex: 1 1 220px; max-width: 320px; }
@@ -661,6 +669,88 @@ def search_box(base=''):
             '<ul id="fip-search-results" class="fip-search-results" role="listbox" hidden></ul></div>')
 
 
+# Chinese (zh-CN) view. The site is generated in English; when the reader picks
+# 中文, this swaps the site's own wording for the translations in i18n-zh.json
+# (exact strings plus patterns for counts and dates) and keeps doing so for
+# content added later (search results, filters). FIP titles, quoted FIP text,
+# names and meeting topics stay in English. The choice is kept in localStorage;
+# ?lang=zh or ?lang=en in a link overrides it.
+I18N_JS = r"""
+<script>
+(function () {
+  var btn = document.querySelector('.lang-toggle');
+  if (!btn) return;
+  var KEY = 'fips-lang', base = btn.getAttribute('data-base') || '', lang = 'en';
+  try {
+    var q = new URLSearchParams(location.search).get('lang');
+    if (q === 'zh' || q === 'en') localStorage.setItem(KEY, q);
+    lang = localStorage.getItem(KEY) === 'zh' ? 'zh' : 'en';
+  } catch (e) {}
+  if (lang === 'zh') {
+    btn.textContent = 'EN'; btn.setAttribute('lang', 'en'); btn.setAttribute('aria-label', 'Switch to English (切换到英文)');
+  }
+  btn.addEventListener('click', function () {
+    try { localStorage.setItem(KEY, lang === 'zh' ? 'en' : 'zh'); } catch (e) {}
+    var u = new URL(location.href); u.searchParams.delete('lang'); location.href = u.toString();
+  });
+  if (lang !== 'zh') return;
+  var root = document.documentElement;
+  root.style.visibility = 'hidden';
+  var reveal = setTimeout(function () { root.style.visibility = ''; }, 1500);
+  fetch(base + 'i18n-zh.json').then(function (r) { return r.json(); }).then(apply)
+    .catch(function () {}).then(function () { clearTimeout(reveal); root.style.visibility = ''; });
+
+  function apply(data) {
+    var D = data.strings, P = data.patterns.map(function (p) { return [new RegExp(p[0]), p[1]]; });
+    var MON = {Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12};
+    var FULL = {January: 1, February: 2, March: 3, April: 4, May: 5, June: 6, July: 7, August: 8,
+                September: 9, October: 10, November: 11, December: 12};
+    var has = Object.prototype.hasOwnProperty;
+    function dates(s) {
+      return s.replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}), (\d{4})\b/g,
+                       function (m, a, d, y) { return y + '年' + MON[a] + '月' + (+d) + '日'; })
+              .replace(/\b(January|February|March|April|May|June|July|August|September|October|November|December) (\d{4})\b/g,
+                       function (m, a, y) { return y + '年' + FULL[a] + '月'; })
+              .replace(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2})$/,
+                       function (m, a, d) { return MON[a] + '月' + (+d) + '日'; });
+    }
+    function tr(s) {
+      if (has.call(D, s)) return D[s];
+      for (var i = 0; i < P.length; i++) {
+        var m = s.match(P[i][0]);
+        if (m) return P[i][1].replace(/\{(\d)\}/g, function (x, k) { return tr(m[+k] || ''); });
+      }
+      return dates(s);
+    }
+    function text(n) {
+      var t = n.nodeValue, s = t.replace(/\s+/g, ' ').trim();
+      if (!s) return;
+      var r = tr(s);
+      if (r !== s) n.nodeValue = t.match(/^\s*/)[0] + r + t.match(/\s*$/)[0];
+    }
+    var SKIP = {SCRIPT: 1, STYLE: 1, CODE: 1, PRE: 1, TEXTAREA: 1};
+    function walk(el) {
+      if (el.nodeType === 3) { if (!el.parentNode || !SKIP[el.parentNode.nodeName]) text(el); return; }
+      if (el.nodeType !== 1 || SKIP[el.nodeName] || el.hasAttribute('data-no-i18n')) return;
+      ['placeholder', 'title', 'aria-label'].forEach(function (a) {
+        var v = el.getAttribute(a);
+        if (v) { var r = tr(v.trim()); if (r !== v.trim()) el.setAttribute(a, r); }
+      });
+      for (var c = el.firstChild; c; c = c.nextSibling) walk(c);
+    }
+    root.setAttribute('lang', 'zh-CN');
+    var title = tr(document.title); if (title !== document.title) document.title = title;
+    walk(document.body);
+    btn.textContent = 'EN';
+    new MutationObserver(function (list) {
+      list.forEach(function (m) { m.addedNodes.forEach(walk); });
+    }).observe(document.body, {childList: true, subtree: true});
+  }
+})();
+</script>
+"""
+
+
 # Loads fips-index.json on first focus; matches FIP numbers and title words.
 SEARCH_JS = """
 <script>
@@ -788,6 +878,7 @@ def page(title, description, current, subtitle, body_html, generated_at=None, ba
     <div class="header-meta">
       <nav class="nav" aria-label="Pages">{nav}</nav>
       {search_box(base)}
+      <button class="lang-toggle" type="button" data-base="{base}" lang="zh" aria-label="切换到中文 (Switch to Chinese)">中文</button>
       <span>Updated {stamp}</span>
     </div>
   </div>
@@ -813,5 +904,6 @@ def page(title, description, current, subtitle, body_html, generated_at=None, ba
 {CORGI_JS}
 {VIDEO_JS}
 {SEARCH_JS}
+{I18N_JS}
 </body>
 </html>'''

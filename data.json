@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-20T15:11:56Z",
+ "generated_at": "2026-11-20T16:39:50Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -4479,7 +4479,7 @@
     "0085",
     "0091",
     "0092",
-    "['0086', 'F3 Soft Launch']"
+    "0086"
    ],
    "mainnet": "2024-08-06T12:00:00Z",
    "mainnet_epoch": 4154640,

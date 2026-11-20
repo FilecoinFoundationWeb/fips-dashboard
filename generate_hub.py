@@ -284,7 +284,6 @@ def overview(ctx):
 <a class="link-card" href="core-devs.html"><strong>Core Devs meetings</strong><span>Notes, recordings and agendas back to 2020.</span></a>
 <a class="link-card" href="implementers.html"><strong>Implementers' calls</strong><span>How upgrades get built: calls, recordings and what each one covered.</span></a>
 <a class="link-card" href="network-upgrades.html"><strong>Network upgrades</strong><span>What shipped when, and which FIPs it included.</span></a>
-<a class="link-card" href="mailto:governance@fil.org"><strong>Contact the governance team</strong><span>governance@fil.org</span></a>
 </div></div></section>'''
 
     body = '\n'.join([

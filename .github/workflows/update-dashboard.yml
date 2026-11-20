@@ -68,8 +68,8 @@ jobs:
           # Per-FIP pages (-A also stages pages removed for FIPs no longer listed), search index and feeds
           git add -A fip frc
           git add fips-index.json feed.xml calendar.ics data.json
-          # The editor checklist is no longer published; remove the old copy if it's there
-          git rm -q --ignore-unmatch editors.html
+          # Unlisted editor checklist (reached by typing "editor" in the search box)
+          git add editors.html
           if [ -d og ]; then git add -A og; fi
           if ! git diff --staged --quiet; then
             git commit -m "Auto-update dashboard $(date +'%Y-%m-%d %H:%M:%S')"

@@ -112,6 +112,13 @@ def review_info(raw_prs, editors):
     return out
 
 
+def in_scope(row):
+    """A planning row the planners have put in the upgrade's proposed scope."""
+    text = f'{row.get("status") or ""} {row.get("notes") or ""} {row.get("timeline") or ""}'
+    return row['readiness'] in ('ready', 'risk') and not re.search(
+        r'not in (the )?(nv\s?\d+ )?(proposal|proposed scope)|not in scope', text, re.I)
+
+
 def _days(n):
     return f'{n} day{"s" if n != 1 else ""}'
 
@@ -273,7 +280,7 @@ def editors_page(ctx, page, fip_a, fmt_date):
         for row in plan_['scope']:
             for url in row.get('links') or []:
                 m = disc_re.search(url)
-                if m and row['readiness'] != 'deferred-out':
+                if m and in_scope(row):
                     in_plan.setdefault(int(m.group(1)), plan_['nv'])
     ready_draft, skipped = [], 0
     for d in ideas or []:
@@ -424,30 +431,25 @@ def editors_page(ctx, page, fip_a, fmt_date):
             steps.append('Open PRs: ' + ', '.join(pr_state(p) for p in prs))
         return status, steps
 
-    order = {'ready': 0, 'risk': 1, 'deferred-in': 2, 'unknown': 3, 'none': 4, 'deferred-out': 5}
-    nv_rows, out_of_scope = [], False
-    for i, row in sorted(enumerate((plan or {}).get('scope') or []), key=lambda x: (order.get(x[1]['readiness'], 3), x[0])):
+    scope_rows = [r for r in (plan or {}).get('scope') or [] if in_scope(r)]
+    others = len((plan or {}).get('scope') or []) - len(scope_rows)
+    nv_rows = []
+    for row in sorted(scope_rows, key=lambda r: r['readiness'] != 'ready'):
         status, steps = next_step(row)
-        if row['readiness'] == 'deferred-out' and not out_of_scope:
-            out_of_scope = True
-            nv_rows.append('<tr><td colspan="5" class="muted small" style="text-align:center;font-weight:600">'
-                           'Moved to a later upgrade</td></tr>')
         item = (fip_a(row['fip']) if row.get('fip') else
                 (f'<a href="{esc(row["link"])}" target="_blank" rel="noopener">{esc(row.get("link_label") or "link")}</a>' if row.get('link') else '—'))
-        detail = ' · '.join(x for x in (esc(row.get('status') or ''), esc(row.get('timeline') or ''),
-                                         f'size {esc(row["size"])}' if row.get('size') else '') if x)
         nv_rows.append(f'<tr><td class="nowrap">{item}</td><td class="title-cell">{esc(row["name"])}'
-                       f'{"<div class=muted small>" + esc(row["summary"]) + "</div>" if row.get("summary") else ""}</td>'
-                       f'<td class="small nowrap">{esc(row["readiness_label"])}</td>'
-                       f'<td class="small">{detail or "—"}{"<div class=muted>" + esc(row["notes"]) + "</div>" if row.get("notes") else ""}</td>'
-                       f'<td class="small">{"<br>".join(steps)}{"<div class=muted>FIP status: " + esc(status) + "</div>" if status else ""}</td></tr>')
+                       f'<div class="muted small">{esc(row["readiness_label"])}{" · FIP status: " + esc(status) if status else ""}</div></td>'
+                       f'<td class="small">{"<br>".join(steps)}</td></tr>')
     if plan:
-        miles = ' · '.join(f'{esc(m["name"])}: <strong>{esc(m["date"])}</strong>' for m in plan.get('milestones') or [])
-        nv_title = f'NV{plan["nv"]} timetable'
-        nv_hint = (f'Everything in the <a href="{esc(plan["url"])}" target="_blank" rel="noopener">NV{plan["nv"]} planning discussion</a>, '
-                   'with the next step for FIP editors worked out from the FIPs repo and open PRs. Planning status and notes are the planners\' own words.')
-        nv_card, nv_count = section('nv', nv_title, nv_hint, ['FIP', 'Item', 'Readiness', 'Planning status', 'Next step for editors'],
-                                    nv_rows, 'The planning discussion has no scope table yet.')
+        dated = [m for m in plan.get('milestones') or [] if (m.get('date') or 'TBD').upper() != 'TBD']
+        miles = ' · '.join(f'{esc(m["name"])}: <strong>{esc(m["date"])}</strong>' for m in dated)
+        nv_title = f'In scope for NV{plan["nv"]}'
+        nv_hint = (f'Items the <a href="{esc(plan["url"])}" target="_blank" rel="noopener">NV{plan["nv"]} planning discussion</a> puts in the proposed scope, '
+                   'with the next step for FIP editors worked out from the FIPs repo and open PRs.'
+                   + (f' {others} other item{"s" if others != 1 else ""} in the discussion {"aren" if others != 1 else "isn"}\'t in scope.' if others else ''))
+        nv_card, nv_count = section('nv', nv_title, nv_hint, ['FIP', 'Item', 'Next step for editors'],
+                                    nv_rows, 'Nothing is marked in scope yet.')
         if miles:
             nv_card = nv_card.replace('<div class="card-body">', f'<div class="card-body"><p class="note" style="margin:0 0 12px">{miles}</p>', 1)
     else:
@@ -486,7 +488,7 @@ def editors_page(ctx, page, fip_a, fmt_date):
                        for lbl, url, d in TOOLS)
              + f'</div>{agenda_html}{editor_list}</div></section>')
 
-    counts = [('nv', f'NV{plan["nv"]} items' if plan else 'Next upgrade', nv_count if plan else '—'),
+    counts = [('nv', f'In NV{plan["nv"]} scope' if plan else 'Next upgrade', nv_count if plan else '—'),
               ('approvals', 'Need editor approval', m0 if reviews is not None else '—'),
               ('ready-draft', 'Ideas ready to draft', m1 if ideas is not None else '—'),
               ('new-proposals', 'New proposals', m2 if ctx.get('prs') is not None else '—'),

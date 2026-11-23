@@ -50,6 +50,14 @@ query($owner: String!, $name: String!) {
 # Markdown table parsing
 # ---------------------------------------------------------------------------
 
+# Scope-lock dates set on the implementers' calls / Core Devs. Anything in an
+# upgrade's proposed scope must be in Last Call (or further) by this date.
+# Update when a new upgrade's lock is agreed.
+SCOPE_LOCK = {
+    30: ('2026-11-25', 'Core Devs #96'),
+}
+
+
 def _cells(line):
     line = line.strip()
     if line.startswith('|'):

@@ -270,6 +270,9 @@ td.nowrap { white-space: nowrap; }
 .pill.changes { background: var(--rejected-bg); color: var(--rejected-fg); border-color: transparent; }
 .pill.waiting { background: var(--lastcall-bg); color: var(--lastcall-fg); border-color: transparent; }
 .pill.est { background: transparent; }
+.pill.progress { background: rgba(0,144,255,.14); color: #005FB3; border-color: transparent; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill.progress { color: #7CC4FF; } }
+:root[data-theme="dark"] .pill.progress { color: #7CC4FF; }
 a.pill.nv-flag { text-decoration: none; margin-left: 4px; font-size: .7rem; vertical-align: middle; }
 a.pill.nv-flag:not(.approved):not(.waiting):not(.changes) { background: var(--draft-bg); color: var(--draft-fg); border-color: transparent; }
 a.pill.nv-flag:hover { filter: brightness(.95); text-decoration: underline; }

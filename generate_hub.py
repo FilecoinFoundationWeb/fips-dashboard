@@ -762,6 +762,105 @@ READY_SHORT = {'ready': 'Ready', 'risk': 'At risk', 'deferred-in': 'Carried over
                'none': 'Not upgrade-bound', 'unknown': '—'}
 
 
+TRACK = {  # key: (pill class, label)
+    'done': ('approved', 'Accepted'),
+    'progress': ('progress', 'In progress'),
+    'risk': ('waiting', 'At risk'),
+    'missed': ('changes', 'Missed scope lock'),
+}
+
+
+def scope_track(row, ctx, now, lock):
+    """Where an in-scope item stands against the scope lock, from the FIPs repo itself.
+
+    Accepted/Final = done; in Last Call = in progress; anything else is at risk
+    until the lock date, and missed after it."""
+    n = row.get('fip')
+    status = None
+    if n:
+        status = (ctx['fips'].get(n) or {}).get('status') or (ctx['files'].get(n) or {}).get('_status')
+    prs = {}
+    for url in row.get('links') or []:
+        m = re.search(r'FIPs/pull/(\d+)', url, re.I)
+        if m:
+            for pr in ctx.get('prs') or []:
+                if pr['number'] == int(m.group(1)):
+                    prs[pr['number']] = pr
+    for pr in (ctx.get('prs_by_fip') or {}).get(n, []) if n else []:
+        prs[pr['number']] = pr
+    lc_pr = next((pr for pr in prs.values()
+                  if re.search(r'last[\s-]?call', f'{pr.get("title") or ""} {pr.get("body") or ""}', re.I)), None)
+    if status in ('Accepted', 'Final'):
+        return 'done', status, f'FIP is {status}.'
+    if status == 'Last Call':
+        w = next((w for w in ctx['open_lc'] if w['number'] == n), None)
+        end = f' Review ends {fmt_date(w["end"])}{" (est.)" if w["estimated_end"] else ""}.' if w else ''
+        return 'progress', 'In Last Call', 'In Last Call.' + end
+    lock_txt = fmt_date(lock) if lock else 'the scope lock'
+    late = lock and now.date() > lock.date()
+    if status:
+        need = (f'Last Call PR <a href="{esc(lc_pr["url"])}" target="_blank" rel="noopener">#{lc_pr["number"]}</a> open; '
+                f'needs merging by {lock_txt}.' if lc_pr else f'Needs to enter Last Call by {lock_txt}.')
+        state = status
+    elif prs:
+        pr = sorted(prs.values(), key=lambda x: x['number'])[0]
+        need = (f'Draft PR <a href="{esc(pr["url"])}" target="_blank" rel="noopener">#{pr["number"]}</a> open; '
+                f'needs merging and Last Call by {lock_txt}.')
+        state = 'Draft PR'
+    else:
+        need = f'No FIP yet; needs a draft and Last Call by {lock_txt}.'
+        state = 'Discussion'
+    if late:
+        return 'missed', state, f'Not in Last Call by {lock_txt}.'
+    return 'risk', state, need
+
+
+def scope_tracker_html(p, ctx, now):
+    """The in-scope items for one upgrade, tracked against its scope lock."""
+    rows = [r for r in p['scope'] if editors.in_scope(r)]
+    if not rows:
+        return '', {}
+    lock_date, lock_where = sp.SCOPE_LOCK.get(p['nv'], (None, None))
+    lock = datetime.fromisoformat(lock_date).replace(tzinfo=timezone.utc) if lock_date else None
+    tracked = {}
+    body = []
+    for r in rows:
+        key, state, need = scope_track(r, ctx, now, lock)
+        tracked[id(r)] = key
+        cls, label = TRACK[key]
+        name = esc(r['name'])
+        if r['fip']:
+            name = re.sub(r'FIP-?\d+', fip_a(r['fip']), name, count=1)
+        elif r['link']:
+            name = f'<a href="{esc(r["link"])}" target="_blank" rel="noopener">{name}</a>'
+        body.append(f'<tr><td class="nowrap"><span class="pill {cls}">{label}</span></td>'
+                    f'<td class="title-cell">{name}</td><td class="nowrap small">{esc(state)}</td><td class="small">{need}</td></tr>')
+    order = {'missed': 0, 'risk': 1, 'progress': 2, 'done': 3}
+    body = [b for _, b in sorted(zip([order[tracked[id(r)]] for r in rows], body), key=lambda x: x[0])]
+    counts = {}
+    for k in tracked.values():
+        counts[k] = counts.get(k, 0) + 1
+    on_track = counts.get('done', 0) + counts.get('progress', 0)
+    if lock:
+        days = (lock.date() - now.date()).days
+        when = ('today' if days == 0 else f'in {days} day{"s" if days != 1 else ""}' if days > 0
+                else f'{-days} day{"s" if days != -1 else ""} ago')
+        lock_line = (f'<strong>Scope lock: {fmt_date(lock)}</strong> ({when}{", " + esc(lock_where) if lock_where else ""}). '
+                     'Anything in scope must be in Last Call by then.')
+    else:
+        lock_line = 'No scope-lock date recorded yet.'
+    summary = (f'{on_track} of {len(rows)} in Last Call or Accepted'
+               + (f' · {counts["risk"]} at risk' if counts.get('risk') else '')
+               + (f' · {counts["missed"]} missed the lock' if counts.get('missed') else ''))
+    html = (f'<h3 class="sub-h">In scope: tracking to the scope lock</h3>'
+            f'<p class="small" style="margin:4px 0 8px">{lock_line} {summary}.</p>'
+            '<div class="table-scroll"><table class="data"><thead><tr><th>Track</th><th>In scope</th>'
+            '<th>FIPs repo</th><th>What\'s needed</th></tr></thead><tbody>' + ''.join(body) + '</tbody></table></div>'
+            '<p class="note">Track comes from each FIP\'s status in the FIPs repo: Accepted = done, in Last Call = in progress, '
+            'anything earlier = at risk until the scope lock. "In scope" follows the planning discussion.</p>')
+    return html, tracked
+
+
 def scope_planning_card(ctx):
     """Scope planning for upgrades that haven't shipped yet, from the core-devs planning discussions."""
     planning = ctx.get('planning')
@@ -778,10 +877,13 @@ def scope_planning_card(ctx):
         return ''
     sections = []
     for p in plans:
+        tracker, tracked = scope_tracker_html(p, ctx, now)
         counts = {}
         for r in p['scope']:
-            counts[r['readiness']] = counts.get(r['readiness'], 0) + 1
-        tally = ' · '.join(f'{n} {READY_SHORT[k].lower()}' for k, n in counts.items() if k != 'unknown')
+            label = TRACK[tracked[id(r)]][1] if id(r) in tracked else READY_SHORT[r['readiness']]
+            if r['readiness'] != 'unknown' or id(r) in tracked:
+                counts[label] = counts.get(label, 0) + 1
+        tally = ' · '.join(f'{n} {k.lower()}' for k, n in counts.items())
         rows = []
         for r in p['scope']:
             name = esc(r['name'])
@@ -789,16 +891,24 @@ def scope_planning_card(ctx):
                 name = re.sub(r'FIP-?\d+', fip_a(r['fip']), name, count=1)
             elif r['link']:
                 name = f'<a href="{esc(r["link"])}" target="_blank" rel="noopener">{name}</a>'
-            pill = f'<span class="pill {READY_PILL[r["readiness"]]}" title="{esc(r["readiness_label"])}">{READY_SHORT[r["readiness"]]}</span>'
+            if id(r) in tracked:
+                cls, label = TRACK[tracked[id(r)]]
+                pill = f'<span class="pill {cls}" title="In scope; tracked against the FIPs repo">{label}</span>'
+            else:
+                pill = f'<span class="pill {READY_PILL[r["readiness"]]}" title="{esc(r["readiness_label"])}">{READY_SHORT[r["readiness"]]}</span>'
             summary = f'<div class="muted small">{esc(r["summary"][:220])}</div>' if r['summary'] else ''
             notes = f'<div class="small" style="margin-top:4px"><strong>Open:</strong> {esc(r["notes"][:200])}</div>' if r['notes'] else ''
             rows.append(f'<tr><td class="nowrap">{pill}</td><td class="title-cell">{name}{summary}{notes}</td>'
                         f'<td class="small">{esc(r["status"])}</td><td class="small">{esc(r["timeline"])}</td>'
                         f'<td class="num">{esc(r["size"]) or "<span class=muted>—</span>"}</td></tr>')
         table = ('<div class="table-scroll"><table class="data"><thead><tr><th>Readiness</th><th>Candidate</th>'
-                 '<th>Status &amp; progress</th><th>Timeline</th><th class="num">Size</th></tr></thead><tbody>'
+                 '<th>Status &amp; progress (planning discussion)</th><th>Timeline</th><th class="num">Size</th></tr></thead><tbody>'
                  + ''.join(rows) + '</tbody></table></div>') if rows else \
             '<p class="empty">No scope table in the planning discussion yet.</p>'
+        if tracker and rows:
+            table = (f'<details class="more" style="margin-top:14px"><summary>All {len(rows)} candidates in the planning discussion</summary>'
+                     f'{table}</details>')
+        table = tracker + table
         ms = ''.join(f'<li><span>{esc(m["name"])}</span><strong>{esc(m["date"])}</strong></li>' for m in p['milestones'])
         ms_html = f'<h3 class="sub-h">Milestones</h3><ul class="milestones">{ms}</ul>' if ms else ''
         naming = f'<p class="small" style="margin-top:10px"><strong>Name:</strong> {esc(p["naming"])}</p>' if p['naming'] else ''

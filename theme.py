@@ -552,6 +552,26 @@ CORGI_SVG = """
 </svg>
 """
 
+# Holiday season: the corgi wears a Santa hat from Nov 20 to Jan 6 (build date,
+# UTC). The site rebuilds every 6 hours, so the hat comes and goes on its own.
+SANTA_HAT = """    <!-- Santa hat -->
+    <g class="santa-hat">
+      <path d="M113 23 C113 11 107 5 99 4 C114 -4 133 2 143 21 Z" fill="#D62828"/>
+      <path d="M119 19 C119 11 114 6 107 4" stroke="#A4161A" stroke-width="1.6" fill="none" opacity=".7"/>
+      <rect x="110" y="17" width="35" height="9" rx="4.5" fill="#FFFFFF" transform="rotate(-6 128 21)"/>
+      <circle cx="99" cy="4" r="5" fill="#FFFFFF"/>
+    </g>
+"""
+
+
+def holiday_season(now=None):
+    d = (now or datetime.now(timezone.utc)).date()
+    return d.month == 12 or (d.month == 11 and d.day >= 20) or (d.month == 1 and d.day <= 6)
+
+
+if holiday_season():
+    CORGI_SVG = CORGI_SVG.replace('    </g>\n  </g>\n</svg>', SANTA_HAT + '    </g>\n  </g>\n</svg>', 1)
+
 # GitHub Pages serves pages with a 10-minute browser cache that can't be
 # changed. On load, re-fetch this page from the network (cache: 'reload' also
 # refreshes the browser's cached copy) and, if a newer build exists, reload

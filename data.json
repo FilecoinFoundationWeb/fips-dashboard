@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-22T19:18:33Z",
+ "generated_at": "2026-11-23T06:56:39Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -3963,8 +3963,8 @@
   {
    "number": "0122",
    "title": "Size the miner actor's reward-derived charges (faults) by the consensus weight",
-   "status": "Draft",
-   "file_status": "Draft",
+   "status": "Last Call",
+   "file_status": "Last Call",
    "type": "Technical (Core)",
    "category": "Core",
    "authors": "Luca Nizzardo (@lucaniz), Irene Giacomelli (@irenegia)",
@@ -3972,15 +3972,24 @@
    "discussions": [
     "https://github.com/filecoin-project/FIPs/discussions/1302"
    ],
-   "status_since": "2026-11-17T14:47:56Z",
+   "status_since": "2026-11-22T23:53:21Z",
    "history": [
     {
      "status": "Draft",
      "since": "2026-11-17T14:47:56Z",
      "commit": "c8b6fffc647cd0d73b19be712e955ff1287c5c1a"
+    },
+    {
+     "status": "Last Call",
+     "since": "2026-11-22T23:53:21Z",
+     "commit": "ac7971b7d637bbfde849e560a33b0087cd4f6d7e"
     }
    ],
-   "last_call": null,
+   "last_call": {
+    "start": "2026-11-22T23:53:21Z",
+    "end": "2026-12-06T23:53:21Z",
+    "estimated_end": true
+   },
    "network_upgrade": null,
    "mentions": [
     "Storage providers",

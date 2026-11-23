@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-23T06:56:39Z",
+ "generated_at": "2026-11-23T15:00:44Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -3893,8 +3893,8 @@
   {
    "number": "0119",
    "title": "Increase maximum sector lifetime to 10 years",
-   "status": "Last Call",
-   "file_status": "Last Call",
+   "status": "Accepted",
+   "file_status": "Accepted",
    "type": "Technical (Core)",
    "category": "Core",
    "authors": "Luca Nizzardo (@lucaniz)",
@@ -3902,7 +3902,7 @@
    "discussions": [
     "https://github.com/filecoin-project/FIPs/discussions/1291"
    ],
-   "status_since": "2026-11-04T00:48:55Z",
+   "status_since": "2026-11-23T11:55:56Z",
    "history": [
     {
      "status": "Draft",
@@ -3913,13 +3913,14 @@
      "status": "Last Call",
      "since": "2026-11-04T00:48:55Z",
      "commit": "191324e6b2e4bd4ea6ea46bab4191c4ec063aaff"
+    },
+    {
+     "status": "Accepted",
+     "since": "2026-11-23T11:55:56Z",
+     "commit": "59b208dae3061476c5ead6d509fed7c5480696b9"
     }
    ],
-   "last_call": {
-    "start": "2026-11-04T00:48:55Z",
-    "end": "2026-11-18T00:48:55Z",
-    "estimated_end": true
-   },
+   "last_call": null,
    "network_upgrade": null,
    "mentions": [
     "Storage providers",

@@ -824,9 +824,17 @@ def scope_tracker_html(p, ctx, now):
     lock = datetime.fromisoformat(lock_date).replace(tzinfo=timezone.utc) if lock_date else None
     tracked = {}
     body = []
-    for r in rows:
+    # A planning row can still say FIP-XXXX after its draft is merged and numbered,
+    # so match unnumbered rows to a FIP by title (ignoring "(or a variant)" and the like).
+    by_title = {sp._norm_title(f.get('title')): num for num, f in ctx['fips'].items() if f.get('title')}
+    for orig in rows:
+        r = orig
+        if not r.get('fip'):
+            num = by_title.get(sp._norm_title(re.sub(r'\(.*?\)', '', r['name'])))
+            if num:
+                r = dict(r, fip=num, name=re.sub(r'^\s*FIP-?X+', 'FIP-' + num, r['name'], flags=re.I))
         key, state, need = scope_track(r, ctx, now, lock)
-        tracked[id(r)] = key
+        tracked[id(orig)] = key
         cls, label = TRACK[key]
         name = esc(r['name'])
         if r['fip']:

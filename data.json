@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-23T23:40:44Z",
+ "generated_at": "2026-11-24T09:22:42Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -3933,8 +3933,8 @@
   {
    "number": "0121",
    "title": "Remove the Fil+ Actors (f06, f07, f080)",
-   "status": "Draft",
-   "file_status": "Draft",
+   "status": "Last Call",
+   "file_status": "Last Call",
    "type": "Technical",
    "category": "Core",
    "authors": "Rod Vagg (@rvagg)",
@@ -3942,15 +3942,24 @@
    "discussions": [
     "https://github.com/filecoin-project/FIPs/discussions/1300"
    ],
-   "status_since": "2026-11-05T04:16:44Z",
+   "status_since": "2026-11-24T04:11:44Z",
    "history": [
     {
      "status": "Draft",
      "since": "2026-11-05T04:16:44Z",
      "commit": "d9f473c4d8a7c23ea76ea06705e33e720a1b7372"
+    },
+    {
+     "status": "Last Call",
+     "since": "2026-11-24T04:11:44Z",
+     "commit": "929ffbf66f9a46f89b6ba7a9e15aa5b7c8e46d98"
     }
    ],
-   "last_call": null,
+   "last_call": {
+    "start": "2026-11-24T04:11:44Z",
+    "end": "2026-12-08T04:11:44Z",
+    "estimated_end": true
+   },
    "network_upgrade": null,
    "mentions": [
     "Storage providers",
@@ -3998,6 +4007,37 @@
    ],
    "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0122.md",
    "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0122.html"
+  },
+  {
+   "number": "0123",
+   "title": "Actor Type Indirection in the State Tree",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg)",
+   "created": "2026-11-09",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1090"
+   ],
+   "status_since": "2026-11-24T04:10:12Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-11-24T04:10:12Z",
+     "commit": "22884d153a07120c0e4fbb87851df5a17f7b6a74"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Storage providers",
+    "Clients and data onboarding",
+    "Smart contract developers",
+    "RPC and tooling"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0123.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0123.html"
   }
  ],
  "frcs": [

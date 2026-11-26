@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-25T21:27:54Z",
+ "generated_at": "2026-11-26T07:47:02Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -4011,8 +4011,8 @@
   {
    "number": "0123",
    "title": "Actor Type Indirection in the State Tree",
-   "status": "Draft",
-   "file_status": "Draft",
+   "status": "Last Call",
+   "file_status": "Last Call",
    "type": "Technical",
    "category": "Core",
    "authors": "Rod Vagg (@rvagg)",
@@ -4020,15 +4020,24 @@
    "discussions": [
     "https://github.com/filecoin-project/FIPs/discussions/1090"
    ],
-   "status_since": "2026-11-24T04:10:12Z",
+   "status_since": "2026-11-26T00:09:06Z",
    "history": [
     {
      "status": "Draft",
      "since": "2026-11-24T04:10:12Z",
      "commit": "22884d153a07120c0e4fbb87851df5a17f7b6a74"
+    },
+    {
+     "status": "Last Call",
+     "since": "2026-11-26T00:09:06Z",
+     "commit": "9d7a9d961d20e2b2cae91e70caa22eb9edd3376c"
     }
    ],
-   "last_call": null,
+   "last_call": {
+    "start": "2026-11-26T00:09:06Z",
+    "end": "2026-12-10T00:09:06Z",
+    "estimated_end": true
+   },
    "network_upgrade": null,
    "mentions": [
     "Storage providers",

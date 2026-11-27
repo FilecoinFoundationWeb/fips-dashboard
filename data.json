@@ -1,6 +1,6 @@
 {
  "about": "Filecoin FIPs and network upgrades from the public records in filecoin-project/FIPs and filecoin-project/core-devs, plus FRCs (standards that share the FIP numbering). Unofficial; the repos are the authority. \"mentions\" lists groups the FIP text mentions, not an impact assessment.",
- "generated_at": "2026-11-26T21:15:52Z",
+ "generated_at": "2026-11-27T07:46:11Z",
  "site": "https://filecoinfoundationweb.github.io/fips-dashboard/",
  "fips": [
   {
@@ -4047,6 +4047,34 @@
    ],
    "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0123.md",
    "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0123.html"
+  },
+  {
+   "number": "0124",
+   "title": "Disable creation of payment channel actors",
+   "status": "Draft",
+   "file_status": "Draft",
+   "type": "Technical",
+   "category": "Core",
+   "authors": "Rod Vagg (@rvagg), Mayank (@LexLuthr), Steve Loeppky (@BigLep)",
+   "created": "2026-11-24",
+   "discussions": [
+    "https://github.com/filecoin-project/FIPs/discussions/1290"
+   ],
+   "status_since": "2026-11-27T00:28:08Z",
+   "history": [
+    {
+     "status": "Draft",
+     "since": "2026-11-27T00:28:08Z",
+     "commit": "fc29f93ffedc947c3aebb46b730542df8dc46fac"
+    }
+   ],
+   "last_call": null,
+   "network_upgrade": null,
+   "mentions": [
+    "Smart contract developers"
+   ],
+   "file_url": "https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0124.md",
+   "page_url": "https://filecoinfoundationweb.github.io/fips-dashboard/fip/0124.html"
   }
  ],
  "frcs": [
